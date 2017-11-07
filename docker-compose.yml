@@ -1,0 +1,24 @@
+#
+# Extra-services, deployed to tools.rm3l.org
+#
+
+version: '3.3'
+
+services:
+  #
+  # Reverse Proxy
+  #
+  reverse-proxy:
+    build: ./reverse-proxy
+    ports:
+      - "5180:8080"
+    labels:
+      org.rm3l.services.service_name: "reverse-proxy"
+      org.rm3l.services.service_description: "Microservice for proxying requests to any other remote server"
+      org.rm3l.services.service_url: "http://tools.rm3l.org:5180"
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8080/health"]
+      interval: 1m30s
+      timeout: 10s
+      retries: 3
+    restart: always
