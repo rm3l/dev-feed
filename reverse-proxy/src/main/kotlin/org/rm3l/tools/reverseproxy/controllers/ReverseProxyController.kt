@@ -31,11 +31,13 @@ class ReverseProxyController(restTemplateBuilder: RestTemplateBuilder) {
 
         val requester = request.remoteAddr?:request.getHeader(X_FORWARDED_FOR)
 
-        logger.info("POST /proxy - " +
-                "origin=${requester?:"???"}, " +
-                "user-agent=[${request.getHeader("user-agent")}], " +
-                "content-type=[${request.contentType}] - " +
-                "payload=$proxyData")
+        if (logger.isDebugEnabled) {
+            logger.debug("POST /proxy - " +
+                    "origin=${requester ?: "???"}, " +
+                    "user-agent=[${request.getHeader("user-agent")}], " +
+                    "content-type=[${request.contentType}] - " +
+                    "payload=$proxyData")
+        }
 
         val targetHost = proxyData.targetHost?:"${request.scheme}://${request.serverName}:${request.serverPort}"
         val requestHeaders: MutableMap<String, List<String>> = mutableMapOf(
