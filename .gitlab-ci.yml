@@ -3,14 +3,15 @@ stages:
   - deploy
 
 before_script:
-  - apt-get update -y
+  - apk update || apt-get update -y
+
   # For CD pipeline
   # Install ssh-agent if not already installed, it is required by Docker.
   # (change apt-get to yum if you use a CentOS-based image)
-  - 'which ssh-agent || apt-get install openssh-client -y'
+  - 'which ssh-agent || apk add openssh || apt-get install openssh-client -y'
 
   # Run ssh-agent (inside the build environment)
-  - ssh-add <(echo "$SSH_PRIVATE_KEY")
+  - echo "$SSH_PRIVATE_KEY" | ssh-add -
 
   # For Docker builds disable host key checking. Be aware that by adding that
   # you are suspectible to man-in-the-middle attacks.
@@ -24,10 +25,10 @@ before_script:
   - mkdir -p ~/.ssh
   - '[[ -f /.dockerenv ]] && echo "$SSH_SERVER_HOSTKEYS" > ~/.ssh/known_hosts'
 
-  - 'which rsync || apt-get install rsync -y'
+  - 'which rsync || apk add rsync || apt-get install rsync -y'
 
 build-reverse-proxy:
-  image: openjdk:8-jdk
+  image: openjdk:8-jdk-alpine
   stage: build
   script:
     - cd reverse-proxy && chmod +x ./gradlew && ./gradlew build
@@ -38,7 +39,7 @@ build-reverse-proxy:
     - reverse-proxy/build/test-results
 
 production_backend:
-  image: debian:jessie
+  image: alpine:3.6
   stage: deploy
   script:
     - ssh -p 1022 ci@rm3l.org "mkdir -p /home/ci/Backend"
