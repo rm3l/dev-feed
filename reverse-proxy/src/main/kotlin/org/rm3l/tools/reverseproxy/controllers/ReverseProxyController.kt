@@ -13,6 +13,7 @@ import org.springframework.web.client.UnknownHttpStatusCodeException
 import java.util.*
 import javax.servlet.http.HttpServletRequest
 
+const val USER_AGENT = "user-agent"
 const val X_FORWARDED_FOR = "X-Forwarded-For"
 const val X_FORWARDED_HOST = "X-Forwarded-Host"
 const val X_FORWARDED_PROTO = "X-Forwarded-Proto"
@@ -34,7 +35,7 @@ class ReverseProxyController(restTemplateBuilder: RestTemplateBuilder) {
         if (logger.isDebugEnabled) {
             logger.debug("POST /proxy - " +
                     "origin=${requester ?: "???"}, " +
-                    "user-agent=[${request.getHeader("user-agent")}], " +
+                    "user-agent=[${request.getHeader(USER_AGENT)}], " +
                     "content-type=[${request.contentType}] - " +
                     "payload=$proxyData")
         }
