@@ -3,12 +3,13 @@ stages:
   - deploy
 
 before_script:
-  - '[[ -f ./gradlew ]] && chmod +x ./gradlew'
-
+  - apk update
+  
   # For CD pipeline
   # Install ssh-agent if not already installed, it is required by Docker.
   # (change apt-get to yum if you use a CentOS-based image)
-  - 'which ssh-agent || ( apt-get update -y && apt-get install openssh-client -y )'
+
+  - 'which ssh-agent || apk add openssh'
 
   # Run ssh-agent (inside the build environment)
   - eval $(ssh-agent -s)
@@ -28,10 +29,10 @@ before_script:
   - mkdir -p ~/.ssh
   - '[[ -f /.dockerenv ]] && echo "$SSH_SERVER_HOSTKEYS" > ~/.ssh/known_hosts'
 
-  - 'which rsync || (apt-get update -y && apt-get install rsync -y )'
+  - 'which rsync || apk add rsync'
 
 build-reverse-proxy:
-  image: openjdk:8-jdk
+  image: openjdk:8-jdk-alpine
   stage: build
   script:
     - cd reverse-proxy && chmod +x ./gradlew && ./gradlew build
