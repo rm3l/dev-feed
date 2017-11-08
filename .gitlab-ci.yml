@@ -31,15 +31,15 @@ before_script:
   - 'which rsync || (apt-get update -y && apt-get install rsync -y )'
 
 build-reverse-proxy:
-  image: openjdk:8-jdk-alpine
+  image: openjdk:8-jdk
   stage: build
   script:
     - cd reverse-proxy && chmod +x ./gradlew && ./gradlew build
   artifacts:
     paths:
-    - build/libs
-    - build/reports
-    - build/test-results
+    - reverse-proxy/build/libs
+    - reverse-proxy/build/reports
+    - reverse-proxy/build/test-results
 
 production_backend:
   image: debian:jessie
