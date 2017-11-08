@@ -30,7 +30,7 @@ class ReverseProxyController {
     @PostMapping(value = "/proxy")
     @ResponseBody
     fun proxyRequest(@RequestBody(required = true) proxyData: ProxyData,
-                     request: HttpServletRequest): ResponseEntity<String> {
+                     request: HttpServletRequest): ResponseEntity<*> {
 
         val requester = request.remoteAddr?:request.getHeader(X_FORWARDED_FOR)
 

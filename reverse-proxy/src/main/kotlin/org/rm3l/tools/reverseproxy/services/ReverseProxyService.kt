@@ -1,14 +1,14 @@
 package org.rm3l.tools.reverseproxy.services
 
-import com.google.common.cache.Cache
-import com.google.common.cache.CacheBuilder
 import org.rm3l.tools.reverseproxy.controllers.X_FORWARDED_FOR
 import org.rm3l.tools.reverseproxy.controllers.X_FORWARDED_HOST
 import org.rm3l.tools.reverseproxy.controllers.X_FORWARDED_PROTO
 import org.rm3l.tools.reverseproxy.resources.ProxyData
 import org.slf4j.LoggerFactory
-import org.springframework.beans.factory.annotation.Value
+import org.springframework.beans.factory.annotation.Qualifier
 import org.springframework.boot.web.client.RestTemplateBuilder
+import org.springframework.cache.Cache
+import org.springframework.cache.CacheManager
 import org.springframework.http.HttpEntity
 import org.springframework.http.HttpHeaders
 import org.springframework.http.HttpMethod
@@ -19,25 +19,21 @@ import javax.annotation.PostConstruct
 import javax.servlet.http.HttpServletRequest
 
 @Service
-class ReverseProxyService(restTemplateBuilder: RestTemplateBuilder) {
+class ReverseProxyService(@Qualifier("proxyResponseCacheManager") private val cacheManager: CacheManager,
+                          restTemplateBuilder: RestTemplateBuilder) {
 
     private val logger = LoggerFactory.getLogger(ReverseProxyService::class.java)
 
     private val restTemplate = restTemplateBuilder.build()
 
-    @Value("\${cache.size:100000}")
-    private val cacheSize: Long = 100000
-
-    private var cache: Cache<String, ResponseEntity<String>>? = null
+    private var proxyResponseCache : Cache? = null
 
     @PostConstruct
     fun init() {
-        cache = CacheBuilder.newBuilder()
-        .maximumSize(cacheSize)
-                .build()
+        proxyResponseCache = cacheManager.getCache("proxyResponseCache")
     }
 
-    fun exchangeWithRemoteServer(request: HttpServletRequest, proxyData: ProxyData): ResponseEntity<String> {
+    fun exchangeWithRemoteServer(request: HttpServletRequest, proxyData: ProxyData): ResponseEntity<*> {
         val targetHost = proxyData.targetHost?:"${request.scheme}://${request.serverName}:${request.serverPort}"
         val requestHeaders: MutableMap<String, List<String>> = mutableMapOf(
                 X_FORWARDED_FOR to setOf(request.remoteAddr?:request.getHeader(X_FORWARDED_FOR)?:"").toList(),
@@ -55,17 +51,17 @@ class ReverseProxyService(restTemplateBuilder: RestTemplateBuilder) {
             logger.debug(">>> $requestStr")
         }
 
-        val responseEntity: ResponseEntity<String>
-        val responseEntityFromCache = cache?.getIfPresent(targetHost)
+        val responseEntity: ResponseEntity<*>
+        val responseEntityFromCache = proxyResponseCache?.get(targetHost)
         if (proxyData.forceRequest == true || responseEntityFromCache == null) {
             responseEntity = this.restTemplate.exchange(targetHost,
                     HttpMethod.resolve((proxyData.requestMethod?:RequestMethod.GET).name),
                     requestEntity,
                     String::class.java,
                     proxyData.requestParams ?: emptyMap<String, String>())
-            cache?.put(targetHost, responseEntity)
+            proxyResponseCache?.put(targetHost, responseEntity)
         } else {
-            responseEntity = responseEntityFromCache
+            responseEntity = responseEntityFromCache.get() as ResponseEntity<*>
         }
 
         if (logger.isDebugEnabled) {
