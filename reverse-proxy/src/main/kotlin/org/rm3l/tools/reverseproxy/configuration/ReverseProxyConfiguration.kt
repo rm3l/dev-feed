@@ -11,6 +11,7 @@ class ReverseProxyConfiguration {
     fun requestLoggingFilter(): CommonsRequestLoggingFilter {
         val loggingFilter = CommonsRequestLoggingFilter()
         loggingFilter.setIncludeClientInfo(true)
+        loggingFilter.isIncludeHeaders = true
         loggingFilter.setIncludeQueryString(true)
         loggingFilter.setIncludePayload(true)
         return loggingFilter
