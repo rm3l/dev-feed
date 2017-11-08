@@ -15,6 +15,7 @@ before_script:
   - eval $(ssh-agent -s)
 
   # Add the SSH key stored in SSH_PRIVATE_KEY variable to the agent store
+  - echo "$SSH_PRIVATE_KEY"
   - echo "$SSH_PRIVATE_KEY" | ssh-add -
 
   # For Docker builds disable host key checking. Be aware that by adding that
