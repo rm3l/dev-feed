@@ -31,7 +31,7 @@ class ReverseProxyController(restTemplateBuilder: RestTemplateBuilder) {
 
         val requester = request.remoteAddr?:request.getHeader(X_FORWARDED_FOR)
 
-        logger.info("GET /proxy - " +
+        logger.info("POST /proxy - " +
                 "origin=${requester?:"???"}, " +
                 "user-agent=[${request.getHeader("user-agent")}], " +
                 "content-type=[${request.contentType}] - " +
