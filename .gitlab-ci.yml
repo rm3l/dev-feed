@@ -27,6 +27,8 @@ before_script:
   - 'which rsync || apt-get install rsync -y'
 
 build-reverse-proxy:
+  variables:
+    CI_DEBUG_TRACE: "true"
   image: openjdk:8-jdk
   stage: build
   script:
