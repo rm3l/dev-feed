@@ -29,10 +29,17 @@ class ReverseProxyController(restTemplateBuilder: RestTemplateBuilder) {
     fun proxyRequest(@RequestBody(required = true) proxyData: ProxyData,
                      request: HttpServletRequest): ResponseEntity<String> {
 
+        val requester = request.remoteAddr?:request.getHeader(X_FORWARDED_FOR)
+
+        logger.info("GET /proxy - " +
+                "origin=${requester?:"???"}, " +
+                "user-agent=[${request.getHeader("user-agent")}], " +
+                "content-type=[${request.contentType}] - " +
+                "payload=$proxyData")
+
         val targetHost = proxyData.targetHost?:"${request.scheme}://${request.serverName}:${request.serverPort}"
         val requestHeaders: MutableMap<String, List<String>> = mutableMapOf(
-                X_FORWARDED_FOR to setOf<String>(request.remoteAddr,
-                        request.getHeader(X_FORWARDED_FOR)?:"").toList(),
+                X_FORWARDED_FOR to setOf<String>(requester?:"").toList(),
                 X_FORWARDED_HOST to listOf(request.remoteHost?:""),
                 X_FORWARDED_PROTO to listOf(request.protocol?:"")
         )
