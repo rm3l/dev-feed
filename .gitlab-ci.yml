@@ -43,7 +43,7 @@ production_backend:
   stage: deploy
   script:
     - ssh -p 1022 ci@rm3l.org "mkdir -p /home/ci/Backend"
-    - rsync -ravz -e 'ssh -p 1022' --exclude='.git/' --exclude='.gitlab-ci.yml' --exclude='.gradle' --exclude='build' --delete-excluded ./tools ci@rm3l.org:/home/ci/Backend
+    - rsync -ravz -e 'ssh -p 1022' --exclude='.git/' --exclude='.gitlab-ci.yml' --exclude='**/.gradle' --exclude='**/build' --exclude='**/out' --delete-excluded . ci@rm3l.org:/home/ci/Backend
     - ssh -p 1022 ci@rm3l.org "cd /home/ci/Backend && docker-compose -p backend up -d --build"
   only:
     - master
