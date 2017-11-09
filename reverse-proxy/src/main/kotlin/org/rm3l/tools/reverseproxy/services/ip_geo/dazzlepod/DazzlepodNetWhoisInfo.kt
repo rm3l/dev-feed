@@ -18,6 +18,7 @@ import org.rm3l.tools.reverseproxy.resources.ip_geo.NetWhoisInfo
 * "organization": "GOOGLE - Google Inc.,US"
 * }
 */
+@Suppress("MemberVisibilityCanPrivate")
 @JsonIgnoreProperties(ignoreUnknown = true)
 data class DazzlepodNetWhoisInfo(val ip: String? = null,
                                  val prefix: String? = null,
@@ -29,4 +30,19 @@ data class DazzlepodNetWhoisInfo(val ip: String? = null,
                                  val hostname: String? = null,
                                  val longitude: String? = null,
                                  val latitude: String? = null,
-                                 val organization: String? = null): NetWhoisInfo
+                                 val organization: String? = null): NetWhoisInfo {
+
+    override fun isNone(): Boolean {
+        return asn == null
+                && city == null
+                && country == null
+                && country_code == null
+                && hostname == null
+                && ip == null
+                && latitude == null
+                && longitude == null
+                && organization == null
+                && prefix == null
+                && region == null
+    }
+}

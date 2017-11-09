@@ -71,7 +71,7 @@ class ReverseProxyController(val objectMapper: ObjectMapper): ApplicationContext
                 .map { it to ProxyData(targetHost = ipGeolocationService.getTargetUrl(it)) }
                 .map { it.first to reverseProxyService.exchangeWithRemoteServer(request, it.second).body.toString()}
                 .map { it.first to objectMapper.readValue(it.second, ipGeolocationService.getResponseType()) }
-                .map { NetWhoisInfoApiResponse(it.first, it.second) }
+                .map { NetWhoisInfoApiResponse(it.first, if (it.second.isNone()) null else it.second) }
                 .toList()
     }
 }
