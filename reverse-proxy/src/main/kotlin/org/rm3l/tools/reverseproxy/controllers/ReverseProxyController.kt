@@ -1,11 +1,17 @@
 package org.rm3l.tools.reverseproxy.controllers
 
 import com.fasterxml.jackson.annotation.JsonIgnore
+import com.fasterxml.jackson.databind.ObjectMapper
 import org.rm3l.tools.reverseproxy.resources.ProxyData
+import org.rm3l.tools.reverseproxy.resources.ip_geo.NetWhoisInfoApiResponse
 import org.rm3l.tools.reverseproxy.services.ReverseProxyService
+import org.rm3l.tools.reverseproxy.services.ip_geo.IPGeolocationService
 import org.rm3l.tools.reverseproxy.utils.getRootCause
 import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.beans.factory.annotation.Value
+import org.springframework.context.ApplicationContext
+import org.springframework.context.ApplicationContextAware
 import org.springframework.http.*
 import org.springframework.web.bind.annotation.*
 import org.springframework.web.client.*
@@ -18,13 +24,23 @@ const val X_FORWARDED_HOST = "X-Forwarded-Host"
 const val X_FORWARDED_PROTO = "X-Forwarded-Proto"
 
 @RestController
-class ReverseProxyController {
+class ReverseProxyController(val objectMapper: ObjectMapper): ApplicationContextAware {
 
     private val logger = LoggerFactory.getLogger(ReverseProxyController::class.java)
+
+    private lateinit var applicationContext: ApplicationContext
+
+    @Value("\${service.ipGeolocation}")
+    private var ipGeolocationServiceName: String? = null
+
+    override fun setApplicationContext(applicationContext: ApplicationContext?) {
+        this.applicationContext = applicationContext!!
+    }
 
     @Autowired
     lateinit var reverseProxyService: ReverseProxyService
 
+    //General-purpose service
     @PostMapping(value = "/proxy")
     @ResponseBody
     fun proxyRequest(@RequestBody(required = true) proxyData: ProxyData,
@@ -43,6 +59,21 @@ class ReverseProxyController {
         return reverseProxyService.exchangeWithRemoteServer(request, proxyData)
     }
 
+    //Specific: IP Geo Lookup service
+    @PostMapping(value = "/proxy/networkGeoLocation")
+    @ResponseBody
+    @ResponseStatus(HttpStatus.CREATED)
+    fun geoLookupIP(@RequestBody(required = true) ipsOrHosts: Set<String>,
+                    request: HttpServletRequest): Collection<NetWhoisInfoApiResponse> {
+        val ipGeolocationService = applicationContext
+                .getBean(this.ipGeolocationServiceName, IPGeolocationService::class.java)
+        return ipsOrHosts
+                .map { it to ProxyData(targetHost = ipGeolocationService.getTargetUrl(it)) }
+                .map { it.first to reverseProxyService.exchangeWithRemoteServer(request, it.second).body.toString()}
+                .map { it.first to objectMapper.readValue(it.second, ipGeolocationService.getResponseType()) }
+                .map { NetWhoisInfoApiResponse(it.first, it.second) }
+                .toList()
+    }
 }
 
 @RestControllerAdvice

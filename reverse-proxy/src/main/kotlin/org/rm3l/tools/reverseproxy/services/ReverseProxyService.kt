@@ -34,7 +34,7 @@ class ReverseProxyService(@Qualifier("proxyResponseCacheManager") private val ca
     }
 
     fun exchangeWithRemoteServer(request: HttpServletRequest, proxyData: ProxyData): ResponseEntity<*> {
-        val targetHost = proxyData.targetHost?:"${request.scheme}://${request.serverName}:${request.serverPort}"
+        val targetHost = ProxyData.resolveTargetHost(proxyData, request)
         val requestHeaders: MutableMap<String, List<String>> = mutableMapOf(
                 X_FORWARDED_FOR to setOf(request.remoteAddr?:request.getHeader(X_FORWARDED_FOR)?:"").toList(),
                 X_FORWARDED_HOST to listOf(request.remoteHost?:""),

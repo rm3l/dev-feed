@@ -51,8 +51,9 @@ dependencies {
 	compile("org.jetbrains.kotlin:kotlin-reflect:${kotlinVersion}")
 	compile 'com.github.ben-manes.caffeine:caffeine:2.6.0'
 	compile 'com.squareup.okhttp3:okhttp:3.9.0'
+	compile "com.fasterxml.jackson.module:jackson-module-kotlin:2.9.0"
 	runtime('org.springframework.boot:spring-boot-devtools')
-	optional "org.springframework.boot:spring-boot-configuration-processor"
+	optional "org.springframework.boot:spring-boot-configuration-processor" //requires 'propdeps 'plugin
 	testCompile('org.springframework.boot:spring-boot-starter-test')
 	testCompile('org.springframework.security:spring-security-test')
 }
