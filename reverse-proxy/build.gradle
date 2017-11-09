@@ -5,12 +5,21 @@ buildscript {
 	}
 	repositories {
 		mavenCentral()
+		maven { url 'http://repo.spring.io/plugins-release' }
 	}
 	dependencies {
 		classpath("org.springframework.boot:spring-boot-gradle-plugin:${springBootVersion}")
 		classpath("org.jetbrains.kotlin:kotlin-gradle-plugin:${kotlinVersion}")
 		classpath("org.jetbrains.kotlin:kotlin-allopen:${kotlinVersion}")
+		classpath 'io.spring.gradle:propdeps-plugin:0.0.9.RELEASE'
 	}
+}
+
+configure(allprojects) {
+	apply plugin: 'propdeps'
+	apply plugin: 'propdeps-maven'
+	apply plugin: 'propdeps-idea'
+	apply plugin: 'propdeps-eclipse'
 }
 
 apply plugin: 'kotlin'
@@ -47,3 +56,5 @@ dependencies {
 	testCompile('org.springframework.boot:spring-boot-starter-test')
 	testCompile('org.springframework.security:spring-security-test')
 }
+
+compileJava.dependsOn(processResources)
