@@ -12,7 +12,7 @@ services:
     build: ./reverse-proxy
     ports:
       - "5180:8080"
-      - "5181:8081"
+      - "172.0.0.1:5181:8081"
     labels:
       org.rm3l.services.service_name: "reverse-proxy"
       org.rm3l.services.service_description: "Microservice for proxying requests to any other remote server"
