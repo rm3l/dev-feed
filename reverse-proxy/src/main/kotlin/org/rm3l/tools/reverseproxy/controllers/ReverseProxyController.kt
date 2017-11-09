@@ -7,10 +7,7 @@ import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.http.*
 import org.springframework.web.bind.annotation.*
-import org.springframework.web.client.HttpClientErrorException
-import org.springframework.web.client.HttpServerErrorException
-import org.springframework.web.client.RestClientException
-import org.springframework.web.client.UnknownHttpStatusCodeException
+import org.springframework.web.client.*
 import java.util.*
 import javax.servlet.http.HttpServletRequest
 
@@ -55,6 +52,10 @@ class ReverseProxyControllerAdvice {
     fun handleHttpClientException(e: HttpClientErrorException) = wrapException(e)
 
     @ExceptionHandler
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    fun handleHttpClientException(e: ResourceAccessException) = wrapException(e)
+
+    @ExceptionHandler
     @ResponseStatus(HttpStatus.BAD_GATEWAY)
     fun handleHttpServerException(e: HttpServerErrorException) = wrapException(e)
 
@@ -77,7 +78,7 @@ class ReverseProxyControllerAdvice {
         @JvmStatic
         fun wrapException(e: Throwable): ReverseProxyControllerErrorResponse {
             val errorResponse = ReverseProxyControllerErrorResponse(cause = e,
-                    isClientError = e is HttpClientErrorException)
+                    isClientError = e is HttpClientErrorException || e is ResourceAccessException)
             if (errorResponse.isClientError) {
                 logger.info(errorResponse.errorId, e)
             } else if (logger.isDebugEnabled) {
