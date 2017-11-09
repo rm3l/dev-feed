@@ -103,5 +103,8 @@ data class ReverseProxyControllerErrorResponse(
     val timestamp = System.currentTimeMillis()
 
     @Suppress("unused")
-    val errorMessage = "${cause::class.java.simpleName} : ${rootCause::class.java.simpleName} : ${rootCause.message}"
+    val errorMessage =
+            "${cause::class.java.simpleName} :" +
+                    (if (cause != rootCause) rootCause::class.java.simpleName + " :" else "") +
+                    " ${rootCause.message}"
 }
