@@ -3,6 +3,7 @@ package org.rm3l.tools.reverseproxy.controllers
 import com.fasterxml.jackson.annotation.JsonIgnore
 import org.rm3l.tools.reverseproxy.resources.ProxyData
 import org.rm3l.tools.reverseproxy.services.ReverseProxyService
+import org.rm3l.tools.reverseproxy.utils.getRootCause
 import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.http.*
@@ -94,11 +95,13 @@ data class ReverseProxyControllerErrorResponse(
         @JsonIgnore private val cause: Throwable,
         @JsonIgnore val isClientError: Boolean = false) {
 
+    private val rootCause = cause.getRootCause()
+
     val errorId = UUID.randomUUID().toString()
 
     @Suppress("unused")
-    private val timestamp = System.currentTimeMillis()
+    val timestamp = System.currentTimeMillis()
 
     @Suppress("unused")
-    private val errorMessage = "${cause::class.java.simpleName} : ${cause.message}"
+    val errorMessage = "${cause::class.java.simpleName} : ${rootCause::class.java.simpleName} : ${rootCause.message}"
 }
