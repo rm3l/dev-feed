@@ -1,5 +1,6 @@
 package org.rm3l.tools.reverseproxy.services.ip_geo.dazzlepod
 
+import com.fasterxml.jackson.annotation.JsonIgnore
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties
 import org.rm3l.tools.reverseproxy.resources.ip_geo.NetWhoisInfo
 
@@ -32,6 +33,7 @@ data class DazzlepodNetWhoisInfo(val ip: String? = null,
                                  val latitude: String? = null,
                                  val organization: String? = null): NetWhoisInfo {
 
+    @JsonIgnore
     override fun isNone(): Boolean {
         return asn == null
                 && city == null
