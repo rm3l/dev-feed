@@ -4,6 +4,10 @@
 
 version: '3.3'
 
+#networks:
+#  management:
+#  app:
+
 services:
   #
   # Reverse Proxy
@@ -24,3 +28,6 @@ services:
       timeout: 10s
       retries: 3
     restart: always
+#    networks:
+#      - management
+#      - app
