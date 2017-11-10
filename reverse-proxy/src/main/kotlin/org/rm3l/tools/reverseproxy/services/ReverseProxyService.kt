@@ -7,7 +7,6 @@ import org.rm3l.tools.reverseproxy.resources.ProxyData
 import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Qualifier
 import org.springframework.boot.web.client.RestTemplateBuilder
-import org.springframework.cache.Cache
 import org.springframework.cache.CacheManager
 import org.springframework.http.HttpEntity
 import org.springframework.http.HttpHeaders
@@ -15,7 +14,7 @@ import org.springframework.http.HttpMethod
 import org.springframework.http.ResponseEntity
 import org.springframework.stereotype.Service
 import org.springframework.web.bind.annotation.RequestMethod
-import javax.annotation.PostConstruct
+import java.net.URL
 import javax.servlet.http.HttpServletRequest
 
 @Service
@@ -26,15 +25,11 @@ class ReverseProxyService(@Qualifier("proxyResponseCacheManager") private val ca
 
     private val restTemplate = restTemplateBuilder.build()
 
-    private var proxyResponseCache : Cache? = null
-
-    @PostConstruct
-    fun init() {
-        proxyResponseCache = cacheManager.getCache("proxyResponseCache")
-    }
-
     fun exchangeWithRemoteServer(request: HttpServletRequest, proxyData: ProxyData): ResponseEntity<*> {
         val targetHost = ProxyData.resolveTargetHost(proxyData, request)
+
+        val proxyResponseCache = cacheManager.getCache(URL(targetHost).host)
+
         val requestHeaders: MutableMap<String, List<String>> = mutableMapOf(
                 X_FORWARDED_FOR to setOf(request.remoteAddr?:request.getHeader(X_FORWARDED_FOR)?:"").toList(),
                 X_FORWARDED_HOST to listOf(request.remoteHost?:""),
@@ -52,14 +47,14 @@ class ReverseProxyService(@Qualifier("proxyResponseCacheManager") private val ca
         }
 
         val responseEntity: ResponseEntity<*>
-        val responseEntityFromCache = proxyResponseCache?.get(targetHost)
+        val responseEntityFromCache = proxyResponseCache.get(targetHost)
         if (proxyData.forceRequest == true || responseEntityFromCache == null) {
             responseEntity = this.restTemplate.exchange(targetHost,
                     HttpMethod.resolve((proxyData.requestMethod?:RequestMethod.GET).name),
                     requestEntity,
                     String::class.java,
                     proxyData.requestParams ?: emptyMap<String, String>())
-            proxyResponseCache?.put(targetHost, responseEntity)
+            proxyResponseCache.put(targetHost, responseEntity)
         } else {
             responseEntity = responseEntityFromCache.get() as ResponseEntity<*>
         }
