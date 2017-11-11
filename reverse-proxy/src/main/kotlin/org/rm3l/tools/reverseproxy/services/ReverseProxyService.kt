@@ -8,10 +8,7 @@ import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Qualifier
 import org.springframework.boot.web.client.RestTemplateBuilder
 import org.springframework.cache.CacheManager
-import org.springframework.http.HttpEntity
-import org.springframework.http.HttpHeaders
-import org.springframework.http.HttpMethod
-import org.springframework.http.ResponseEntity
+import org.springframework.http.*
 import org.springframework.stereotype.Service
 import org.springframework.web.bind.annotation.RequestMethod
 import java.net.URL
@@ -24,6 +21,7 @@ class ReverseProxyService(@Qualifier("proxyResponseCacheManager") private val ca
     private val logger = LoggerFactory.getLogger(ReverseProxyService::class.java)
 
     private val restTemplate = restTemplateBuilder.build()
+
 
     fun exchangeWithRemoteServer(request: HttpServletRequest, proxyData: ProxyData): ResponseEntity<*> {
         val targetHost = ProxyData.resolveTargetHost(proxyData, request)

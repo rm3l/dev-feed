@@ -17,6 +17,8 @@ services:
     ports:
       - "5180:8080"
       - "172.20.0.1:5181:8081"
+    volumes:
+      - /home/ci/.data/reverse-proxy:/data
     labels:
       org.rm3l.services.service_name: "reverse-proxy"
       org.rm3l.services.service_description: "Microservice for proxying requests to any other remote server"
