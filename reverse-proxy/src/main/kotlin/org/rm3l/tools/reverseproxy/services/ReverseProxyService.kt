@@ -28,7 +28,10 @@ class ReverseProxyService(@Qualifier("proxyResponseCacheManager") private val ca
     fun exchangeWithRemoteServer(request: HttpServletRequest, proxyData: ProxyData): ResponseEntity<*> {
         val targetHost = ProxyData.resolveTargetHost(proxyData, request)
 
-        val proxyResponseCache = cacheManager.getCache(URL(targetHost).host)
+        val targetHostUrl = URL(targetHost)
+        val proxyResponseCache = cacheManager.getCache(
+                "%s:%d".format(targetHostUrl.host,
+                        if (targetHostUrl.port == -1) targetHostUrl.defaultPort else targetHostUrl.port))
 
         val requestHeaders: MutableMap<String, List<String>> = mutableMapOf(
                 X_FORWARDED_FOR to setOf(request.remoteAddr?:request.getHeader(X_FORWARDED_FOR)?:"").toList(),
