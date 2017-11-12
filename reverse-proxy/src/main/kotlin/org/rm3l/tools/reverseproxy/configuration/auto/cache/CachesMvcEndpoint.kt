@@ -47,7 +47,11 @@ class CachesMvcEndpoint(private val cachesEndpoint: CachesEndpoint): EndpointMvc
         val cacheManager = cachesEndpoint.getCacheManagerByName(cacheManagerName) ?:
                 return ResponseEntity.notFound().build()
 
-        val cache = cacheManager.getCache(cacheName) ?: return ResponseEntity.notFound().build()
+        if (!cacheManager.cacheNames.contains(cacheName)) {
+            return ResponseEntity.notFound().build()
+        }
+
+        val cache = cacheManager.getCache(cacheName)
 
         cache.clear()
         logger.info("Cache {} from CacheManager {} cleared", cacheName, cacheManagerName)
@@ -70,7 +74,11 @@ class CachesMvcEndpoint(private val cachesEndpoint: CachesEndpoint): EndpointMvc
         val cacheManager = cachesEndpoint.getCacheManagerByName(cacheManagerName) ?:
                 return ResponseEntity.notFound().build()
 
-        val cache = cacheManager.getCache(cacheName) ?: return ResponseEntity.notFound().build()
+        if (!cacheManager.cacheNames.contains(cacheName)) {
+            return ResponseEntity.notFound().build()
+        }
+
+        val cache = cacheManager.getCache(cacheName)
 
         val keyExtractor = CacheKeysExtractorFactory.getKeyExtractor(cache)
         return ResponseEntity.ok(keyExtractor.extractKeys(cache))
