@@ -13,5 +13,5 @@ EXPOSE 8080
 EXPOSE 8081
 RUN apk add --no-cache curl
 HEALTHCHECK --interval=5m --timeout=3s \
-  CMD curl -f http://localhost:8081/health || exit 1
+  CMD curl -f http://localhost:8081/management/health || exit 1
 ENTRYPOINT exec java $JAVA_OPTS -Djava.security.egd=file:/dev/./urandom -jar /root/reverse-proxy.jar
