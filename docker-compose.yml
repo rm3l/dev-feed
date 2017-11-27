@@ -30,6 +30,26 @@ services:
       timeout: 10s
       retries: 3
     restart: always
+
+  #
+  # GraphQL API against the IANA Service Names and Port Numbers Registry
+  #
+  service-names-port-numbers:
+    build: ./service-names-port-numbers
+    ports:
+      - "5280:8080"
+      - "172.20.0.1:5281:8081"
+    labels:
+      org.rm3l.services.service_name: "service-names-port-numbers"
+      org.rm3l.services.service_description: "GraphQL API against the IANA Service Names and Port Numbers Registry"
+      org.rm3l.services.service_url: "http://tools.rm3l.org:5280"
+      org.rm3l.services.management_url: "http://172.20.0.1:5281"
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8081/management/health"]
+      interval: 1m30s
+      timeout: 10s
+      retries: 3
+    restart: always
 #    networks:
 #      - management
 #      - app

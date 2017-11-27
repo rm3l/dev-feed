@@ -44,13 +44,26 @@ build-reverse-proxy:
     - reverse-proxy/build/reports
     - reverse-proxy/build/test-results
 
+build-service-names-port-numbers:
+  image: openjdk:8-jdk
+  stage: build
+  script:
+    - cd service-names-port-numbers
+    - chmod +x ./gradlew
+    - ./gradlew build
+  artifacts:
+    paths:
+    - service-names-port-numbers/build/libs
+    - service-names-port-numbers/build/reports
+    - service-names-port-numbers/build/test-results
+
 production_backend:
   image: debian:jessie
   stage: deploy
   script:
     - ssh -p 1022 ci@rm3l.org "mkdir -p /home/ci/Backend"
     - rsync -ravz -e 'ssh -p 1022' --exclude='.git/' --exclude='.gitlab-ci.yml' --exclude='**/.gradle' --exclude='**/build' --exclude='**/out' --delete-excluded . ci@rm3l.org:/home/ci/Backend
-    - ssh -p 1022 ci@rm3l.org "cd /home/ci/Backend && docker-compose -p backend up -d --build"
+    - ssh -p 1022 ci@rm3l.org "cd /home/ci/Backend && docker-compose -p backend up -d --build --remove-orphans"
   only:
     - master
   environment: production
