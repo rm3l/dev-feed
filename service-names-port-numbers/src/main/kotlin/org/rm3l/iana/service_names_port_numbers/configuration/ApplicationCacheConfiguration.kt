@@ -9,9 +9,11 @@ import org.springframework.context.ApplicationContext
 import org.springframework.context.ApplicationContextAware
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
+import org.springframework.scheduling.annotation.EnableScheduling
 import java.util.concurrent.TimeUnit
 
 @Configuration
+@EnableScheduling
 class ApplicationCacheConfiguration(restTemplateBuilder: RestTemplateBuilder) : ApplicationContextAware {
 
     private var applicationContext: ApplicationContext? = null
@@ -45,7 +47,8 @@ class ApplicationCacheConfiguration(restTemplateBuilder: RestTemplateBuilder) : 
             }
 
     companion object {
-        private val DL_URL_FORMAT =
+        @JvmField
+        val DL_URL_FORMAT =
                 "https://www.iana.org/assignments/service-names-port-numbers/service-names-port-numbers.%s"
     }
 }
