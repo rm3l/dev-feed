@@ -15,9 +15,9 @@ class Query(private val cache: LoadingCache<ServiceNamePortNumberMappingParser.F
             fullListOfRecords
         } else {
             fullListOfRecords
-                    .filter { filter.ports?.contains(it.portNumber) ?: true }
-                    .filter { filter.protocols?.contains(it.transportProtocol) ?: true }
-                    .filter { filter.services?.contains(it.serviceName) ?: true }
+                    .filter { filter.ports == null || filter.ports.isEmpty() || filter.ports.contains(it.portNumber) }
+                    .filter { filter.protocols == null || filter.protocols.isEmpty() || filter.protocols.contains(it.transportProtocol) }
+                    .filter { filter.services == null || filter.services.isEmpty() || filter.services.contains(it.serviceName) }
         }
     }
 }
