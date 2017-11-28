@@ -1,6 +1,6 @@
 buildscript {
     ext {
-        kotlinVersion = '1.1.61'
+        kotlinVersion = '1.2.0'
         springBootVersion = '1.5.8.RELEASE'
         jacksonVersion = '2.9.0'
         graphqlSpringBootStarterVersion = '3.10.0'
