@@ -21,11 +21,10 @@ class ScheduledTasks(@Qualifier(value = "ianaServiceNamePortNumbersRemoteCache")
                 .forEach { format ->
                     try {
                         logger.info("[$format] Updating DB from: " +
-                                ApplicationCacheConfiguration.DL_URL_FORMAT.format(format))
+                                ApplicationCacheConfiguration.DL_URL_FORMAT.format(format.name.toLowerCase()))
                         cache.refresh(format)
                         logger.info("[$format] Task scheduled. Will be refresh soon.")
                     } catch (e: Exception) {
-                        //No worries
                         if (logger.isDebugEnabled) {
                             logger.debug(e.message, e)
                         }
