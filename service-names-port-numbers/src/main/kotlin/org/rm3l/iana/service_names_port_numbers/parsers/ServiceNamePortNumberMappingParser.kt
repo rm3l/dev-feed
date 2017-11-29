@@ -5,8 +5,10 @@ import org.rm3l.iana.service_names_port_numbers.domain.Record
 interface ServiceNamePortNumberMappingParser {
 
     enum class Format {
-        CSV,
         XML,
+        
+        //We might handle other formats here
+        //CSV,
         //HTML,
         //TEXT
     }
