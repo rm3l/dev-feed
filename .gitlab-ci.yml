@@ -44,11 +44,11 @@ build-reverse-proxy:
     - reverse-proxy/build/reports
     - reverse-proxy/build/test-results
 
-build-service-names-port-numbers:
+build-iana-service-names-port-numbers:
   image: openjdk:8-jdk
   stage: build
   script:
-    - cd service-names-port-numbers
+    - cd iana-service-names-port-numbers
     - chmod +x ./gradlew
     - ./gradlew build
   artifacts:
