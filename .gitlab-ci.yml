@@ -55,9 +55,9 @@ build-iana-service-names-port-numbers:
     - ./gradlew build
   artifacts:
     paths:
-    - service-names-port-numbers/build/libs
-    - service-names-port-numbers/build/reports
-    - service-names-port-numbers/build/test-results
+    - iana-service-names-port-numbers/build/libs
+    - iana-service-names-port-numbers/build/reports
+    - iana-service-names-port-numbers/build/test-results
 
 production_backend:
   image: debian:jessie
