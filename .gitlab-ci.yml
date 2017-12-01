@@ -28,6 +28,7 @@ before_script:
   - mkdir -p ~/.ssh
   - '[[ -f /.dockerenv ]] && echo "$SSH_SERVER_HOSTKEYS" > ~/.ssh/known_hosts'
 
+  - 'which git || apt-get install git -y'
   - 'which rsync || apt-get install rsync -y'
 
 
