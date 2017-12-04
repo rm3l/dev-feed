@@ -4,10 +4,6 @@
 
 version: '3.3'
 
-#networks:
-#  management:
-#  app:
-
 services:
   #
   # Reverse Proxy
@@ -39,6 +35,8 @@ services:
     ports:
       - "5280:8080"
       - "172.20.0.1:5281:8081"
+    volumes:
+      - ./conf/iana-service-names-port-numbers:/etc/iana:ro
     labels:
       org.rm3l.services.service_name: "iana-service-names-port-numbers"
       org.rm3l.services.service_description: "GraphQL API against the IANA Service Names and Port Numbers Registry"
@@ -50,7 +48,6 @@ services:
       timeout: 10s
       retries: 3
     restart: always
-    entrypoint: java $JAVA_OPTS -Djava.security.egd=file:/dev/./urandom -jar -Dsecurity.basic.enabled=true -Dmanagement.security.enabled=true -Dsecurity.user.password="R<Dwp)uK,]:%\"j7}88:B8K(]5(<>'YEkLGF'4Hf+z'<Rcu_d7sQ}]zHKY~<n[p_n" /root/iana-service-names-port-numbers-app.jar
-#    networks:
-#      - management
-#      - app
+    entrypoint: java $JAVA_OPTS -Djava.security.egd=file:/dev/./urandom -jar /root/iana-service-names-port-numbers-app.jar
+
+
