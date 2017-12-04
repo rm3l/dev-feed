@@ -50,7 +50,7 @@ services:
       timeout: 10s
       retries: 3
     restart: always
-    entrypoint: exec java $JAVA_OPTS -Djava.security.egd=file:/dev/./urandom -jar -Dsecurity.basic.enabled=true -Dmanagement.security.enabled=true -Dsecurity.user.password="R<Dwp)uK,]:%\"j7}88:B8K(]5(<>'YEkLGF'4Hf+z'<Rcu_d7sQ}]zHKY~<n[p_n" /root/iana-service-names-port-numbers.jar
+    entrypoint: java $JAVA_OPTS -Djava.security.egd=file:/dev/./urandom -jar -Dsecurity.basic.enabled=true -Dmanagement.security.enabled=true -Dsecurity.user.password="R<Dwp)uK,]:%\"j7}88:B8K(]5(<>'YEkLGF'4Hf+z'<Rcu_d7sQ}]zHKY~<n[p_n" /root/iana-service-names-port-numbers.jar
     # TODO Override command to include specific application properties with security enabled (or not) :)
 #    networks:
 #      - management
