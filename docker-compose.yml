@@ -30,15 +30,15 @@ services:
   #
   # GraphQL API against the IANA Service Names and Port Numbers Registry
   #
-  iana-service-names-port-numbers:
-    image: rm3l/iana-service-names-port-numbers
+  service-names-port-numbers:
+    image: rm3l/service-names-port-numbers
     ports:
       - "5280:8080"
       - "172.20.0.1:5281:8081"
     volumes:
-      - ./conf/iana-service-names-port-numbers:/etc/iana:ro
+      - ./conf/service-names-port-numbers:/etc/rm3l:ro
     labels:
-      org.rm3l.services.service_name: "iana-service-names-port-numbers"
+      org.rm3l.services.service_name: "service-names-port-numbers"
       org.rm3l.services.service_description: "GraphQL API against the IANA Service Names and Port Numbers Registry"
       org.rm3l.services.service_url: "http://tools.rm3l.org:5280"
       org.rm3l.services.management_url: "http://172.20.0.1:5281"
@@ -48,6 +48,6 @@ services:
       timeout: 10s
       retries: 3
     restart: always
-    entrypoint: java $JAVA_OPTS -Djava.security.egd=file:/dev/./urandom -jar /root/iana-service-names-port-numbers-app.jar
+    #entrypoint: java $JAVA_OPTS -Djava.security.egd=file:/dev/./urandom -jar /root/service-names-port-numbers-app.jar
 
 
