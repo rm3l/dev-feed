@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:awesome_dev/ui/news_of_the_day.dart';
 
 void main() => runApp(new AwesomeDevApp());
 
@@ -78,6 +79,20 @@ class _AwesomeDevState extends State<AwesomeDev> with TickerProviderStateMixin {
   }
 
   Widget _buildTransitionsStack() {
+
+    if (_currentIndex == 0) {
+      return new NewsOfTheDay();
+    }
+    if (_currentIndex == 1) {
+      return new Text("Index $_currentIndex: My Favorites!!!");
+    }
+    if (_currentIndex == 2) {
+      return new Text("Index $_currentIndex: Archives!!!");
+    }
+    if (_currentIndex == 3) {
+      return new Text("Index $_currentIndex: Tags!!!");
+    }
+
     final List<FadeTransition> transitions = <FadeTransition>[];
 
     for (NavigationIconView view in _navigationViews) {
