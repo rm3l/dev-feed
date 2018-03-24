@@ -1,0 +1,40 @@
+schema {
+    query: Query
+    mutation: Mutation
+}
+
+scalar Date
+
+type Query {
+    articles(filter: ArticleFilter): [Article]
+    lastArticles(): [Article]
+
+    tags(search: [String]): [String]
+}
+
+type Mutation {
+    addArticle(input: Article!): Article
+    deleteArticle(id: ID!): Boolean
+    updateArticle(id: ID!, input: Article!): Article
+
+    addTag(input: String): String
+    tagArticle(articleId: ID!, tags: [String]): Article
+    untagArticle(articleId: ID!, tagsToRemove: [String]): Article
+}
+
+type Article {
+    id: ID!
+    date: Date!
+    title: String!
+    description: String
+    url: String!
+    domain: String!
+    tags: [String]
+}
+
+input ArticleFilter {
+    from: Date,
+    to: Date,
+    search: String,
+    tags: [String]
+}
