@@ -6,6 +6,7 @@ import org.jetbrains.exposed.sql.transactions.transaction
 import org.joda.time.DateTime
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.stereotype.Component
+import java.net.URL
 import javax.annotation.PostConstruct
 
 object Articles : Table(name = "articles") {
@@ -14,6 +15,7 @@ object Articles : Table(name = "articles") {
     val title = varchar(name = "title", length = 255)
     val description = text(name = "description").nullable()
     val link = varchar(name = "link", length = 255)
+    val hostname = varchar(name = "hostname", length = 255).nullable()
 }
 
 object Tags : Table(name = "tags") {
@@ -78,6 +80,7 @@ class AwesomeDevDao {
                 it[title] = articleTitle
                 it[description] = articleDescription
                 it[link] = articleLink
+                it[hostname] = URL(articleLink).host
             } get Articles.id
 
             tags?.map { articleTag ->
