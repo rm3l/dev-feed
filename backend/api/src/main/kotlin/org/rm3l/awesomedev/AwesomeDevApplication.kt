@@ -1,13 +1,10 @@
 package org.rm3l.awesomedev
 
-import org.rm3l.awesomedev.crawlers.DiscoverDevIoCrawler
-import org.rm3l.awesomedev.dal.AwesomeDevDao
-import org.springframework.boot.CommandLineRunner
 import org.springframework.boot.SpringApplication
 import org.springframework.boot.autoconfigure.SpringBootApplication
 import org.springframework.context.annotation.PropertySource
 import org.springframework.context.annotation.PropertySources
-import org.springframework.stereotype.Component
+import org.springframework.scheduling.annotation.EnableScheduling
 
 @SpringBootApplication
 @PropertySources(value = [
@@ -15,17 +12,10 @@ import org.springframework.stereotype.Component
     PropertySource(value = ["classpath:application.properties"]),
     PropertySource(value = ["file:/etc/rm3l/awesome-dev.properties"], ignoreResourceNotFound = true)]
 )
+@EnableScheduling
 class AwesomeDevApplication
 
 fun main(args: Array<String>) {
     SpringApplication.run(AwesomeDevApplication::class.java, *args)
 }
 
-@Component
-class AwesomeDevApplicationRunner(val crawler: DiscoverDevIoCrawler, val dao: AwesomeDevDao) : CommandLineRunner {
-
-    override fun run(vararg args: String?) {
-        dao.createDatabase()
-        crawler.triggerRemoteWebsiteCrawling()
-    }
-}

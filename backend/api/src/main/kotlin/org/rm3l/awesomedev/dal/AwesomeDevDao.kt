@@ -1,12 +1,12 @@
 package org.rm3l.awesomedev.dal
 
 import org.jetbrains.exposed.sql.*
-import org.jetbrains.exposed.sql.transactions.transaction
 import org.jetbrains.exposed.sql.SchemaUtils.createMissingTablesAndColumns
+import org.jetbrains.exposed.sql.transactions.transaction
 import org.joda.time.DateTime
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.stereotype.Component
-import java.util.*
+import javax.annotation.PostConstruct
 
 object Articles : Table(name = "articles") {
     val id = integer(name = "id").autoIncrement().primaryKey()
@@ -40,7 +40,8 @@ class AwesomeDevDao {
     @Value("\${datasource.password}")
     private lateinit var datasourcePassword: String
 
-    fun createDatabase() {
+    @PostConstruct
+    fun init() {
         Database.connect(
                 url = datasourceUrl,
                 driver = datasourceDriver,
@@ -67,8 +68,9 @@ class AwesomeDevDao {
         return result
     }
 
+    @Synchronized
     fun insertArticleAndTags(articleDate: String, articleTitle: String, articleDescription: String?,
-                             articleLink: String, tags: Set<String>?) {
+                             articleLink: String, tags: Collection<String>?) {
 
         transaction {
             val articleIdentifier = Articles.insert {
