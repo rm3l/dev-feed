@@ -6,6 +6,7 @@ import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.scheduling.annotation.Scheduled
 import org.springframework.stereotype.Component
+import java.net.URL
 import java.util.concurrent.*
 import java.util.function.Supplier
 import javax.annotation.PostConstruct
@@ -15,11 +16,13 @@ const val BACKEND_BASE_URL = "http://www.discoverdev.io"
 const val BACKEND_ARCHIVE_URL = "$BACKEND_BASE_URL/archive"
 const val USER_AGENT = "org.rm3l.discoverdev_io"
 
-data class Article(val date: String,
+data class Article(val id: Long?= null,
+                   val date: String,
                    val title: String,
-                   var description: String? = null,
-                   var url: String,
-                   val tags: Collection<String>? = setOf())
+                   val description: String? = null,
+                   val url: String,
+                   val domain: String = URL(url).host,
+                   var tags: Collection<String>? = setOf())
 
 @Component
 class DiscoverDevIoCrawler(val dao: AwesomeDevDao) {
@@ -40,7 +43,7 @@ class DiscoverDevIoCrawler(val dao: AwesomeDevDao) {
         this.triggerRemoteWebsiteCrawling()
     }
 
-    @Scheduled(cron = "\${crawling.refresh.cron.expression}")
+    @Scheduled(cron = "\${crawlers.task.cron-expression}")
     fun triggerRemoteWebsiteCrawling() {
         try {
             logger.info(">>> Crawling website: $BACKEND_ARCHIVE_URL")
@@ -124,7 +127,7 @@ private class DiscoverDevIoArchiveCrawler(private val dao: AwesomeDevDao, privat
             logger.debug("$existArticlesByTitleAndUrl = existArticlesByTitleAndUrl(${article.title}, ${article.url})")
         }
         if (!existArticlesByTitleAndUrl) {
-            dao.insertArticleAndTags(article.date, article.title, article.description, article.url, article.tags)
+            dao.insertArticleAndTags(article)
         }
     }
 }

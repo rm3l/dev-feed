@@ -42,14 +42,24 @@ repositories {
 
 dependencies {
     compile('org.springframework.boot:spring-boot-starter-actuator')
-    compile('org.springframework.boot:spring-boot-starter-webflux')
+    compile('org.springframework.boot:spring-boot-starter-web')
     compile('com.fasterxml.jackson.module:jackson-module-kotlin')
     compile("org.jetbrains.kotlin:kotlin-stdlib-jdk8")
     compile("org.jetbrains.kotlin:kotlin-reflect")
+
     compile ("org.jsoup:jsoup:1.11.2")
+
     compile ("org.jetbrains.exposed:exposed:0.10.1")
+
+    //JDBC Drivers
     compile 'org.xerial:sqlite-jdbc:3.21.0.1'
     compile 'com.h2database:h2:1.4.197'
+
+    // GraphQL and GraphiQL
+    compile 'com.graphql-java:graphql-spring-boot-starter:4.0.0'
+    compile 'com.graphql-java:graphiql-spring-boot-starter:4.0.0'
+    compile 'com.graphql-java:graphql-java-tools:4.3.0'
+
     testCompile('org.springframework.boot:spring-boot-starter-test')
     testCompile('io.projectreactor:reactor-test')
 }
