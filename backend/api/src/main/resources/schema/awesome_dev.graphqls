@@ -29,6 +29,14 @@ type Article {
     url: String!
     domain: String!
     tags: [String]
+    screenshot: Screenshot
+}
+
+type Screenshot {
+    data: String
+    height: Int
+    width: Int
+    mimeType: String
 }
 
 input ArticleFilter {

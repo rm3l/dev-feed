@@ -1,5 +1,6 @@
 package org.rm3l.awesomedev.crawlers
 
+import khttp.get
 import org.jsoup.Jsoup
 import org.rm3l.awesomedev.dal.AwesomeDevDao
 import org.slf4j.LoggerFactory
@@ -22,7 +23,13 @@ data class Article(val id: Long?= null,
                    val description: String? = null,
                    val url: String,
                    val domain: String = URL(url).host,
-                   var tags: Collection<String>? = setOf())
+                   var tags: Collection<String>? = setOf(),
+                   var screenshot: Screenshot? = null)
+
+data class Screenshot(val data: String?= null,
+                      val height: Int?= null,
+                      val width: Int?= null,
+                      val mimeType: String?= null)
 
 @Component
 class DiscoverDevIoCrawler(val dao: AwesomeDevDao) {
@@ -58,6 +65,9 @@ class DiscoverDevIoCrawler(val dao: AwesomeDevDao) {
                                     CompletableFuture.supplyAsync(
                                             DiscoverDevIoCrawlerArchiveFetcherFutureSupplier(it), executorService) }
                                 .flatMap { it.join() }
+                                .map { CompletableFuture.supplyAsync(
+                                        DiscoverDevIoArticleScreenshotGrabber(dao, it), executorService) }
+                                .map { it.join() }
                                 .map { CompletableFuture.supplyAsync(
                                         DiscoverDevIoArchiveCrawler(dao, it), executorService) }
                                 .toTypedArray()
@@ -108,6 +118,49 @@ private class DiscoverDevIoCrawlerArchiveFetcherFutureSupplier(private val date:
                     }
 }
 
+private class DiscoverDevIoArticleScreenshotGrabber(private val dao: AwesomeDevDao, private val article: Article):
+        Supplier<Article> {
+
+    companion object {
+
+        private const val GOOGLE_PAGESPEED_URL_FORMAT =
+                "https://www.googleapis.com/pagespeedonline/v1/runPagespeed?url=%s&screenshot=true"
+
+        @JvmStatic
+        private val logger = LoggerFactory.getLogger(DiscoverDevIoArticleScreenshotGrabber::class.java)
+    }
+
+    override fun get(): Article {
+        val url = GOOGLE_PAGESPEED_URL_FORMAT.format(article.url)
+        try {
+            //Check if (title, url) pair already exist in the DB
+            val existArticlesByTitleAndUrl = dao.existArticlesByTitleAndUrl(article.title, article.url)
+            if (logger.isDebugEnabled) {
+                logger.debug("$existArticlesByTitleAndUrl = existArticlesByTitleAndUrl(${article.title}, ${article.url})")
+            }
+            if (!existArticlesByTitleAndUrl) {
+                val screenshotJsonObject = get(url).jsonObject.getJSONObject("screenshot")
+                val base64ImageData = screenshotJsonObject.getString("data")
+                val mimeType = screenshotJsonObject.getString("mime_type")
+                val height = screenshotJsonObject.getInt("height")
+                val width = screenshotJsonObject.getInt("width")
+                if (!base64ImageData.isNullOrBlank()) {
+                    article.screenshot = Screenshot(data = base64ImageData,
+                            mimeType = mimeType,
+                            width = width,
+                            height = height)
+                }
+            }
+        } catch (e: Exception) {
+            if (logger.isDebugEnabled) {
+                logger.debug("Could not fetch screenshot data for ${article.url}: $url", e)
+            }
+        }
+        return article
+    }
+
+}
+
 private class DiscoverDevIoArchiveCrawler(private val dao: AwesomeDevDao, private val article: Article):
         Supplier<Unit> {
 
@@ -127,7 +180,7 @@ private class DiscoverDevIoArchiveCrawler(private val dao: AwesomeDevDao, privat
             logger.debug("$existArticlesByTitleAndUrl = existArticlesByTitleAndUrl(${article.title}, ${article.url})")
         }
         if (!existArticlesByTitleAndUrl) {
-            dao.insertArticleAndTags(article)
+            dao.insertArticle(article)
         }
     }
 }

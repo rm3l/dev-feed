@@ -7,6 +7,7 @@ import org.jetbrains.exposed.sql.SqlExpressionBuilder.like
 import org.jetbrains.exposed.sql.transactions.transaction
 import org.joda.time.DateTime
 import org.rm3l.awesomedev.crawlers.Article
+import org.rm3l.awesomedev.crawlers.Screenshot
 import org.rm3l.awesomedev.graphql.ArticleFilter
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.stereotype.Component
@@ -20,6 +21,10 @@ object Articles : Table(name = "articles") {
     val description = text(name = "description").nullable()
     val link = varchar(name = "link", length = 255)
     val hostname = varchar(name = "hostname", length = 255).nullable()
+    val screenshotData = text(name = "screenshot_data").nullable()
+    val screenshotWidth = integer(name = "screenshot_width").nullable()
+    val screenshotHeight = integer(name = "screenshot_height").nullable()
+    val screenshotMimeType = varchar(name = "screenshot_mime_type", length = 255).nullable()
 }
 
 object Tags : Table(name = "tags") {
@@ -77,7 +82,7 @@ class AwesomeDevDao {
     }
 
     @Synchronized
-    fun insertArticleAndTags(article: Article) {
+    fun insertArticle(article: Article) {
 
         transaction {
             val articleIdentifier = Articles.insert {
@@ -86,6 +91,10 @@ class AwesomeDevDao {
                 it[description] = article.description
                 it[link] = article.url
                 it[hostname] = article.domain
+                it[screenshotData] = article.screenshot?.data
+                it[screenshotMimeType] = article.screenshot?.mimeType
+                it[screenshotWidth] = article.screenshot?.width
+                it[screenshotHeight] = article.screenshot?.height
             } get Articles.id
 
             article.tags?.map { articleTag ->
@@ -128,29 +137,36 @@ class AwesomeDevDao {
                     tagsResolvedFromSearch = getTags(search = filter.tags)
                 }
             }
-            query = if (whereClause != null) Articles.select(whereClause) else Articles.selectAll()
-            limit?.let { query.limit(it, offset?:DEFAULT_OFFSET) }
+            query = if (whereClause != null) { Articles.select(whereClause) } else { Articles.selectAll() }
+//            limit?.let { query.limit(it, offset?:DEFAULT_OFFSET) }
             query.orderBy(Articles.date, isAsc = false)
 
-            result.addAll(query
+            val list = query
                     .map {
                         val article = Article(id = it[Articles.id].toLong(),
                                 title = it[Articles.title],
                                 url = it[Articles.link],
                                 domain = it[Articles.hostname] ?: URL(it[Articles.link]).host,
-                                date = it[Articles.date].toDate().toString())
+                                date = it[Articles.date].toDate().toString(),
+                                screenshot = Screenshot(
+                                        data = it[Articles.screenshotData],
+                                        mimeType = it[Articles.screenshotMimeType],
+                                        width = it[Articles.screenshotWidth],
+                                        height = it[Articles.screenshotHeight]
+                                ))
                         val tags = ArticlesTags.slice(ArticlesTags.tagName)
                                 .select { ArticlesTags.articleId.eq(it[Articles.id]) }
                                 .map { it[ArticlesTags.tagName] }
                                 .toSet()
                         article to tags
                     }
-                    .filter { it.second.any { tagsResolvedFromSearch?.contains(it)?:true } }
+                    .filter { it.second.any { tagsResolvedFromSearch?.contains(it) ?: true } }
                     .map {
                         it.first.tags = it.second
                         it.first
                     }
-                    .toList())
+                    .toList()
+            result.addAll(if(limit != null) list.take(limit) else list)
         }
         return result.toList()
     }
@@ -185,7 +201,13 @@ class AwesomeDevDao {
                                             title = it[Articles.title],
                                             url = it[Articles.link],
                                             domain = it[Articles.hostname] ?: URL(it[Articles.link]).host,
-                                            date = it[Articles.date].toDate().toString())
+                                            date = it[Articles.date].toDate().toString(),
+                                            screenshot = Screenshot(
+                                                    data = it[Articles.screenshotData],
+                                                    mimeType = it[Articles.screenshotMimeType],
+                                                    width = it[Articles.screenshotWidth],
+                                                    height = it[Articles.screenshotHeight]
+                                            ))
                                     val tags = ArticlesTags.slice(ArticlesTags.tagName)
                                             .select { ArticlesTags.articleId.eq(it[Articles.id]) }
                                             .map { it[ArticlesTags.tagName] }
