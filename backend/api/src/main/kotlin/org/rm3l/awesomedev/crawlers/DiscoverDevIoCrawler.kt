@@ -118,6 +118,9 @@ private class DiscoverDevIoCrawlerArchiveFetcherFutureSupplier(private val date:
                     }
 }
 
+/**
+ * Remote Website screenshot grabber. Based upon this article: https://shkspr.mobi/blog/2015/11/google-secret-screenshot-api/
+ */
 private class DiscoverDevIoArticleScreenshotGrabber(private val dao: AwesomeDevDao, private val article: Article):
         Supplier<Article> {
 
@@ -139,12 +142,16 @@ private class DiscoverDevIoArticleScreenshotGrabber(private val dao: AwesomeDevD
                 logger.debug("$existArticlesByTitleAndUrl = existArticlesByTitleAndUrl(${article.title}, ${article.url})")
             }
             if (!existArticlesByTitleAndUrl) {
-                val screenshotJsonObject = get(url).jsonObject.getJSONObject("screenshot")
+                val screenshotJsonObject =
+                        get(url).jsonObject.getJSONObject("screenshot")
+                //Weird, but for reasons best known to Google, / is replaced with _, and + is replaced with -
                 val base64ImageData = screenshotJsonObject.getString("data")
+                        .replace("_", "/")
+                        .replace("-", "+")
                 val mimeType = screenshotJsonObject.getString("mime_type")
                 val height = screenshotJsonObject.getInt("height")
                 val width = screenshotJsonObject.getInt("width")
-                if (!base64ImageData.isNullOrBlank()) {
+                if (!base64ImageData.isBlank()) {
                     article.screenshot = Screenshot(data = base64ImageData,
                             mimeType = mimeType,
                             width = width,
