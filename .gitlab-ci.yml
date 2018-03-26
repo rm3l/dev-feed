@@ -8,10 +8,10 @@ build_backend_api:
   image: java:8
 
   before_script:
-    - chmod +x ./gradlew
+    - chmod +x ./backend/api/gradlew
 
   script:
-    - ./gradlew build
+    - cd backend/api && ./gradlew build
 
   artifacts:
     when: always
