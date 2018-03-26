@@ -5,6 +5,7 @@ import org.rm3l.awesomedev.crawlers.Article
 import org.rm3l.awesomedev.dal.AwesomeDevDao
 import org.springframework.stereotype.Component
 
+@Suppress("unused")
 @Component
 class Query(private val dao: AwesomeDevDao): GraphQLQueryResolver {
 
