@@ -8,6 +8,8 @@ type Query {
     articles(limit: Int, offset: Int, filter: ArticleFilter): [Article]
     recentArticles(limit: Int, offset: Int): [Article]
 
+    allButRecentArticles(limit: Int, offset: Int, filter: ArticleFilter): [Article]
+
     tags(limit: Int, offset: Int, search: [String]): [String]
 }
 

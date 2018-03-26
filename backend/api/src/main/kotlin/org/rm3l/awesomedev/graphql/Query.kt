@@ -14,5 +14,9 @@ class Query(private val dao: AwesomeDevDao): GraphQLQueryResolver {
 
     fun recentArticles(limit: Int?, offset: Int?) = dao.getRecentArticles(limit, offset)
 
+    fun allButRecentArticles(limit: Int?, offset: Int?, filter: ArticleFilter?): Collection<Article> {
+        TODO("TODO")
+    }
+
     fun tags(limit: Int?, offset: Int?, search: List<String>?) = dao.getTags(limit, offset, search)
 }
