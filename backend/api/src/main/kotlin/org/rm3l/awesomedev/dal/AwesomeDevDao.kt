@@ -113,6 +113,75 @@ class AwesomeDevDao {
         }
     }
 
+    fun allButRecentArticles(limit: Int? = null, offset: Int? = null, filter: ArticleFilter? = null): Collection<Article> {
+        val result = mutableListOf<Article>()
+        transaction {
+            Articles.slice(Articles.date)
+                    .selectAll()
+                    .orderBy(Articles.date, isAsc = false)
+                    .withDistinct().limit(1)
+                    .map { it[Articles.date] }
+                    .firstOrNull()
+                    ?.let { lastArticleDate ->
+                        val query: Query
+                        var whereClause = not(Op.build { Articles.date.eq(lastArticleDate) })
+                        var tagsResolvedFromSearch: Collection<String>? = null
+                        if (filter != null) {
+                            if (filter.from != null) {
+                                whereClause = whereClause.and(
+                                        Articles.date.between(
+                                                DateTime(filter.from),
+                                                filter.to?.map { DateTime(it) } ?: DateTime.now()))
+                            } else if (filter.to != null) {
+                                whereClause = whereClause.and(
+                                        Articles.date.between(DateTime.now(), DateTime(filter.to)))
+                            }
+                            if (filter.search != null) {
+                                val searchPattern = "%${filter.search}%"
+                                val searchClause = (Articles.title like searchPattern)
+                                        .or(Articles.description like searchPattern)
+                                        .or(Articles.link like searchPattern)
+                                whereClause = whereClause?.and(searchClause)?:searchClause
+                            }
+                            if (filter.tags != null) {
+                                tagsResolvedFromSearch = getTags(search = filter.tags)
+                            }
+                        }
+                        query = Articles.select(whereClause)
+//                      limit?.let { query.limit(it, offset?:DEFAULT_OFFSET) }
+                        query.orderBy(Articles.date, isAsc = false)
+
+                        val list = query
+                                .map {
+                                    val article = Article(id = it[Articles.id].toLong(),
+                                            title = it[Articles.title],
+                                            url = it[Articles.link],
+                                            domain = it[Articles.hostname] ?: URL(it[Articles.link]).host,
+                                            date = it[Articles.date].toDate().toString(),
+                                            screenshot = Screenshot(
+                                                    data = it[Articles.screenshotData],
+                                                    mimeType = it[Articles.screenshotMimeType],
+                                                    width = it[Articles.screenshotWidth],
+                                                    height = it[Articles.screenshotHeight]
+                                            ))
+                                    val tags = ArticlesTags.slice(ArticlesTags.tagName)
+                                            .select { ArticlesTags.articleId.eq(it[Articles.id]) }
+                                            .map { it[ArticlesTags.tagName] }
+                                            .toSet()
+                                    article to tags
+                                }
+                                .filter { it.second.any { tagsResolvedFromSearch?.contains(it) ?: true } }
+                                .map {
+                                    it.first.tags = it.second
+                                    it.first
+                                }
+                                .toList()
+                        result.addAll(if(limit != null) list.take(limit) else list)
+                    }
+        }
+        return result
+    }
+
     fun getArticles(limit: Int? = null, offset: Int? = null, filter: ArticleFilter? = null): Collection<Article> {
         val result = mutableListOf<Article>()
         transaction {
