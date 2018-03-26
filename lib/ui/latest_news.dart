@@ -5,13 +5,13 @@ import 'package:html/dom.dart' as html_dom;
 import 'dart:io';
 import 'package:feedparser/feedparser.dart' as feed_parser;
 
-class NewsOfTheDay extends StatefulWidget {
+class LatestNews extends StatefulWidget {
   @override
-  State<StatefulWidget> createState() => new NewsOfTheDayState();
+  State<StatefulWidget> createState() => new LatestNewsState();
 
 }
 
-class NewsOfTheDayState extends State<NewsOfTheDay> {
+class LatestNewsState extends State<LatestNews> {
 
   final _suggestions = <WordPair>[];
 

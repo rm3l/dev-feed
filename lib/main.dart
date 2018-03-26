@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:awesome_dev/ui/news_of_the_day.dart';
+import 'package:awesome_dev/ui/latest_news.dart';
 
 void main() => runApp(new AwesomeDevApp());
 
@@ -35,7 +35,7 @@ class _AwesomeDevState extends State<AwesomeDev> with TickerProviderStateMixin {
     _navigationViews = <NavigationIconView>[
       new NavigationIconView(
         icon: const Icon(Icons.new_releases),
-        title: 'News of the Day',
+        title: 'Latest',
 //        color: Colors.deepPurple,
         vsync: this,
       ),
@@ -81,7 +81,7 @@ class _AwesomeDevState extends State<AwesomeDev> with TickerProviderStateMixin {
   Widget _buildTransitionsStack() {
 
     if (_currentIndex == 0) {
-      return new NewsOfTheDay();
+      return new LatestNews();
     }
     if (_currentIndex == 1) {
       return new Text("Index $_currentIndex: My Favorites!!!");
