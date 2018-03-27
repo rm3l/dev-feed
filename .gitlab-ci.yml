@@ -5,20 +5,16 @@ stages:
 
 build_backend_api:
   stage: build
-  image: java:8
-
+  image: openjdk:8-jdk
   before_script:
     - chmod +x ./backend/api/gradlew
-
   script:
     - cd backend/api && ./gradlew build
-
   artifacts:
     when: always
     paths:
     - backend/api/build/libs
     - backend/api/build/reports
-
   # Note on caching:
   # We should not rely upon the cache, as it is done on a best effort basis,
   # i.e., no cache if run on different runners
@@ -33,23 +29,9 @@ build_backend_api:
 
 build_mobile_apps:
   stage: build
-  # TODO Use image with Flutter installed
-  image: registry.gitlab.com/lemra/router-companion-android/android-sdk:latest
-
-  before_script:
-    # TODO Add all these in a dedicated Dockerfile
-    - apt-get --yes --force-yes update
-    - apt-get --yes --force-yes install locales
-    - rm -rf /var/lib/apt/lists/*
-    - localedef -i en_US -c -f UTF-8 -A /usr/share/locale/locale.alias en_US.UTF-8
-    - export LANG=en_US.utf8
-    - mkdir -p /tmp
-    - git clone -b beta https://github.com/flutter/flutter.git /tmp/flutter
-    - export PATH=/tmp/flutter/bin:$PATH
-
+  image: registry.gitlab.com/lemra/awesomedev/flutter:latest
   script:
     - flutter build apk
-
   artifacts:
     when: always
     paths:
