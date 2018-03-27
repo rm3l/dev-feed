@@ -37,6 +37,12 @@ build_mobile_apps:
   image: registry.gitlab.com/lemra/router-companion-android/android-sdk:latest
 
   before_script:
+    # TODO Add all these in a dedicated Dockerfile
+    - apt-get --yes --force-yes update
+    - apt-get --yes --force-yes install locales
+    - rm -rf /var/lib/apt/lists/*
+    - localedef -i en_US -c -f UTF-8 -A /usr/share/locale/locale.alias en_US.UTF-8
+    - export LANG=en_US.utf8
     - mkdir -p /tmp
     - git clone -b beta https://github.com/flutter/flutter.git /tmp/flutter
     - export PATH=/tmp/flutter/bin:$PATH
