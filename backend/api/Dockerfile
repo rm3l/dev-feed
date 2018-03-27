@@ -1,4 +1,4 @@
-FROM java:8-jdk AS builder
+FROM openjdk:8-jdk AS builder
 
 ADD . /code/awesome_dev/backend
 WORKDIR  /code/awesome_dev/backend

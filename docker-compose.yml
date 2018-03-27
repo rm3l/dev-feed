@@ -1,3 +1,20 @@
 version '3.3'
 
-# TODO
+services:
+  graphql-api:
+    build:
+      context: ./backend/api
+    ports:
+      - "9000:8080"
+      - "172.20.0.1:9001:8081"
+    labels:
+      org.rm3l.router_companion.service_name: "awesome-dev-graphql-api"
+      org.rm3l.router_companion.service_description: "GraphQL API against DiscoverDev.io website"
+      org.rm3l.router_companion.service_url: "http://tools.rm3l.org:9000/graphiql"
+      org.rm3l.services.management_url: "http://172.20.0.1:9001/actuator"
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8081/actuator/health"]
+      interval: 1m30s
+      timeout: 10s
+      retries: 3
+    restart: always

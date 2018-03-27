@@ -73,7 +73,8 @@ prepare_production_environment:
           --exclude='.gitlab-ci.yml'
           --exclude='.gradle'
           --exclude='build'
-          --delete-excluded ./backend/api
+          --delete-excluded ./docker-compose.yml
+          --delete-excluded ./backend
         ci@rm3l.org:/home/ci/awesome_dev
 
 #
