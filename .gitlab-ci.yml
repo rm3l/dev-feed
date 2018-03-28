@@ -86,6 +86,6 @@ production_backend_api:
   dependencies:
     - build_backend_api
   script:
-    - ls -lhrt build/
+    - ls -lhrt .
     - ssh -p 1022 ci@rm3l.org "cd /home/ci/awesome_dev && ls -lhrt build/ && mkdir -p backend/api/build && cp -r build/TODO.zip backend/api/build/artifacts.zip && docker-compose -p awesome-dev pull && docker-compose -p awesome-dev up -d --build --remove-orphans"
 
