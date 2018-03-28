@@ -72,7 +72,7 @@ prepare_production_environment:
           --exclude='.git/'
           --exclude='.gitlab-ci.yml'
           --exclude='.gradle'
-          --exclude='build'
+          --delete-excluded='build'
           --delete-excluded ./docker-compose.yml
           --delete-excluded ./backend
         ci@rm3l.org:/home/ci/awesome_dev
@@ -83,7 +83,9 @@ prepare_production_environment:
 production_backend_api:
   <<: *production_job_definition
   stage: deploy
+  dependencies:
+    - build_backend_api
   script:
-    - ssh -p 1022 ci@rm3l.org
-        "cd /home/ci/awesome_dev && export BACKEND_API_BUILD_JOB_NAME=build_backend_api && export JOB_TOKEN=\"$CI_JOB_TOKEN\" && docker-compose -p awesome-dev pull && docker-compose -p awesome-dev up -d --build --remove-orphans"
+    - ls -lhrt build/
+    - ssh -p 1022 ci@rm3l.org "cd /home/ci/awesome_dev && ls -lhrt build/ && mkdir -p backend/api/build && cp -r build/TODO.zip backend/api/build/artifacts.zip && docker-compose -p awesome-dev pull && docker-compose -p awesome-dev up -d --build --remove-orphans"
 

@@ -7,6 +7,8 @@ services:
       args:
         - JOB_TOKEN
         - BACKEND_API_BUILD_JOB_NAME
+    volumes:
+      - /home/ci/awesome_dev/build:/build
     ports:
       - "9000:8080"
       - "172.20.0.1:9001:8081"
@@ -21,3 +23,4 @@ services:
       timeout: 10s
       retries: 3
     restart: always
+
