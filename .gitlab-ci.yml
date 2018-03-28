@@ -83,11 +83,7 @@ prepare_production_environment:
 production_backend_api:
   <<: *production_job_definition
   stage: deploy
-  before_script:
-    - export JOB_TOKEN=$CI_JOB_TOKEN
-    - export BACKEND_API_BUILD_JOB_NAME="build_backend_api"
   script:
     - ssh -p 1022 ci@rm3l.org
-        "cd /home/ci/awesome_dev && docker-compose -p awesome-dev pull && docker-compose -p awesome-dev up -d --build --remove-orphans"
-
+        "cd /home/ci/awesome_dev && export BACKEND_API_BUILD_JOB_NAME=build_backend_api && export JOB_TOKEN=\"$CI_JOB_TOKEN\" && docker-compose -p awesome-dev pull && docker-compose -p awesome-dev up -d --build --remove-orphans"
 
