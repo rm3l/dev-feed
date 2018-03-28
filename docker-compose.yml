@@ -4,11 +4,8 @@ services:
   graphql-api:
     build:
       context: ./backend/api
-      args:
-        - JOB_TOKEN
-        - BACKEND_API_BUILD_JOB_NAME
     volumes:
-      - /home/ci/awesome_dev/build:/build
+      - graphql-api-data-volume:/etc/awesome_dev
     ports:
       - "9000:8080"
       - "172.20.0.1:9001:8081"
@@ -23,4 +20,7 @@ services:
       timeout: 10s
       retries: 3
     restart: always
+    command: ["java", "-Ddatasource.url=jdbc:h2:file:/etc/awesome_dev/.awesome_dev.db", "-jar", "/app.jar"]
 
+volumes:
+  graphql-api-data-volume:
