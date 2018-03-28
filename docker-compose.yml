@@ -4,6 +4,9 @@ services:
   graphql-api:
     build:
       context: ./backend/api
+      args:
+        - JOB_TOKEN
+        - BACKEND_API_BUILD_JOB_NAME
     ports:
       - "9000:8080"
       - "172.20.0.1:9001:8081"
