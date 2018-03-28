@@ -23,7 +23,7 @@ RUN curl \
 
 
 RUN curl \
-    -sSL
+    -sSL \
     --header "JOB-TOKEN: $JOB_TOKEN" \
     $DL_URL \
     --output /app.jar
