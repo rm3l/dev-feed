@@ -1,12 +1,5 @@
 FROM java:8
 
-RUN apt-get update
-RUN apt-get --yes --force-yes install \
-    unzip
-RUN apt-get --yes --force-yes autoremove
-RUN rm -rf /var/cache/apt/archives/*
-
-ADD ./build /build
-# TODO Unzip artifact and run it
+ADD ./api/build/libs/api-0.0.1-SNAPSHOT.jar /app.jar
 
 CMD ["java", "-jar", "/app.jar"]
