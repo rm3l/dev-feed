@@ -1,10 +1,11 @@
 stages:
-  - build
+  - build_backend
+  - build_mobile_clients
   - pre_deploy
   - deploy
 
 build_backend_api:
-  stage: build
+  stage: build_backend
   image: openjdk:8-jdk
   before_script:
     - chmod +x ./backend/api/gradlew
@@ -27,11 +28,23 @@ build_backend_api:
       - $GRADLE_USER_HOME/build-cache/
 
 
-build_mobile_apps:
-  stage: build
+build_mobile_apps_android:
+  stage: build_mobile_clients
   image: registry.gitlab.com/lemra/awesomedev/flutter:latest
   script:
     - flutter build apk
+  artifacts:
+    when: always
+    paths:
+    - build/app/outputs/
+
+# TODO
+build_mobile_apps_ios:
+  stage: build_mobile_clients
+  image: hello-world # TODO Find a suitable image
+  script:
+      - echo "TODO | Not Implemented as yet"
+#    - flutter build ios || true
   artifacts:
     when: always
     paths:
