@@ -39,11 +39,10 @@ build_mobile_apps_android:
 
 # TODO
 build_mobile_apps_ios:
-  stage: build
-  image: hello-world # TODO Find a suitable image
+  stage: debian:9
+  image: registry.gitlab.com/lemra/awesomedev/flutter:latest # TODO Find a way to include IOS Dev tools in the image
   script:
-      - echo "TODO | Not Implemented as yet"
-#    - flutter build ios || true
+    - flutter build ios || echo "TODO | Not Implemented as yet"
   artifacts:
     when: always
     paths:

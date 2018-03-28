@@ -37,6 +37,7 @@ compileTestKotlin {
 
 repositories {
     jcenter()
+    mavenCentral()
     maven { url 'https://dl.bintray.com/kotlin/exposed' }
 }
 
