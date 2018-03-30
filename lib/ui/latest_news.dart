@@ -1,12 +1,7 @@
 import 'package:flutter/material.dart';
-import 'dart:io';
 import 'package:awesome_dev/api/articles.dart';
 import 'package:awesome_dev/api/graphql.dart';
-
-import 'package:http/http.dart';
-import 'package:logging/logging.dart'; // Optional
 import 'package:graphql_client/graphql_client.dart';
-import 'package:graphql_client/graphql_dsl.dart';
 
 class LatestNews extends StatefulWidget {
   @override
@@ -55,7 +50,7 @@ class LatestNewsState extends State<LatestNews> {
 //    if (index >= _suggestions.length) {
 //    _suggestions.addAll(generateWordPairs().take(10));
 //    }
-    return _buildRow(_suggestions[index]);
+    return _buildRow("Hiya @$i");
     },
     );
   }
@@ -64,7 +59,7 @@ class LatestNewsState extends State<LatestNews> {
     final alreadySaved = _saved.contains(pair);
     return new ListTile(
       title: new Text(
-        "Hiya",
+        pair,
         style: _biggerFont,
       ),
       trailing: new Icon(
