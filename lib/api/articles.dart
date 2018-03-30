@@ -57,6 +57,7 @@ class ArticlesResolver extends Object with Alias, Fields implements GQLField {
   UrlResolver url = new UrlResolver();
   DomainResolver domain = new DomainResolver();
   TagsResolver tags = new TagsResolver();
+  ScreenshotResolver screenshot = new ScreenshotResolver();
 
   String _queryResolverName;
 
@@ -79,7 +80,7 @@ class ArticlesResolver extends Object with Alias, Fields implements GQLField {
   String get name => _queryResolverName;
 
   @override
-  List<GQLField> get fields => [date, title, description, url, domain, tags];
+  List<GQLField> get fields => [date, title, description, url, domain, tags, screenshot];
 
 }
 
