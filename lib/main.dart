@@ -1,15 +1,23 @@
 import 'package:flutter/material.dart';
 import 'package:awesome_dev/ui/latest_news.dart';
 
+import 'package:logging/logging.dart'; // Optional
+
 void main() => runApp(new AwesomeDevApp());
 
 class AwesomeDevApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
+    Logger.root // Optional
+      ..level = Level.ALL
+      ..onRecord.listen((rec) {
+        print('${rec.level.name}: ${rec.time}: ${rec.message}');
+      });
+
     return new MaterialApp(
       title: 'Awesome Dev',
       theme: new ThemeData(
-        primaryColor: Colors.blue,
+        primaryColor: Colors.green,
         backgroundColor: Colors.grey,
       ),
       home: new AwesomeDev(),

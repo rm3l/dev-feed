@@ -8,9 +8,7 @@ dependencies:
   # The following adds the Cupertino Icons font to your application.
   # Use with the CupertinoIcons class for iOS style icons.
   cupertino_icons: ^0.1.0
-  english_words: ^3.1.0
-  feedparser: ^0.0.2
-  html: any
+  graphql_client: "^0.0.3"
 
 
 dev_dependencies:

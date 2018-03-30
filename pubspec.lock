@@ -85,20 +85,6 @@ packages:
       url: "https://pub.dartlang.org"
     source: hosted
     version: "0.1.1"
-  english_words:
-    dependency: "direct main"
-    description:
-      name: english_words
-      url: "https://pub.dartlang.org"
-    source: hosted
-    version: "3.1.0"
-  feedparser:
-    dependency: "direct main"
-    description:
-      name: feedparser
-      url: "https://pub.dartlang.org"
-    source: hosted
-    version: "0.0.2"
   flutter:
     dependency: "direct main"
     description: flutter
@@ -123,8 +109,15 @@ packages:
       url: "https://pub.dartlang.org"
     source: hosted
     version: "1.1.5"
-  html:
+  graphql_client:
     dependency: "direct main"
+    description:
+      name: graphql_client
+      url: "https://pub.dartlang.org"
+    source: hosted
+    version: "0.0.3"
+  html:
+    dependency: transitive
     description:
       name: html
       url: "https://pub.dartlang.org"
@@ -249,13 +242,6 @@ packages:
       url: "https://pub.dartlang.org"
     source: hosted
     version: "1.5.1"
-  petitparser:
-    dependency: transitive
-    description:
-      name: petitparser
-      url: "https://pub.dartlang.org"
-    source: hosted
-    version: "1.7.6"
   plugin:
     dependency: transitive
     description:
@@ -408,13 +394,6 @@ packages:
       url: "https://pub.dartlang.org"
     source: hosted
     version: "1.0.7"
-  xml:
-    dependency: transitive
-    description:
-      name: xml
-      url: "https://pub.dartlang.org"
-    source: hosted
-    version: "3.0.0"
   yaml:
     dependency: transitive
     description:

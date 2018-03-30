@@ -1,9 +1,12 @@
 import 'package:flutter/material.dart';
-import 'package:english_words/english_words.dart';
-import 'package:html/parser.dart' show parse;
-import 'package:html/dom.dart' as html_dom;
 import 'dart:io';
-import 'package:feedparser/feedparser.dart' as feed_parser;
+import 'package:awesome_dev/api/articles.dart';
+import 'package:awesome_dev/api/graphql.dart';
+
+import 'package:http/http.dart';
+import 'package:logging/logging.dart'; // Optional
+import 'package:graphql_client/graphql_client.dart';
+import 'package:graphql_client/graphql_dsl.dart';
 
 class LatestNews extends StatefulWidget {
   @override
@@ -13,69 +16,55 @@ class LatestNews extends StatefulWidget {
 
 class LatestNewsState extends State<LatestNews> {
 
-  final _suggestions = <WordPair>[];
+  final _suggestions = <String>[];
 
-  final _saved = new Set<WordPair>();
+  final _saved = new Set<String>();
 
   final _biggerFont = const TextStyle(fontSize: 18.0);
 
-  _fetchFeed(BuildContext context) async {
-    var url = 'http://www.discoverdev.io/rss.xml';
-    var httpClient = new HttpClient();
-    String result;
+  _fetchArticles(BuildContext context) async {
+    final query = new ArticlesQuery("GetRecentArticles", "recentArticles");
     try {
-      var request = await httpClient.getUrl(Uri.parse(url));
-      var response = await request.close();
-      if (response.statusCode == HttpStatus.OK) {
-//        var json = await response.transform(UTF8.decoder).join();
-//        var data = JSON.decode(json);
-        result = response.toString();
-        feed_parser.Feed feed = feed_parser.parse(result);
-        Scaffold.of(context).showSnackBar(new SnackBar(
-          content: new Text(feed.toString()),
-        ));
-      } else {
-        result =
-        'Error fetching RSS feed:\nHttp status ${response.statusCode}';
-        Scaffold.of(context).showSnackBar(new SnackBar(
-          content: new Text(result),
-        ));
-      }
-    } catch (exception) {
-      result = 'Failed fetching RSS feed: ${exception.toString()}';
+      final queryRes = await graphQLClient.execute(
+        query,
+        variables: {},
+        headers: {
+          'User-Agent': 'org.rm3l.discoverdev.io',
+        },
+      );
+
       Scaffold.of(context).showSnackBar(new SnackBar(
-        content: new Text(result),
+        content: new Text(queryRes.viewer.title.toString()),
       ));
+
+    } on GQLException catch (e) {
+      print(e.message);
+      print(e.gqlErrors);
     }
-
-
   }
 
   @override
   Widget build(BuildContext context) {
-    _fetchFeed(context);
+    _fetchArticles(context);
     return new ListView.builder(
         padding: const EdgeInsets.all(16.0),
     itemBuilder: (context, i) {
     if (i.isOdd) return new Divider();
 
     final index = i ~/ 2;
-    if (index >= _suggestions.length) {
-    _suggestions.addAll(generateWordPairs().take(10));
-    }
+//    if (index >= _suggestions.length) {
+//    _suggestions.addAll(generateWordPairs().take(10));
+//    }
     return _buildRow(_suggestions[index]);
     },
     );
   }
 
-  Widget _buildRow(WordPair pair) {
-    var document = parse(
-        '<body>Hello world! <a href="www.html5rocks.com">${pair.asPascalCase}!');
-//    print(document.outerHtml);
+  Widget _buildRow(String pair) {
     final alreadySaved = _saved.contains(pair);
     return new ListTile(
       title: new Text(
-        document.outerHtml,
+        "Hiya",
         style: _biggerFont,
       ),
       trailing: new Icon(
