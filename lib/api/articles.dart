@@ -21,7 +21,7 @@ query GetRecentArticles {
   }
 }
  */
-class ArticlesQuery extends Object with Fields implements GQLOperation {
+class ArticlesQuery extends Object with ScalarCollection<ArticlesResolver>, Fields implements GQLOperation {
 
   String _queryName;
   String _queryResolverName;
@@ -49,7 +49,7 @@ class ArticlesQuery extends Object with Fields implements GQLOperation {
 
 }
 
-class ArticlesResolver extends Object with Alias, Fields implements GQLField {
+class ArticlesResolver extends Object with Fields implements GQLField {
 
   DateResolver date = new DateResolver();
   TitleResolver title = new TitleResolver();
@@ -64,17 +64,14 @@ class ArticlesResolver extends Object with Alias, Fields implements GQLField {
   ArticlesResolver(this._queryResolverName);
 
   @override
-  GQLField clone() {
-    var clone = new ArticlesResolver(this._queryResolverName);
-    clone..date = date.clone();
-    clone..title = title.clone();
-    clone..description = description.clone();
-    clone..url = url.clone();
-    clone..domain = domain.clone();
-    clone..tags = tags.clone();
-
-    return clone;
-  }
+  GQLField clone() => new ArticlesResolver(this._queryResolverName)
+    ..date = date.clone()
+    ..title = title.clone()
+    ..description = description.clone()
+    ..url = url.clone()
+    ..domain = domain.clone()
+    ..tags = tags.clone()
+    ..screenshot = screenshot.clone();
 
   @override
   String get name => _queryResolverName;
@@ -84,7 +81,7 @@ class ArticlesResolver extends Object with Alias, Fields implements GQLField {
 
 }
 
-class DateResolver extends Object with Alias, Fields implements GQLField {
+class DateResolver extends Object with Scalar<String>, Fields implements GQLField {
   @override
   String get name => 'date';
 
@@ -92,7 +89,7 @@ class DateResolver extends Object with Alias, Fields implements GQLField {
   DateResolver clone() => new DateResolver();
 }
 
-class TitleResolver extends Object with Alias, Fields implements GQLField {
+class TitleResolver extends Object with Scalar<String>, Fields implements GQLField {
   @override
   String get name => 'title';
 
@@ -100,7 +97,7 @@ class TitleResolver extends Object with Alias, Fields implements GQLField {
   TitleResolver clone() => new TitleResolver();
 }
 
-class DescriptionResolver extends Object with Alias, Fields implements GQLField {
+class DescriptionResolver extends Object with Scalar<String>, Fields implements GQLField {
   @override
   String get name => 'description';
 
@@ -108,7 +105,7 @@ class DescriptionResolver extends Object with Alias, Fields implements GQLField 
   DescriptionResolver clone() => new DescriptionResolver();
 }
 
-class UrlResolver extends Object with Alias, Fields implements GQLField {
+class UrlResolver extends Object with Scalar<String>, Fields implements GQLField {
   @override
   String get name => 'url';
 
@@ -116,7 +113,7 @@ class UrlResolver extends Object with Alias, Fields implements GQLField {
   UrlResolver clone() => new UrlResolver();
 }
 
-class DomainResolver extends Object with Alias, Fields implements GQLField {
+class DomainResolver extends Object with Scalar<String>, Fields implements GQLField {
   @override
   String get name => 'domain';
 
@@ -124,7 +121,7 @@ class DomainResolver extends Object with Alias, Fields implements GQLField {
   DomainResolver clone() => new DomainResolver();
 }
 
-class TagsResolver extends Object with Alias, Fields implements GQLField {
+class TagsResolver extends Object with Scalar<List<String>>, Fields implements GQLField {
   @override
   String get name => 'tags';
 
@@ -132,7 +129,7 @@ class TagsResolver extends Object with Alias, Fields implements GQLField {
   TagsResolver clone() => new TagsResolver();
 }
 
-class ScreenshotResolver extends Object with Alias, Fields implements GQLField {
+class ScreenshotResolver extends Object with Fields implements GQLField {
 
   ScreenshotWidthResolver width = new ScreenshotWidthResolver();
   ScreenshotHeightResolver height = new ScreenshotHeightResolver();
@@ -140,15 +137,11 @@ class ScreenshotResolver extends Object with Alias, Fields implements GQLField {
   ScreenshotDataResolver data = new ScreenshotDataResolver();
 
   @override
-  GQLField clone() {
-    var clone = new ScreenshotResolver();
-    clone..width = width.clone();
-    clone..height = height.clone();
-    clone..mimeType = mimeType.clone();
-    clone..data = data.clone();
-
-    return clone;
-  }
+  GQLField clone() => new ScreenshotResolver()
+    ..width = width.clone()
+    ..height = height.clone()
+    ..mimeType = mimeType.clone()
+    ..data = data.clone();
 
   @override
   String get name => "screenshot";
@@ -158,7 +151,7 @@ class ScreenshotResolver extends Object with Alias, Fields implements GQLField {
 
 }
 
-class ScreenshotWidthResolver extends Object with Alias, Fields implements GQLField {
+class ScreenshotWidthResolver extends Object with Scalar<num>, Fields implements GQLField {
   @override
   String get name => 'width';
 
@@ -166,7 +159,7 @@ class ScreenshotWidthResolver extends Object with Alias, Fields implements GQLFi
   ScreenshotWidthResolver clone() => new ScreenshotWidthResolver();
 }
 
-class ScreenshotHeightResolver extends Object with Alias, Fields implements GQLField {
+class ScreenshotHeightResolver extends Object with Scalar<num>, Fields implements GQLField {
   @override
   String get name => 'height';
 
@@ -174,7 +167,7 @@ class ScreenshotHeightResolver extends Object with Alias, Fields implements GQLF
   ScreenshotHeightResolver clone() => new ScreenshotHeightResolver();
 }
 
-class ScreenshotMimeTypeResolver extends Object with Alias, Fields implements GQLField {
+class ScreenshotMimeTypeResolver extends Object with Scalar<String>, Fields implements GQLField {
   @override
   String get name => 'mimeType';
 
@@ -182,7 +175,7 @@ class ScreenshotMimeTypeResolver extends Object with Alias, Fields implements GQ
   ScreenshotMimeTypeResolver clone() => new ScreenshotMimeTypeResolver();
 }
 
-class ScreenshotDataResolver extends Object with Alias, Fields implements GQLField {
+class ScreenshotDataResolver extends Object with Scalar<String>, Fields implements GQLField {
   @override
   String get name => 'data';
 
