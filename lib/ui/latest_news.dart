@@ -1,3 +1,4 @@
+import 'package:awesome_dev/ui/widgets/article_card.dart';
 import 'package:flutter/material.dart';
 import 'package:awesome_dev/api/articles.dart';
 
@@ -9,58 +10,71 @@ class LatestNews extends StatefulWidget {
 class LatestNewsState extends State<LatestNews> {
   final _recentArticles = <Article>[];
 
-  final _savedArticles = new Set<Article>();
+  bool _isLoading = false;
 
-  final _biggerFont = const TextStyle(fontSize: 18.0);
+  @override
+  void initState() {
+    super.initState();
+    _fetchArticles(context);
+  }
 
   _fetchArticles(BuildContext context) async {
+    setState(() {
+      _isLoading = true;
+    });
     final articlesClient = new ArticlesClient();
     try {
       final recentArticles = await articlesClient.getRecentArticles();
-      _recentArticles.clear();
-      _recentArticles.addAll(recentArticles);
+      setState(() {
+        _recentArticles.clear();
+        _recentArticles.addAll(recentArticles);
+        _isLoading = false;
+      });
     } on Exception catch (e) {
       Scaffold.of(context).showSnackBar(new SnackBar(
             content: new Text("Internal Error: ${e.toString()}"),
           ));
+      setState(() {
+        _isLoading = false;
+      });
     }
   }
 
   @override
   Widget build(BuildContext context) {
-    _fetchArticles(context);
-    return new ListView.builder(
-      padding: const EdgeInsets.all(16.0),
-        itemCount: _recentArticles.length,
-      itemBuilder: (context, i) {
-//        if (i.isOdd) return new Divider();
-        return _buildRow(_recentArticles[i]);
-      },
-    );
-  }
-
-  Widget _buildRow(Article article) {
-    final alreadySaved = _savedArticles.contains(article);
-    return new ListTile(
-      title: new Text(
-        article.title,
-        style: _biggerFont,
+    return new Container(
+      padding: new EdgeInsets.all(8.0),
+      child: new Column(
+        mainAxisAlignment: MainAxisAlignment.start,
+        children: <Widget>[
+          _isLoading ? new CircularProgressIndicator() : new Container(),
+          new Expanded(
+            child: new ListView.builder(
+              padding: new EdgeInsets.all(8.0),
+              itemCount: _recentArticles.length,
+              itemBuilder: (BuildContext context, int index) {
+                return new ArticleCard(
+                  article: _recentArticles[index],
+                  onCardClick: () {
+//                      Navigator.of(context).push(
+//                          new FadeRoute(
+//                            builder: (BuildContext context) => new BookNotesPage(_items[index]),
+//                            settings: new RouteSettings(name: '/notes', isInitialRoute: false),
+//                          ));
+                  },
+                  onStarClick: () {
+                    setState(() {
+                      _recentArticles[index].starred =
+                          !_recentArticles[index].starred;
+                    });
+//                      Repository.get().updateBook(_items[index]);
+                  },
+                );
+              },
+            ),
+          ),
+        ],
       ),
-      trailing: new Icon(
-        alreadySaved ? Icons.favorite : Icons.favorite_border,
-        color: alreadySaved ? Colors.red : null,
-      ),
-      onTap: () {
-        setState(
-          () {
-            if (alreadySaved) {
-              _savedArticles.remove(article);
-            } else {
-              _savedArticles.add(article);
-            }
-          },
-        );
-      },
     );
   }
 }

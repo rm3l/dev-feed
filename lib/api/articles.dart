@@ -29,6 +29,8 @@ class Article {
 
   ArticleLinkScreenshot screenshot;
 
+  bool starred = false;
+
   Article(this.id, this.title, this.url, this.date, this.description,
       this.domain, this.tags, this.screenshot);
 
@@ -45,15 +47,13 @@ class Article {
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
-          other is Article &&
-              runtimeType == other.runtimeType &&
-              title == other.title &&
-              url == other.url;
+      other is Article &&
+          runtimeType == other.runtimeType &&
+          title == other.title &&
+          url == other.url;
 
   @override
-  int get hashCode =>
-      title.hashCode ^
-      url.hashCode;
+  int get hashCode => title.hashCode ^ url.hashCode;
 }
 
 /*
@@ -82,19 +82,17 @@ class ArticleLinkScreenshot {
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
-          other is ArticleLinkScreenshot &&
-              runtimeType == other.runtimeType &&
-              data == other.data;
+      other is ArticleLinkScreenshot &&
+          runtimeType == other.runtimeType &&
+          data == other.data;
 
   @override
   int get hashCode => data.hashCode;
 }
 
 class ArticlesClient {
-
   Future<List<Article>> getRecentArticles() async {
-    final String query =
-        "query { \n "
+    final String query = "query { \n "
         " recentArticles { \n "
         "   id \n "
         "   date \n "
@@ -115,8 +113,7 @@ class ArticlesClient {
     final dataMap = map["data"];
     var recentArticlesList = dataMap["recentArticles"];
     if (recentArticlesList == null) {
-      throw new StateError(
-          'No content');
+      throw new StateError('No content');
     }
     List<Article> result = [];
     for (var recentArticle in recentArticlesList) {

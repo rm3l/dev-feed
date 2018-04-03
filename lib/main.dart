@@ -33,7 +33,6 @@ class AwesomeDev extends StatefulWidget {
 }
 
 class _AwesomeDevState extends State<AwesomeDev> with TickerProviderStateMixin {
-
   int _currentIndex = 0;
   List<NavigationIconView> _navigationViews;
 
@@ -75,8 +74,7 @@ class _AwesomeDevState extends State<AwesomeDev> with TickerProviderStateMixin {
 
   @override
   void dispose() {
-    for (NavigationIconView view in _navigationViews)
-      view.controller.dispose();
+    for (NavigationIconView view in _navigationViews) view.controller.dispose();
     super.dispose();
   }
 
@@ -87,7 +85,6 @@ class _AwesomeDevState extends State<AwesomeDev> with TickerProviderStateMixin {
   }
 
   Widget _buildTransitionsStack() {
-
     if (_currentIndex == 0) {
       return new LatestNews();
     }
@@ -159,9 +156,7 @@ class _AwesomeDevState extends State<AwesomeDev> with TickerProviderStateMixin {
 //          )
 //        ],
       ),
-      body: new Center(
-          child: _buildTransitionsStack()
-      ),
+      body: new Center(child: _buildTransitionsStack()),
       bottomNavigationBar: botNavBar,
     );
   }
@@ -173,7 +168,7 @@ class NavigationIconView {
     String title,
     Color color,
     TickerProvider vsync,
-  }) : _icon = icon,
+  })  : _icon = icon,
         _color = color,
         _title = title,
         item = new BottomNavigationBarItem(
@@ -198,7 +193,8 @@ class NavigationIconView {
   final AnimationController controller;
   CurvedAnimation _animation;
 
-  FadeTransition transition(BottomNavigationBarType type, BuildContext context) {
+  FadeTransition transition(
+      BottomNavigationBarType type, BuildContext context) {
     Color iconColor;
     if (type == BottomNavigationBarType.shifting) {
       iconColor = _color;

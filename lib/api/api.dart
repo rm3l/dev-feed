@@ -23,11 +23,8 @@ Example of query
   }
  */
 Future<Map<String, dynamic>> issueGraphQLQuery(String query,
-    {
-      String operationName = "",
-      Map<String, dynamic> variables = const{}
-    }) async {
-
+    {String operationName = "",
+    Map<String, dynamic> variables = const {}}) async {
   Map<String, dynamic> jsonBody = {
     "query": query,
     "operationName": operationName,
@@ -54,4 +51,3 @@ Future<Map<String, dynamic>> issueGraphQLQuery(String query,
   }
   return json.decode(await response.transform(utf8.decoder).join());
 }
-
