@@ -91,6 +91,21 @@ class ArticleLinkScreenshot {
 }
 
 class ArticlesClient {
+
+  Future<List<Article>> _getArticles(String graphqlQuery, String queryKey) async {
+    var map = await issueGraphQLQuery(graphqlQuery);
+    final dataMap = map["data"];
+    var recentArticlesList = dataMap[queryKey];
+    if (recentArticlesList == null) {
+      throw new StateError('No content');
+    }
+    List<Article> result = [];
+    for (var recentArticle in recentArticlesList) {
+      result.add(new Article.fromJson(recentArticle));
+    }
+    return result;
+  }
+
   Future<List<Article>> getRecentArticles() async {
     final String query = "query { \n "
         " recentArticles { \n "
@@ -109,16 +124,27 @@ class ArticlesClient {
         "   } \n "
         " } \n "
         "}";
-    var map = await issueGraphQLQuery(query);
-    final dataMap = map["data"];
-    var recentArticlesList = dataMap["recentArticles"];
-    if (recentArticlesList == null) {
-      throw new StateError('No content');
-    }
-    List<Article> result = [];
-    for (var recentArticle in recentArticlesList) {
-      result.add(new Article.fromJson(recentArticle));
-    }
-    return result;
+    return _getArticles(query, "recentArticles");
+  }
+
+  Future<List<Article>> getAllButRecentArticles() async {
+    final String query = "query { \n "
+        " allButRecentArticles { \n "
+        "   id \n "
+        "   date \n "
+        "   title \n "
+        "   description \n "
+        "   url \n "
+        "   domain \n "
+        "   tags \n "
+        "   screenshot { \n "
+        "       height \n "
+        "       width \n "
+        "       mimeType \n "
+        "       data \n "
+        "   } \n "
+        " } \n "
+        "}";
+    return _getArticles(query, "allButRecentArticles");
   }
 }

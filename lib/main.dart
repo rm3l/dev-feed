@@ -1,3 +1,4 @@
+import 'package:awesome_dev/ui/archives.dart';
 import 'package:flutter/material.dart';
 import 'package:awesome_dev/ui/latest_news.dart';
 
@@ -92,7 +93,8 @@ class _AwesomeDevState extends State<AwesomeDev> with TickerProviderStateMixin {
       return new Text("Index $_currentIndex: My Favorites!!!");
     }
     if (_currentIndex == 2) {
-      return new Text("Index $_currentIndex: Archives!!!");
+      return new ArticleArchives();
+//      return new Text("Index $_currentIndex: Archives!!!");
     }
     if (_currentIndex == 3) {
       return new Text("Index $_currentIndex: Tags!!!");

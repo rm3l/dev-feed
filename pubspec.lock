@@ -296,6 +296,13 @@ packages:
     description: flutter
     source: sdk
     version: "0.0.99"
+  small_calendar:
+    dependency: "direct main"
+    description:
+      name: small_calendar
+      url: "https://pub.dartlang.org"
+    source: hosted
+    version: "0.3.0"
   source_map_stack_trace:
     dependency: transitive
     description:
