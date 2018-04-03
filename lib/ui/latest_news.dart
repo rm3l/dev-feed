@@ -1,40 +1,28 @@
 import 'package:flutter/material.dart';
 import 'package:awesome_dev/api/articles.dart';
-import 'package:awesome_dev/api/graphql.dart';
-import 'package:graphql_client/graphql_client.dart';
 
 class LatestNews extends StatefulWidget {
   @override
   State<StatefulWidget> createState() => new LatestNewsState();
-
 }
 
 class LatestNewsState extends State<LatestNews> {
+  final _recentArticles = <Article>[];
 
-  final _suggestions = <String>[];
-
-  final _saved = new Set<String>();
+  final _savedArticles = new Set<Article>();
 
   final _biggerFont = const TextStyle(fontSize: 18.0);
 
   _fetchArticles(BuildContext context) async {
-    final query = new ArticlesQuery("GetRecentArticles", "recentArticles");
+    final articlesClient = new ArticlesClient();
     try {
-      final queryRes = await graphQLClient.execute(
-        query,
-        variables: {},
-        headers: {
-          'User-Agent': 'org.rm3l.discoverdev.io',
-        },
-      );
-
+      final recentArticles = await articlesClient.getRecentArticles();
+      _recentArticles.clear();
+      _recentArticles.addAll(recentArticles);
+    } on Exception catch (e) {
       Scaffold.of(context).showSnackBar(new SnackBar(
-        content: new Text(queryRes.viewer.title.toString()),
-      ));
-
-    } on GQLException catch (e) {
-      print(e.message);
-      print(e.gqlErrors);
+            content: new Text("Internal Error: ${e.toString()}"),
+          ));
     }
   }
 
@@ -42,24 +30,20 @@ class LatestNewsState extends State<LatestNews> {
   Widget build(BuildContext context) {
     _fetchArticles(context);
     return new ListView.builder(
-        padding: const EdgeInsets.all(16.0),
-    itemBuilder: (context, i) {
-    if (i.isOdd) return new Divider();
-
-    final index = i ~/ 2;
-//    if (index >= _suggestions.length) {
-//    _suggestions.addAll(generateWordPairs().take(10));
-//    }
-    return _buildRow("Hiya @$i");
-    },
+      padding: const EdgeInsets.all(16.0),
+        itemCount: _recentArticles.length,
+      itemBuilder: (context, i) {
+//        if (i.isOdd) return new Divider();
+        return _buildRow(_recentArticles[i]);
+      },
     );
   }
 
-  Widget _buildRow(String pair) {
-    final alreadySaved = _saved.contains(pair);
+  Widget _buildRow(Article article) {
+    final alreadySaved = _savedArticles.contains(article);
     return new ListTile(
       title: new Text(
-        pair,
+        article.title,
         style: _biggerFont,
       ),
       trailing: new Icon(
@@ -68,16 +52,15 @@ class LatestNewsState extends State<LatestNews> {
       ),
       onTap: () {
         setState(
-              () {
+          () {
             if (alreadySaved) {
-              _saved.remove(pair);
+              _savedArticles.remove(article);
             } else {
-              _saved.add(pair);
+              _savedArticles.add(article);
             }
           },
         );
       },
     );
   }
-
 }

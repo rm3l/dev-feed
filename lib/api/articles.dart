@@ -1,184 +1,127 @@
-import 'package:graphql_client/graphql_dsl.dart';
+import 'dart:async';
 
-const API_ENDPOINT = 'http://tools.rm3l.org:9000/graphql';
+import 'package:awesome_dev/api/api.dart';
 
 /*
-Example of query
-query GetRecentArticles {
-  recentArticles {
-    date
-    title
-    description
-    url
-    domain
-    tags
-    screenshot {
-      height
-      width
-      mimeType
-      data
-    }
-  }
-}
+    id: ID!
+    date: String!
+    title: String!
+    description: String
+    url: String!
+    domain: String!
+    tags: [String]
+    screenshot: Screenshot
  */
-class ArticlesQuery extends Object with ScalarCollection<ArticlesResolver>, Fields implements GQLOperation {
+class Article {
+  String id;
 
-  String _queryName;
-  String _queryResolverName;
+  String date;
 
-  ArticlesResolver viewer;
+  String title;
 
-  ArticlesQuery(String queryName, String queryResolverName) {
-    this._queryName = queryName;
-    this._queryResolverName = queryResolverName;
-    this.viewer = new ArticlesResolver(queryResolverName);
+  String description;
+
+  String url;
+
+  String domain;
+
+  List<String> tags;
+
+  ArticleLinkScreenshot screenshot;
+
+  Article(this.id, this.title, this.url, this.date, this.description,
+      this.domain, this.tags, this.screenshot);
+
+  Article.fromJson(Map<String, dynamic> json)
+      : id = json['id'],
+        date = json['date'],
+        title = json['title'],
+        url = json['url'],
+        description = json['description'],
+        domain = json['domain'],
+        tags = json['tags'],
+        screenshot = new ArticleLinkScreenshot.fromJson(json['screenshot']);
+
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+          other is Article &&
+              runtimeType == other.runtimeType &&
+              title == other.title &&
+              url == other.url;
+
+  @override
+  int get hashCode =>
+      title.hashCode ^
+      url.hashCode;
+}
+
+/*
+data: String
+    height: Int
+    width: Int
+    mimeType: String
+ */
+class ArticleLinkScreenshot {
+  String mimeType;
+
+  int width;
+
+  int height;
+
+  String data;
+
+  ArticleLinkScreenshot(this.data, this.width, this.height, this.mimeType);
+
+  ArticleLinkScreenshot.fromJson(Map<String, dynamic> json)
+      : data = json['data'],
+        width = json['width'],
+        height = json['height'],
+        mimeType = json['mimeType'];
+
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+          other is ArticleLinkScreenshot &&
+              runtimeType == other.runtimeType &&
+              data == other.data;
+
+  @override
+  int get hashCode => data.hashCode;
+}
+
+class ArticlesClient {
+
+  Future<List<Article>> getRecentArticles() async {
+    final String query =
+        "query { \n "
+        " recentArticles { \n "
+        "   id \n "
+        "   date \n "
+        "   title \n "
+        "   description \n "
+        "   url \n "
+        "   domain \n "
+        "   tags \n "
+        "   screenshot { \n "
+        "       height \n "
+        "       width \n "
+        "       mimeType \n "
+        "       data \n "
+        "   } \n "
+        " } \n "
+        "}";
+    var map = await issueGraphQLQuery(query);
+    final dataMap = map["data"];
+    var recentArticlesList = dataMap["recentArticles"];
+    if (recentArticlesList == null) {
+      throw new StateError(
+          'No content');
+    }
+    List<Article> result = [];
+    for (var recentArticle in recentArticlesList) {
+      result.add(new Article.fromJson(recentArticle));
+    }
+    return result;
   }
-
-  @override
-  GQLField clone() =>
-      new ArticlesQuery(_queryName, _queryResolverName)..viewer = viewer.clone();
-
-  @override
-  String get name => _queryName;
-
-  @override
-  String get type => queryType;
-
-  @override
-  List<GQLField> get fields => [viewer];
-
-}
-
-class ArticlesResolver extends Object with Fields implements GQLField {
-
-  DateResolver date = new DateResolver();
-  TitleResolver title = new TitleResolver();
-  DescriptionResolver description = new DescriptionResolver();
-  UrlResolver url = new UrlResolver();
-  DomainResolver domain = new DomainResolver();
-  TagsResolver tags = new TagsResolver();
-  ScreenshotResolver screenshot = new ScreenshotResolver();
-
-  String _queryResolverName;
-
-  ArticlesResolver(this._queryResolverName);
-
-  @override
-  GQLField clone() => new ArticlesResolver(this._queryResolverName)
-    ..date = date.clone()
-    ..title = title.clone()
-    ..description = description.clone()
-    ..url = url.clone()
-    ..domain = domain.clone()
-    ..tags = tags.clone()
-    ..screenshot = screenshot.clone();
-
-  @override
-  String get name => _queryResolverName;
-
-  @override
-  List<GQLField> get fields => [date, title, description, url, domain, tags, screenshot];
-
-}
-
-class DateResolver extends Object with Scalar<String>, Fields implements GQLField {
-  @override
-  String get name => 'date';
-
-  @override
-  DateResolver clone() => new DateResolver();
-}
-
-class TitleResolver extends Object with Scalar<String>, Fields implements GQLField {
-  @override
-  String get name => 'title';
-
-  @override
-  TitleResolver clone() => new TitleResolver();
-}
-
-class DescriptionResolver extends Object with Scalar<String>, Fields implements GQLField {
-  @override
-  String get name => 'description';
-
-  @override
-  DescriptionResolver clone() => new DescriptionResolver();
-}
-
-class UrlResolver extends Object with Scalar<String>, Fields implements GQLField {
-  @override
-  String get name => 'url';
-
-  @override
-  UrlResolver clone() => new UrlResolver();
-}
-
-class DomainResolver extends Object with Scalar<String>, Fields implements GQLField {
-  @override
-  String get name => 'domain';
-
-  @override
-  DomainResolver clone() => new DomainResolver();
-}
-
-class TagsResolver extends Object with Scalar<List<String>>, Fields implements GQLField {
-  @override
-  String get name => 'tags';
-
-  @override
-  TagsResolver clone() => new TagsResolver();
-}
-
-class ScreenshotResolver extends Object with Fields implements GQLField {
-
-  ScreenshotWidthResolver width = new ScreenshotWidthResolver();
-  ScreenshotHeightResolver height = new ScreenshotHeightResolver();
-  ScreenshotMimeTypeResolver mimeType = new ScreenshotMimeTypeResolver();
-  ScreenshotDataResolver data = new ScreenshotDataResolver();
-
-  @override
-  GQLField clone() => new ScreenshotResolver()
-    ..width = width.clone()
-    ..height = height.clone()
-    ..mimeType = mimeType.clone()
-    ..data = data.clone();
-
-  @override
-  String get name => "screenshot";
-
-  @override
-  List<GQLField> get fields => [width, height, mimeType, data];
-
-}
-
-class ScreenshotWidthResolver extends Object with Scalar<num>, Fields implements GQLField {
-  @override
-  String get name => 'width';
-
-  @override
-  ScreenshotWidthResolver clone() => new ScreenshotWidthResolver();
-}
-
-class ScreenshotHeightResolver extends Object with Scalar<num>, Fields implements GQLField {
-  @override
-  String get name => 'height';
-
-  @override
-  ScreenshotHeightResolver clone() => new ScreenshotHeightResolver();
-}
-
-class ScreenshotMimeTypeResolver extends Object with Scalar<String>, Fields implements GQLField {
-  @override
-  String get name => 'mimeType';
-
-  @override
-  ScreenshotMimeTypeResolver clone() => new ScreenshotMimeTypeResolver();
-}
-
-class ScreenshotDataResolver extends Object with Scalar<String>, Fields implements GQLField {
-  @override
-  String get name => 'data';
-
-  @override
-  ScreenshotDataResolver clone() => new ScreenshotDataResolver();
 }
