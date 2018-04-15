@@ -1,7 +1,7 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
-import 'package:awesome_dev/ui/widgets/article_card.dart';
+import 'package:awesome_dev/ui/widgets/article_widget.dart';
 
 import 'package:awesome_dev/api/articles.dart';
 

@@ -4,8 +4,8 @@ import 'package:flutter/material.dart';
 import 'package:meta/meta.dart';
 import 'package:awesome_dev/api/articles.dart';
 
-class ArticleCard extends StatefulWidget {
-  ArticleCard({
+class ArticleWidget extends StatefulWidget {
+  ArticleWidget({
     this.article,
     @required this.onCardClick,
     @required this.onStarClick,
@@ -17,10 +17,10 @@ class ArticleCard extends StatefulWidget {
   final VoidCallback onStarClick;
 
   @override
-  State<StatefulWidget> createState() => new ArticleCardState();
+  State<StatefulWidget> createState() => new ArticleWidgetState();
 }
 
-class ArticleCardState extends State<ArticleCard> {
+class ArticleWidgetState extends State<ArticleWidget> {
   final _biggerFont = const TextStyle(fontSize: 18.0);
 
   @override

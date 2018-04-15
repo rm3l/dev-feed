@@ -1,4 +1,4 @@
-import 'package:awesome_dev/ui/widgets/article_card.dart';
+import 'package:awesome_dev/ui/widgets/article_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:awesome_dev/api/articles.dart';
 
@@ -53,7 +53,7 @@ class LatestNewsState extends State<LatestNews> {
                 padding: new EdgeInsets.all(8.0),
                 itemCount: _recentArticles.length,
                 itemBuilder: (BuildContext context, int index) {
-                  return new ArticleCard(
+                  return new ArticleWidget(
                     article: _recentArticles[index],
                     onCardClick: () {
   //                      Navigator.of(context).push(
