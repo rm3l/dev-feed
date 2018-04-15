@@ -3,21 +3,29 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:meta/meta.dart';
 import 'package:awesome_dev/api/articles.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 class ArticleWidget extends StatefulWidget {
   ArticleWidget({
     this.article,
-    @required this.onCardClick,
+    this.onCardClick,
     @required this.onStarClick,
   });
 
   final Article article;
-
   final VoidCallback onCardClick;
   final VoidCallback onStarClick;
 
   @override
   State<StatefulWidget> createState() => new ArticleWidgetState();
+
+  _launchURL() async {
+    if (await canLaunch(this.article.url)) {
+      await launch(this.article.url);
+    } else {
+      throw 'Could not launch $this.article.url';
+    }
+  }
 }
 
 class ArticleWidgetState extends State<ArticleWidget> {
@@ -33,7 +41,7 @@ class ArticleWidgetState extends State<ArticleWidget> {
     }
 
     return new GestureDetector(
-        onTap: widget.onCardClick,
+        onTap: widget.onCardClick != null ? widget.onCardClick : widget._launchURL,
         child: new Column(children: <Widget>[
           new Container(
               padding: const EdgeInsets.all(8.0),

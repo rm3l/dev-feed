@@ -55,13 +55,13 @@ class LatestNewsState extends State<LatestNews> {
                 itemBuilder: (BuildContext context, int index) {
                   return new ArticleWidget(
                     article: _recentArticles[index],
-                    onCardClick: () {
-  //                      Navigator.of(context).push(
-  //                          new FadeRoute(
-  //                            builder: (BuildContext context) => new BookNotesPage(_items[index]),
-  //                            settings: new RouteSettings(name: '/notes', isInitialRoute: false),
-  //                          ));
-                    },
+//                    onCardClick: () {
+//  //                      Navigator.of(context).push(
+//  //                          new FadeRoute(
+//  //                            builder: (BuildContext context) => new BookNotesPage(_items[index]),
+//  //                            settings: new RouteSettings(name: '/notes', isInitialRoute: false),
+//  //                          ));
+//                    },
                     onStarClick: () {
                       setState(() {
                         _recentArticles[index].starred =
