@@ -90,14 +90,14 @@ class _AwesomeDevState extends State<AwesomeDev> with TickerProviderStateMixin {
       return new LatestNews();
     }
     if (_currentIndex == 1) {
-      return new Text("Index $_currentIndex: My Favorites!!!");
+      return new Text("Oh no! You do not have any favorite article at the moment.");
     }
     if (_currentIndex == 2) {
       return new ArticleArchives();
 //      return new Text("Index $_currentIndex: Archives!!!");
     }
     if (_currentIndex == 3) {
-      return new Text("Index $_currentIndex: Tags!!!");
+      return new Text("Index $_currentIndex: Tags ...!!!");
     }
 
     final List<FadeTransition> transitions = <FadeTransition>[];
