@@ -19,7 +19,7 @@ class AwesomeDevApp extends StatelessWidget {
       title: 'Awesome Dev',
       theme: new ThemeData(
         primaryColor: Colors.green,
-        backgroundColor: Colors.grey,
+        backgroundColor: Colors.white,
       ),
       home: new AwesomeDev(),
     );
