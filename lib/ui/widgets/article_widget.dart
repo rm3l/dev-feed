@@ -21,7 +21,7 @@ class ArticleWidget extends StatefulWidget {
 
   _launchURL() async {
     if (await canLaunch(this.article.url)) {
-      await launch(this.article.url);
+      await launch(this.article.url, forceWebView: true);
     } else {
       throw 'Could not launch $this.article.url';
     }
