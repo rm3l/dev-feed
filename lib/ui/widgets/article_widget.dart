@@ -33,10 +33,7 @@ class ArticleWidget extends StatefulWidget {
     final newFavoritesList = [];
     final favorites = prefs.getStringList("favs") ?? [];
     newFavoritesList.addAll(favorites);
-    final String favoriteData = "{"
-          "\"title\" : \"${article.title}\","
-          "\"url\" : \"${article.url}\""
-        "}";
+    final String favoriteData = article.toSharedPreferencesString();
     if (!article.starred) { //previous state
       newFavoritesList.add(favoriteData);
     } else {

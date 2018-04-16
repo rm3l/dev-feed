@@ -44,6 +44,11 @@ class Article {
         tags = json['tags'],
         screenshot = new ArticleLinkScreenshot.fromJson(json['screenshot']);
 
+  String toSharedPreferencesString() => "{"
+      "\"title\" : \"${this.title}\","
+      "\"url\" : \"${this.url}\""
+      "}";
+
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
