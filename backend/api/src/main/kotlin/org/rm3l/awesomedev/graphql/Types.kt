@@ -5,8 +5,8 @@ data class ArticleFilter(
         val to: String? = null,
         val search: String? = null,
         val tags: List<String>? = null,
-        val title: String? = null,
-        val url: String? = null
+        val titles: List<String>? = null,
+        val urls: List<String>? = null
 )
 
 data class ArticleInput(

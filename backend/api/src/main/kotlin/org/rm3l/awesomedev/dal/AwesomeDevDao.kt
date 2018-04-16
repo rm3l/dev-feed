@@ -186,30 +186,41 @@ class AwesomeDevDao {
         val result = mutableListOf<Article>()
         transaction {
             val query: Query
-            var whereClause: Op<Boolean>? = null
+            var whereClause: (SqlExpressionBuilder.()->Op<Boolean>)? = null
             var tagsResolvedFromSearch: Collection<String>? = null
             if (filter != null) {
-                if (filter.from != null) {
-                    whereClause = Articles.date.between(DateTime(filter.from),
+                val searchPattern = "%${filter.search}%"
+                whereClause = {
+                    Articles.date.between(filter.from?.map { DateTime(it) } ?: DateTime(0),
                             filter.to?.map { DateTime(it) } ?: DateTime.now())
-                } else if (filter.to != null) {
-                    whereClause = Articles.date.between(DateTime.now(), DateTime(filter.to))
+                            .and(if (filter.search != null) (Articles.title.like(searchPattern)
+                                    .or(Articles.description like searchPattern).or(Articles.link like searchPattern))
+                                else Articles.title.isNotNull())
+                            .and(if (filter.titles != null) Articles.title.inList(filter.titles) else Articles.title.isNotNull())
+                            .and(if (filter.urls != null) Articles.link.inList(filter.urls) else Articles.link.isNotNull())
                 }
-                if (filter.search != null) {
-                    val searchPattern = "%${filter.search}%"
-                    val searchClause = (Articles.title like searchPattern)
-                            .or(Articles.description like searchPattern)
-                            .or(Articles.link like searchPattern)
-                    whereClause = whereClause?.and(searchClause)?:searchClause
-                }
-                if (filter.title != null) {
-                    val searchClause = (Articles.title like filter.title)
-                    whereClause = whereClause?.and(searchClause)?:searchClause
-                }
-                if (filter.url != null) {
-                    val searchClause = (Articles.link like filter.url)
-                    whereClause = whereClause?.and(searchClause)?:searchClause
-                }
+//                if (filter.from != null) {
+//                    whereClause = {Articles.date.between(DateTime(filter.from),
+//                            filter.to?.map { DateTime(it) } ?: DateTime.now())}
+//                } else if (filter.to != null) {
+//                    whereClause = {Articles.date.between(DateTime.now(), DateTime(filter.to))}
+//                }
+//                if (filter.search != null) {
+//                    val searchPattern = "%${filter.search}%"
+//                    val searchClause = (Articles.title like searchPattern)
+//                            .or(Articles.description like searchPattern)
+//                            .or(Articles.link like searchPattern)
+//                    whereClause = whereClause?. and(searchClause)?:searchClause
+//                }
+//                if (filter.titles != null) {
+//                    val searchClause = (Articles.title.inList(filter.titles))
+//                    whereClause = whereClause?.and(searchClause)?:searchClause
+//                    Articles.select { Articles.title.inList(filter.titles) }
+//                }
+//                if (filter.urls != null) {
+//                    val searchClause = (Articles.link.inList(filter.urls))
+//                    whereClause = whereClause?.and(searchClause)?:searchClause
+//                }
                 if (filter.tags != null) {
                     tagsResolvedFromSearch = getTags(search = filter.tags)
                 }
