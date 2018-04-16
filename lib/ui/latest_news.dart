@@ -1,6 +1,7 @@
 import 'package:awesome_dev/ui/widgets/article_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:awesome_dev/api/articles.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 enum IndicatorType { overscroll, refresh }
 
@@ -26,6 +27,16 @@ class LatestNewsState extends State<LatestNews> {
     final articlesClient = new ArticlesClient();
     try {
       final recentArticles = await articlesClient.getRecentArticles();
+      final prefs = await SharedPreferences.getInstance();
+      final favorites = prefs.getStringList("favs") ?? [];
+      for (var article in recentArticles) {
+        final String favoriteData = "{"
+            "\"title\" : \"${article.title}\","
+            "\"url\" : \"${article.url}\""
+            "}";
+        article.starred = favorites.contains(favoriteData);
+      }
+
       setState(() {
         _recentArticles.clear();
         _recentArticles.addAll(recentArticles);
