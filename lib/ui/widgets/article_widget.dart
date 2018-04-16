@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:meta/meta.dart';
 import 'package:awesome_dev/api/articles.dart';
 import 'package:url_launcher/url_launcher.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class ArticleWidget extends StatefulWidget {
   ArticleWidget({
@@ -24,6 +25,26 @@ class ArticleWidget extends StatefulWidget {
       await launch(this.article.url);
     } else {
       throw 'Could not launch $this.article.url';
+    }
+  }
+
+  _handleStarClick() async {
+    final prefs = await SharedPreferences.getInstance();
+    final newFavoritesList = [];
+    final favorites = prefs.getStringList("favs") ?? [];
+    newFavoritesList.addAll(favorites);
+    final String favoriteData = "{"
+          "\"title\" : \"${article.title}\","
+          "\"url\" : \"${article.url}\""
+        "}";
+    if (!article.starred) { //previous state
+      newFavoritesList.add(favoriteData);
+    } else {
+      newFavoritesList.remove(favoriteData);
+    }
+    prefs.setStringList("favs", newFavoritesList);
+    if (onStarClick != null) {
+      onStarClick();
     }
   }
 }
@@ -60,7 +81,7 @@ class ArticleWidgetState extends State<ArticleWidget> {
                                   ? new Icon(Icons.favorite)
                                   : new Icon(Icons.favorite_border),
                               color: widget.article.starred ? Colors.red : null,
-                              onPressed: widget.onStarClick,
+                              onPressed: widget._handleStarClick,
                               alignment: Alignment.topRight,
                             )
                           ],
