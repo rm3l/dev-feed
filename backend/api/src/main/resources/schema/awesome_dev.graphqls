@@ -46,6 +46,8 @@ input ArticleFilter {
     to: String
     search: String
     tags: [String]
+    title: String
+    url: String
 }
 
 input ArticleInput {

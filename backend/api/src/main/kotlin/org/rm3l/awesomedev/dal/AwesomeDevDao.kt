@@ -202,6 +202,14 @@ class AwesomeDevDao {
                             .or(Articles.link like searchPattern)
                     whereClause = whereClause?.and(searchClause)?:searchClause
                 }
+                if (filter.title != null) {
+                    val searchClause = (Articles.title like filter.title)
+                    whereClause = whereClause?.and(searchClause)?:searchClause
+                }
+                if (filter.url != null) {
+                    val searchClause = (Articles.link like filter.url)
+                    whereClause = whereClause?.and(searchClause)?:searchClause
+                }
                 if (filter.tags != null) {
                     tagsResolvedFromSearch = getTags(search = filter.tags)
                 }
