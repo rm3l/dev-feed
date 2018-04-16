@@ -32,11 +32,12 @@ class FavoriteNewsState extends State<FavoriteNews> {
       final articlesToLookup = [];
       for (var fav in favorites) {
         final Map<String, dynamic> map = json.decode(fav);
-        final article = new Article(map['title'], map['url']);
-        article.starred = true;
-        articlesToLookup.add(article);
+        articlesToLookup.add(new Article(map['title'], map['url']));
       }
       final favoriteArticles = await articlesClient.getFavoriteArticles(articlesToLookup);
+      for (var article in favoriteArticles) {
+        article.starred = true;
+      }
       setState(() {
         _articles.clear();
         _articles.addAll(favoriteArticles);
