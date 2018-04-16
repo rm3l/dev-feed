@@ -13,26 +13,26 @@ import 'package:awesome_dev/api/api.dart';
     screenshot: Screenshot
  */
 class Article {
-  String id;
+  final String id;
 
-  String date;
+  final String date;
 
-  String title;
+  final String title;
 
-  String description;
+  final String description;
 
-  String url;
+  final String url;
 
-  String domain;
+  final String domain;
 
-  List<String> tags;
+  final List<String> tags;
 
-  ArticleLinkScreenshot screenshot;
+  final ArticleLinkScreenshot screenshot;
 
   bool starred = false;
 
-  Article(this.id, this.title, this.url, this.date, this.description,
-      this.domain, this.tags, this.screenshot);
+  Article(this.title, this.url,
+      {this.id, this.date, this.description, this.domain, this.tags, this.screenshot});
 
   Article.fromJson(Map<String, dynamic> json)
       : id = json['id'],
@@ -68,15 +68,15 @@ data: String
     mimeType: String
  */
 class ArticleLinkScreenshot {
-  String mimeType;
+  final String mimeType;
 
-  int width;
+  final int width;
 
-  int height;
+  final int height;
 
-  String data;
+  final String data;
 
-  ArticleLinkScreenshot(this.data, this.width, this.height, this.mimeType);
+  ArticleLinkScreenshot({this.data, this.width, this.height, this.mimeType});
 
   ArticleLinkScreenshot.fromJson(Map<String, dynamic> json)
       : data = json['data'],
