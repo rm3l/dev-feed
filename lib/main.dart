@@ -1,6 +1,7 @@
 import 'package:awesome_dev/ui/archives.dart';
 import 'package:flutter/material.dart';
 import 'package:awesome_dev/ui/latest_news.dart';
+import 'package:awesome_dev/ui/favorites.dart';
 
 import 'package:logging/logging.dart'; // Optional
 
@@ -90,7 +91,7 @@ class _AwesomeDevState extends State<AwesomeDev> with TickerProviderStateMixin {
       return new LatestNews();
     }
     if (_currentIndex == 1) {
-      return new Text("Oh no! You do not have any favorite article at the moment.");
+      return new FavoriteNews();
     }
     if (_currentIndex == 2) {
       return new ArticleArchives();

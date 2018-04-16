@@ -132,6 +132,29 @@ class ArticlesClient {
     return _getArticles(query, "recentArticles");
   }
 
+  Future<List<Article>> getFavoriteArticles(List<Article> articlesToLookup) async {
+    final titles = articlesToLookup.map((article) => "\"${article.title}\"").join(",");
+    final urls = articlesToLookup.map((article) => "\"${article.url}\"").join(",");
+    final String query = "query { \n "
+        " articles(filter: {titles: [$titles], urls: [$urls]}) { \n "
+        "   id \n "
+        "   date \n "
+        "   title \n "
+        "   description \n "
+        "   url \n "
+        "   domain \n "
+        "   tags \n "
+        "   screenshot { \n "
+        "       height \n "
+        "       width \n "
+        "       mimeType \n "
+        "       data \n "
+        "   } \n "
+        " } \n "
+        "}";
+    return _getArticles(query, "articles");
+  }
+
   Future<List<Article>> getAllButRecentArticles() async {
     final String query = "query { \n "
         " allButRecentArticles { \n "
