@@ -97,6 +97,15 @@ class ArticleLinkScreenshot {
 
 class ArticlesClient {
 
+  static final ArticlesClient _singleton = new ArticlesClient._internal();
+
+  //Leveraging Dart Factory constructors to build singletons
+  factory ArticlesClient() {
+    return _singleton;
+  }
+
+  ArticlesClient._internal();
+
   Future<List<Article>> _getArticles(String graphqlQuery, String queryKey) async {
     var map = await issueGraphQLQuery(graphqlQuery);
     final dataMap = map["data"];
