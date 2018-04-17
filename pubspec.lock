@@ -193,6 +193,13 @@ packages:
       url: "https://pub.dartlang.org"
     source: hosted
     version: "0.9.6"
+  mocha:
+    dependency: "direct main"
+    description:
+      name: mocha
+      url: "https://pub.dartlang.org"
+    source: hosted
+    version: "0.0.2"
   mockito:
     dependency: transitive
     description:

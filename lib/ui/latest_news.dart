@@ -15,6 +15,7 @@ class LatestNewsState extends State<LatestNews> {
   final GlobalKey<RefreshIndicatorState> _refreshIndicatorKey = new GlobalKey<RefreshIndicatorState>();
 
   final _recentArticles = <Article>[];
+  DateTime _recentArticlesLastUpdate;
 
   @override
   void initState() {
@@ -24,22 +25,30 @@ class LatestNewsState extends State<LatestNews> {
 
   _fetchArticles() async {
     _refreshIndicatorKey.currentState.show();
-    final articlesClient = new ArticlesClient();
-    try {
-      final recentArticles = await articlesClient.getRecentArticles();
-      final prefs = await SharedPreferences.getInstance();
-      final favorites = prefs.getStringList("favs") ?? [];
-      for (var article in recentArticles) {
-        article.starred = favorites.contains(article.toSharedPreferencesString());
+    if (_recentArticles.isNotEmpty &&
+        _recentArticlesLastUpdate != null &&
+        _recentArticlesLastUpdate.day == new DateTime.now().day) {
+      //Same day
+    } else {
+      final articlesClient = new ArticlesClient();
+      try {
+        final recentArticles = await articlesClient.getRecentArticles();
+        final prefs = await SharedPreferences.getInstance();
+        final favorites = prefs.getStringList("favs") ?? [];
+        for (var article in recentArticles) {
+          article.starred =
+              favorites.contains(article.toSharedPreferencesString());
+        }
+        setState(() {
+          _recentArticles.clear();
+          _recentArticles.addAll(recentArticles);
+        });
+        _recentArticlesLastUpdate = new DateTime.now();
+      } on Exception catch (e) {
+        Scaffold.of(context).showSnackBar(new SnackBar(
+          content: new Text("Internal Error: ${e.toString()}"),
+        ));
       }
-      setState(() {
-        _recentArticles.clear();
-        _recentArticles.addAll(recentArticles);
-      });
-    } on Exception catch (e) {
-      Scaffold.of(context).showSnackBar(new SnackBar(
-            content: new Text("Internal Error: ${e.toString()}"),
-          ));
     }
   }
 

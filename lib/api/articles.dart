@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:awesome_dev/api/api.dart';
+import 'package:mocha/mocha.dart';
 
 /*
     id: ID!
@@ -97,6 +98,8 @@ class ArticleLinkScreenshot {
 
 class ArticlesClient {
 
+//  LoadingCache<String,List<Article>> _recentArticlesCache;
+
   static final ArticlesClient _singleton = new ArticlesClient._internal();
 
   //Leveraging Dart Factory constructors to build singletons
@@ -104,7 +107,21 @@ class ArticlesClient {
     return _singleton;
   }
 
-  ArticlesClient._internal();
+  ArticlesClient._internal() {
+//    _recentArticlesCache = new LoadingCache<String,List<Article>>(
+//        _retrieveData,
+//        maximumSize: 1,
+//        expiresAfterWrite: const Duration(days: 1)
+//    );
+  }
+
+//  Future<List<Article>> _retrieveData(final String key) {
+//    if (key == "recentArticles") {
+//      return _fetchRecentArticles();
+//    } else {
+//      throw new UnsupportedError("operation not supported: $key");
+//    }
+//  }
 
   Future<List<Article>> _getArticles(String graphqlQuery, String queryKey) async {
     var map = await issueGraphQLQuery(graphqlQuery);
