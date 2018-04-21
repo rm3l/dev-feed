@@ -1,10 +1,10 @@
 import 'dart:convert';
 
+import 'package:awesome_dev/api/articles.dart';
 import 'package:flutter/material.dart';
 import 'package:meta/meta.dart';
-import 'package:awesome_dev/api/articles.dart';
-import 'package:url_launcher/url_launcher.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 class ArticleWidget extends StatefulWidget {
   ArticleWidget({
@@ -30,8 +30,8 @@ class ArticleWidget extends StatefulWidget {
 
   _handleStarClick() async {
     final prefs = await SharedPreferences.getInstance();
-    final newFavoritesList = [];
-    final favorites = prefs.getStringList("favs") ?? [];
+    final newFavoritesList = <String>[];
+    final favorites = prefs.getStringList("favs") ?? <String>[];
     newFavoritesList.addAll(favorites);
     final String favoriteData = article.toSharedPreferencesString();
     if (!article.starred) {
@@ -100,14 +100,14 @@ class ArticleWidgetState extends State<ArticleWidget> {
               ],
             ),
 
-            //Tags
-            new Row(
-                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                children: tagsWidgets),
+                //Tags
+                new Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                    children: tagsWidgets),
 
-            new Divider(height: 5.0, color: Colors.green),
-          ],
-        )));
+                new Divider(height: 5.0, color: Colors.green),
+              ],
+            )));
 
 //    return new GestureDetector(
 //        onTap: widget.onCardClick != null ? widget.onCardClick : widget._launchURL,
