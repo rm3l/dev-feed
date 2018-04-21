@@ -1,7 +1,6 @@
 import 'dart:async';
 
 import 'package:awesome_dev/api/api.dart';
-import 'package:mocha/mocha.dart';
 
 /*
     id: ID!
@@ -33,7 +32,12 @@ class Article {
   bool starred = false;
 
   Article(this.title, this.url,
-      {this.id, this.date, this.description, this.domain, this.tags, this.screenshot});
+      {this.id,
+      this.date,
+      this.description,
+      this.domain,
+      this.tags,
+      this.screenshot});
 
   Article.fromJson(Map<String, dynamic> json)
       : id = json['id'],
@@ -42,8 +46,16 @@ class Article {
         url = json['url'],
         description = json['description'],
         domain = json['domain'],
-        tags = json['tags'],
+        tags = convertTags(json['tags']),
         screenshot = new ArticleLinkScreenshot.fromJson(json['screenshot']);
+
+  static List<String> convertTags(List<dynamic> tags) {
+    final result = <String>[];
+    for (var tag in tags) {
+      result.add(tag.toString());
+    }
+    return result;
+  }
 
   String toSharedPreferencesString() => "{"
       "\"title\" : \"${this.title}\","
@@ -97,7 +109,6 @@ class ArticleLinkScreenshot {
 }
 
 class ArticlesClient {
-
 //  LoadingCache<String,List<Article>> _recentArticlesCache;
 
   static final ArticlesClient _singleton = new ArticlesClient._internal();
@@ -123,7 +134,8 @@ class ArticlesClient {
 //    }
 //  }
 
-  Future<List<Article>> _getArticles(String graphqlQuery, String queryKey) async {
+  Future<List<Article>> _getArticles(
+      String graphqlQuery, String queryKey) async {
     var map = await issueGraphQLQuery(graphqlQuery);
     final dataMap = map["data"];
     var recentArticlesList = dataMap[queryKey];
@@ -158,9 +170,12 @@ class ArticlesClient {
     return _getArticles(query, "recentArticles");
   }
 
-  Future<List<Article>> getFavoriteArticles(List<Article> articlesToLookup) async {
-    final titles = articlesToLookup.map((article) => "\"${article.title}\"").join(",");
-    final urls = articlesToLookup.map((article) => "\"${article.url}\"").join(",");
+  Future<List<Article>> getFavoriteArticles(
+      List<Article> articlesToLookup) async {
+    final titles =
+        articlesToLookup.map((article) => "\"${article.title}\"").join(",");
+    final urls =
+        articlesToLookup.map((article) => "\"${article.url}\"").join(",");
     final String query = "query { \n "
         " articles(filter: {titles: [$titles], urls: [$urls]}) { \n "
         "   id \n "

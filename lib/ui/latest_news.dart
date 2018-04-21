@@ -1,6 +1,8 @@
+import 'dart:async';
+
+import 'package:awesome_dev/api/articles.dart';
 import 'package:awesome_dev/ui/widgets/article_widget.dart';
 import 'package:flutter/material.dart';
-import 'package:awesome_dev/api/articles.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 enum IndicatorType { overscroll, refresh }
@@ -11,8 +13,8 @@ class LatestNews extends StatefulWidget {
 }
 
 class LatestNewsState extends State<LatestNews> {
-
-  final GlobalKey<RefreshIndicatorState> _refreshIndicatorKey = new GlobalKey<RefreshIndicatorState>();
+  final GlobalKey<RefreshIndicatorState> _refreshIndicatorKey =
+      new GlobalKey<RefreshIndicatorState>();
 
   final _recentArticles = <Article>[];
   DateTime _recentArticlesLastUpdate;
@@ -23,7 +25,7 @@ class LatestNewsState extends State<LatestNews> {
     _fetchArticles();
   }
 
-  _fetchArticles() async {
+  Future<Null> _fetchArticles() async {
     _refreshIndicatorKey.currentState.show();
     if (_recentArticles.isNotEmpty &&
         _recentArticlesLastUpdate != null &&
@@ -46,30 +48,29 @@ class LatestNewsState extends State<LatestNews> {
         _recentArticlesLastUpdate = new DateTime.now();
       } on Exception catch (e) {
         Scaffold.of(context).showSnackBar(new SnackBar(
-          content: new Text("Internal Error: ${e.toString()}"),
-        ));
+              content: new Text("Internal Error: ${e.toString()}"),
+            ));
       }
     }
   }
 
   @override
   Widget build(BuildContext context) {
-
     return new RefreshIndicator(
-      key: _refreshIndicatorKey,
-      onRefresh: _fetchArticles,
-      child: new Container(
-        padding: new EdgeInsets.all(8.0),
-        child: new Column(
-          mainAxisAlignment: MainAxisAlignment.start,
-          children: <Widget>[
-            new Expanded(
-              child: new ListView.builder(
-                padding: new EdgeInsets.all(8.0),
-                itemCount: _recentArticles.length,
-                itemBuilder: (BuildContext context, int index) {
-                  return new ArticleWidget(
-                    article: _recentArticles[index],
+        key: _refreshIndicatorKey,
+        onRefresh: _fetchArticles,
+        child: new Container(
+          padding: new EdgeInsets.all(8.0),
+          child: new Column(
+            mainAxisAlignment: MainAxisAlignment.start,
+            children: <Widget>[
+              new Expanded(
+                child: new ListView.builder(
+                  padding: new EdgeInsets.all(8.0),
+                  itemCount: _recentArticles.length,
+                  itemBuilder: (BuildContext context, int index) {
+                    return new ArticleWidget(
+                      article: _recentArticles[index],
 //                    onCardClick: () {
 //  //                      Navigator.of(context).push(
 //  //                          new FadeRoute(
@@ -77,20 +78,19 @@ class LatestNewsState extends State<LatestNews> {
 //  //                            settings: new RouteSettings(name: '/notes', isInitialRoute: false),
 //  //                          ));
 //                    },
-                    onStarClick: () {
-                      setState(() {
-                        _recentArticles[index].starred =
-                            !_recentArticles[index].starred;
-                      });
-  //                      Repository.get().updateBook(_items[index]);
-                    },
-                  );
-                },
+                      onStarClick: () {
+                        setState(() {
+                          _recentArticles[index].starred =
+                              !_recentArticles[index].starred;
+                        });
+                        //                      Repository.get().updateBook(_items[index]);
+                      },
+                    );
+                  },
+                ),
               ),
-            ),
-          ],
-        ),
-      )
-    );
+            ],
+          ),
+        ));
   }
 }
