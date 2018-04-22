@@ -2,9 +2,9 @@ import 'dart:convert';
 
 import 'package:awesome_dev/api/articles.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_custom_tabs/flutter_custom_tabs.dart';
 import 'package:meta/meta.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:url_launcher/url_launcher.dart';
 
 class ArticleWidget extends StatefulWidget {
   ArticleWidget({
@@ -19,35 +19,47 @@ class ArticleWidget extends StatefulWidget {
 
   @override
   State<StatefulWidget> createState() => new ArticleWidgetState();
+}
 
-  _launchURL() async {
-    if (await canLaunch(this.article.url)) {
-      await launch(this.article.url);
-    } else {
-      throw 'Could not launch $this.article.url';
+class ArticleWidgetState extends State<ArticleWidget> {
+  void _launchURL() async {
+    try {
+      await launch(
+        widget.article.url,
+        option: new CustomTabsOption(
+          toolbarColor: Theme.of(context).primaryColor,
+          enableDefaultShare: true,
+          enableUrlBarHiding: true,
+          showPageTitle: true,
+        ),
+      );
+    } catch (e) {
+      // An exception is thrown if browser app is not installed on Android device.
+      debugPrint(e.toString());
+      Scaffold.of(context).showSnackBar(new SnackBar(
+          content: new Text(
+              'Could not launch URL ($this.article.url): ${e.toString()}')));
     }
   }
 
-  _handleStarClick() async {
+  void _handleStarClick() async {
     final prefs = await SharedPreferences.getInstance();
     final newFavoritesList = <String>[];
     final favorites = prefs.getStringList("favs") ?? <String>[];
     newFavoritesList.addAll(favorites);
-    final String favoriteData = article.toSharedPreferencesString();
-    if (!article.starred) {
+    final String favoriteData = widget.article.toSharedPreferencesString();
+    if (!widget.article.starred) {
       //previous state
       newFavoritesList.add(favoriteData);
     } else {
       newFavoritesList.remove(favoriteData);
     }
     prefs.setStringList("favs", newFavoritesList);
-    if (onStarClick != null) {
-      onStarClick();
+    if (widget.onStarClick != null) {
+      widget.onStarClick();
     }
   }
-}
 
-class ArticleWidgetState extends State<ArticleWidget> {
   @override
   Widget build(BuildContext context) {
     final tagsWidgets = <Widget>[];
@@ -58,8 +70,7 @@ class ArticleWidgetState extends State<ArticleWidget> {
     }
 
     return new GestureDetector(
-        onTap:
-            widget.onCardClick != null ? widget.onCardClick : widget._launchURL,
+        onTap: widget.onCardClick != null ? widget.onCardClick : _launchURL,
         child: new Container(
             padding: const EdgeInsets.all(8.0),
             child: new Column(
@@ -104,7 +115,7 @@ class ArticleWidgetState extends State<ArticleWidget> {
                                 ? new Icon(Icons.favorite)
                                 : new Icon(Icons.favorite_border),
                             color: widget.article.starred ? Colors.red : null,
-                            onPressed: widget._handleStarClick,
+                            onPressed: _handleStarClick,
                             alignment: Alignment.topRight,
                             padding: const EdgeInsets.only(left: 85.0))
                       ],
