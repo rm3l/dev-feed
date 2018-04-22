@@ -1,4 +1,6 @@
 import 'dart:async';
+import 'dart:convert';
+import 'dart:typed_data';
 
 import 'package:awesome_dev/api/api.dart';
 
@@ -89,13 +91,19 @@ class ArticleLinkScreenshot {
 
   final String data;
 
-  ArticleLinkScreenshot({this.data, this.width, this.height, this.mimeType});
+  final Uint8List dataBytes;
+
+  ArticleLinkScreenshot(
+      {this.data, this.width, this.height, this.mimeType, this.dataBytes});
 
   ArticleLinkScreenshot.fromJson(Map<String, dynamic> json)
       : data = json['data'],
         width = json['width'],
         height = json['height'],
-        mimeType = json['mimeType'];
+        mimeType = json['mimeType'],
+        dataBytes = json['data'] != null
+            ? base64.decode(json['data'].toString())
+            : null;
 
   @override
   bool operator ==(Object other) =>

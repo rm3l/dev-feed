@@ -1,5 +1,3 @@
-import 'dart:convert';
-
 import 'package:awesome_dev/api/articles.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_custom_tabs/flutter_custom_tabs.dart';
@@ -101,10 +99,10 @@ class ArticleWidgetState extends State<ArticleWidget> {
                     new Stack(
                       children: <Widget>[
                         widget.article.screenshot != null &&
-                                widget.article.screenshot.data != null
+                                widget.article.screenshot.dataBytes != null
                             ? new Hero(
                                 child: new Image.memory(
-                                  base64.decode(widget.article.screenshot.data),
+                                  widget.article.screenshot.dataBytes,
                                   width: 110.0,
                                 ),
                                 tag: widget.article.id,
