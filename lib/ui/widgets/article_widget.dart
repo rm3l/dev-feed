@@ -1,4 +1,6 @@
 import 'package:awesome_dev/api/articles.dart';
+import 'package:awesome_dev/config/application.dart';
+import 'package:fluro/fluro.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_custom_tabs/flutter_custom_tabs.dart';
 import 'package:meta/meta.dart';
@@ -63,7 +65,12 @@ class ArticleWidgetState extends State<ArticleWidget> {
     final tagsWidgets = <Widget>[];
     if (widget.article.tags != null) {
       for (var tag in widget.article.tags) {
-        tagsWidgets.add(new Expanded(child: new Text(tag)));
+        tagsWidgets.add(new Expanded(
+            child: new GestureDetector(
+          onTap: () => Application.router.navigateTo(context, "/tags/$tag",
+              transition: TransitionType.fadeIn),
+          child: new Text(tag),
+        )));
       }
     }
 

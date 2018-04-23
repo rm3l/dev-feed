@@ -1,6 +1,8 @@
 import 'dart:async';
 
 import 'package:awesome_dev/api/tags.dart' as tagsApi;
+import 'package:awesome_dev/config/application.dart';
+import 'package:fluro/fluro.dart';
 import 'package:flutter/material.dart';
 
 enum IndicatorType { overscroll, refresh }
@@ -57,16 +59,19 @@ class TagsState extends State<Tags> {
 //          itemExtent: 20.0,
           itemCount: _tags.length,
           itemBuilder: (BuildContext context, int index) {
-            return new Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: <Widget>[
-                new Padding(
-                    padding: new EdgeInsets.all(10.0),
-                    child: new Text(_tags[index])),
-                new Divider(
-                    height: 10.0, color: Theme.of(context).primaryColor),
-              ],
-            );
+            return new GestureDetector(
+                onTap: () => Application.router.navigateTo(context, "/tags/${_tags[index]}",
+                    transition: TransitionType.fadeIn),
+                child: new Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: <Widget>[
+                    new Padding(
+                        padding: new EdgeInsets.all(10.0),
+                        child: new Text(_tags[index])),
+                    new Divider(
+                        height: 10.0, color: Theme.of(context).primaryColor),
+                  ],
+                ));
           }),
     );
   }

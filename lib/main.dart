@@ -1,7 +1,10 @@
+import 'package:awesome_dev/config/application.dart';
+import 'package:awesome_dev/config/routes.dart';
 import 'package:awesome_dev/ui/archives.dart';
 import 'package:awesome_dev/ui/favorites.dart';
 import 'package:awesome_dev/ui/latest_news.dart';
 import 'package:awesome_dev/ui/tags.dart';
+import 'package:fluro/fluro.dart';
 import 'package:flutter/material.dart';
 import 'package:logging/logging.dart'; // Optional
 
@@ -37,6 +40,12 @@ class AwesomeDev extends StatefulWidget {
 class _AwesomeDevState extends State<AwesomeDev> with TickerProviderStateMixin {
   int _currentIndex = 0;
   List<NavigationIconView> _navigationViews;
+
+  _AwesomeDevState() {
+    final router = new Router();
+    Routes.configureRoutes(router);
+    Application.router = router;
+  }
 
   @override
   void initState() {
