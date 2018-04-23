@@ -185,7 +185,8 @@ class ArticlesClient {
     final urls =
         articlesToLookup.map((article) => "\"${article.url}\"").join(",");
     final String query = "query { \n "
-        " articles(filter: {titles: [$titles], urls: [$urls]}) { \n "
+        //" articles(filter: {titles: [$titles], urls: [$urls]}) { \n "
+        " articles(filter: {urls: [$urls]}) { \n "
         "   id \n "
         "   date \n "
         "   title \n "
