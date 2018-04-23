@@ -1,8 +1,8 @@
 import 'package:awesome_dev/ui/archives.dart';
-import 'package:flutter/material.dart';
-import 'package:awesome_dev/ui/latest_news.dart';
 import 'package:awesome_dev/ui/favorites.dart';
-
+import 'package:awesome_dev/ui/latest_news.dart';
+import 'package:awesome_dev/ui/tags.dart';
+import 'package:flutter/material.dart';
 import 'package:logging/logging.dart'; // Optional
 
 void main() => runApp(new AwesomeDevApp());
@@ -95,10 +95,9 @@ class _AwesomeDevState extends State<AwesomeDev> with TickerProviderStateMixin {
     }
     if (_currentIndex == 2) {
       return new ArticleArchives();
-//      return new Text("Index $_currentIndex: Archives!!!");
     }
     if (_currentIndex == 3) {
-      return new Text("Index $_currentIndex: Tags ...!!!");
+      return new Tags();
     }
 
     final List<FadeTransition> transitions = <FadeTransition>[];
