@@ -63,14 +63,14 @@ class ArticleWidgetState extends State<ArticleWidget> {
     final tagsWidgets = <Widget>[];
     if (widget.article.tags != null) {
       for (var tag in widget.article.tags) {
-        tagsWidgets.add(new Text(tag));
+        tagsWidgets.add(new Expanded(child: new Text(tag)));
       }
     }
 
     return new GestureDetector(
         onTap: widget.onCardClick != null ? widget.onCardClick : _launchURL,
         child: new Container(
-            padding: const EdgeInsets.all(8.0),
+            padding: const EdgeInsets.only(top: 8.0),
             child: new Column(
               children: <Widget>[
                 new Row(
@@ -87,9 +87,11 @@ class ArticleWidgetState extends State<ArticleWidget> {
                                     style: const TextStyle(
                                         fontWeight: FontWeight.bold,
                                         fontSize: 15.0))),
+                            new Padding(padding: const EdgeInsets.all(3.0)),
                             new Align(
                               alignment: Alignment.topLeft,
                               child: new Text(widget.article.domain,
+                                  style: const TextStyle(color: Colors.black38),
                                   textAlign: TextAlign.left),
                             )
                           ],
@@ -121,12 +123,16 @@ class ArticleWidgetState extends State<ArticleWidget> {
                   ],
                 ),
 
+                new Padding(padding: const EdgeInsets.all(3.0)),
+
                 //Tags
                 new Row(
                     mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                     children: tagsWidgets),
 
-                new Divider(height: 5.0, color: Colors.green),
+                new Padding(padding: const EdgeInsets.all(3.0)),
+
+                new Divider(height: 10.0, color: Theme.of(context).primaryColor)
               ],
             )));
   }
