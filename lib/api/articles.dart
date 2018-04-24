@@ -225,4 +225,46 @@ class ArticlesClient {
         "}";
     return _getArticles(query, "allButRecentArticles");
   }
+
+  Future<List<Article>> getArticlesForDate(String date) async {
+    final String query = "query { \n "
+        " articles(filter: {from: \"$date\", to: \"$date\"}) { \n "
+        "   id \n "
+        "   date \n "
+        "   title \n "
+        "   description \n "
+        "   url \n "
+        "   domain \n "
+        "   tags \n "
+        "   screenshot { \n "
+        "       height \n "
+        "       width \n "
+        "       mimeType \n "
+        "       data \n "
+        "   } \n "
+        " } \n "
+        "}";
+    return _getArticles(query, "articles");
+  }
+
+  Future<List<Article>> getAllArticles() async {
+    final String query = "query { \n "
+        " articles { \n "
+        "   id \n "
+        "   date \n "
+        "   title \n "
+        "   description \n "
+        "   url \n "
+        "   domain \n "
+        "   tags \n "
+        "   screenshot { \n "
+        "       height \n "
+        "       width \n "
+        "       mimeType \n "
+        "       data \n "
+        "   } \n "
+        " } \n "
+        "}";
+    return _getArticles(query, "articles");
+  }
 }
