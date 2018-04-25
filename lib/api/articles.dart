@@ -226,9 +226,9 @@ class ArticlesClient {
     return _getArticles(query, "allButRecentArticles");
   }
 
-  Future<List<Article>> getArticlesForDate(String date) async {
+  Future<List<Article>> getArticlesForDate(int timestamp) async {
     final String query = "query { \n "
-        " articles(filter: {from: \"$date\", to: \"$date\"}) { \n "
+        " articles(filter: {from: \"$timestamp\", to: \"$timestamp\"}) { \n "
         "   id \n "
         "   date \n "
         "   title \n "
