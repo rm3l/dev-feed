@@ -30,6 +30,8 @@ build_backend_api:
 build_mobile_apps_android:
   stage: build
   image: registry.gitlab.com/lemra/awesomedev/flutter:latest
+  before_script:
+    - flutter upgrade
   script:
     - flutter build apk
   artifacts:
@@ -41,6 +43,8 @@ build_mobile_apps_android:
 build_mobile_apps_ios:
   stage: build
   image: registry.gitlab.com/lemra/awesomedev/flutter:latest # TODO Find a way to include IOS Dev tools in the image
+  before_script:
+    - flutter upgrade
   script:
     - flutter build ios || echo "TODO | Not Implemented as yet"
   artifacts:
