@@ -4,7 +4,7 @@ schema {
 }
 
 type Query {
-    articleDates(limit: Int, offset: Int): [String]
+    articleDates(limit: Int, offset: Int): [Long]
     articles(limit: Int, offset: Int, filter: ArticleFilter): [Article]
     recentArticles(limit: Int, offset: Int): [Article]
 
@@ -25,7 +25,7 @@ type Mutation {
 
 type Article {
     id: ID!
-    date: String!
+    timestamp: Long!
     title: String!
     description: String
     url: String!
@@ -42,8 +42,8 @@ type Screenshot {
 }
 
 input ArticleFilter {
-    from: String
-    to: String
+    from: Long
+    to: Long
     search: String
     tags: [String]
     titles: [String]
@@ -51,7 +51,7 @@ input ArticleFilter {
 }
 
 input ArticleInput {
-    date: String
+    timestamp: Long
     title: String!
     description: String
     url: String!

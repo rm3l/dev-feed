@@ -8,7 +8,13 @@ import org.springframework.beans.factory.annotation.Value
 import org.springframework.scheduling.annotation.Scheduled
 import org.springframework.stereotype.Component
 import java.net.URL
-import java.util.concurrent.*
+import java.time.LocalDateTime
+import java.time.ZoneOffset
+import java.time.format.DateTimeFormatter
+import java.util.concurrent.CompletableFuture
+import java.util.concurrent.ExecutionException
+import java.util.concurrent.ExecutorService
+import java.util.concurrent.Executors
 import java.util.function.Supplier
 import javax.annotation.PostConstruct
 import javax.annotation.PreDestroy
@@ -18,7 +24,7 @@ const val BACKEND_ARCHIVE_URL = "$BACKEND_BASE_URL/archive"
 const val USER_AGENT = "org.rm3l.discoverdev_io"
 
 data class Article(val id: Long?= null,
-                   val date: String,
+                   val timestamp: Long = System.currentTimeMillis(),
                    val title: String,
                    val description: String? = null,
                    val url: String,
@@ -103,7 +109,10 @@ private class DiscoverDevIoCrawlerArchiveFetcherFutureSupplier(private val date:
                         val articlesList = select("main.archive-page ul.archive-list li.post-item")
                                 .map { element ->
                                     val titleAndLink = element.select("h1.title a")
-                                    Article(date = date,
+                                    Article(
+                                            timestamp = LocalDateTime
+                                                    .parse("${date}T00:00:00", DateTimeFormatter.ISO_DATE_TIME)
+                                                    .toEpochSecond(ZoneOffset.UTC),
                                             title = titleAndLink.text(),
                                             url = titleAndLink.attr("href"),
                                             description = element.select("p.description").text(),

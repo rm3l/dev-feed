@@ -5,7 +5,6 @@ import org.jetbrains.exposed.sql.SchemaUtils.createMissingTablesAndColumns
 import org.jetbrains.exposed.sql.SqlExpressionBuilder.between
 import org.jetbrains.exposed.sql.SqlExpressionBuilder.like
 import org.jetbrains.exposed.sql.transactions.transaction
-import org.joda.time.DateTime
 import org.rm3l.awesomedev.crawlers.Article
 import org.rm3l.awesomedev.crawlers.Screenshot
 import org.rm3l.awesomedev.graphql.ArticleFilter
@@ -16,7 +15,7 @@ import javax.annotation.PostConstruct
 
 object Articles : Table(name = "articles") {
     val id = integer(name = "id").autoIncrement().primaryKey()
-    val date = date(name = "date")
+    val timestamp = long(name = "timestamp")
     val title = varchar(name = "title", length = 255)
     val description = text(name = "description").nullable()
     val link = varchar(name = "link", length = 255)
@@ -86,7 +85,7 @@ class AwesomeDevDao {
 
         transaction {
             val articleIdentifier = Articles.insert {
-                it[date] = DateTime(article.date)
+                it[timestamp] = article.timestamp
                 it[title] = article.title
                 it[description] = article.description
                 it[link] = article.url
@@ -116,25 +115,23 @@ class AwesomeDevDao {
     fun allButRecentArticles(limit: Int? = null, offset: Int? = null, filter: ArticleFilter? = null): Collection<Article> {
         val result = mutableListOf<Article>()
         transaction {
-            Articles.slice(Articles.date)
+            Articles.slice(Articles.timestamp)
                     .selectAll()
-                    .orderBy(Articles.date, isAsc = false)
+                    .orderBy(Articles.timestamp, isAsc = false)
                     .withDistinct().limit(1)
-                    .map { it[Articles.date] }
+                    .map { it[Articles.timestamp] }
                     .firstOrNull()
                     ?.let { lastArticleDate ->
                         val query: Query
-                        var whereClause = not(Op.build { Articles.date.eq(lastArticleDate) })
+                        var whereClause = not(Op.build { Articles.timestamp.eq(lastArticleDate) })
                         var tagsResolvedFromSearch: Collection<String>? = null
                         if (filter != null) {
                             if (filter.from != null) {
                                 whereClause = whereClause.and(
-                                        Articles.date.between(
-                                                DateTime(filter.from.toString()),
-                                                filter.to?.map { DateTime(it.toString()) } ?: DateTime.now()))
+                                        Articles.timestamp.between(filter.from, filter.to?: System.currentTimeMillis()))
                             } else if (filter.to != null) {
                                 whereClause = whereClause.and(
-                                        Articles.date.between(DateTime.now(), DateTime(filter.to.toString())))
+                                        Articles.timestamp.between(System.currentTimeMillis(), filter.to))
                             }
                             if (filter.search != null) {
                                 val searchPattern = "%${filter.search}%"
@@ -149,7 +146,7 @@ class AwesomeDevDao {
                         }
                         query = Articles.select(whereClause)
 //                      limit?.let { query.limit(it, offset?:DEFAULT_OFFSET) }
-                        query.orderBy(Articles.date, isAsc = false)
+                        query.orderBy(Articles.timestamp, isAsc = false)
 
                         val list = query
                                 .map {
@@ -157,7 +154,7 @@ class AwesomeDevDao {
                                             title = it[Articles.title],
                                             url = it[Articles.link],
                                             domain = it[Articles.hostname] ?: URL(it[Articles.link]).host,
-                                            date = it[Articles.date].toDate().toString(),
+                                            timestamp = it[Articles.timestamp],
                                             screenshot = Screenshot(
                                                     data = it[Articles.screenshotData],
                                                     mimeType = it[Articles.screenshotMimeType],
@@ -191,8 +188,7 @@ class AwesomeDevDao {
             if (filter != null) {
                 val searchPattern = "%${filter.search}%"
                 whereClause = {
-                    Articles.date.between(filter.from?.map { DateTime(it.toString()) } ?: DateTime(0),
-                            filter.to?.map { DateTime(it.toString()) } ?: DateTime.now())
+                    Articles.timestamp.between(filter.from?: 0L, filter.to?: System.currentTimeMillis())
                             .and(if (filter.search != null) (Articles.title.like(searchPattern)
                                     .or(Articles.description like searchPattern).or(Articles.link like searchPattern))
                                 else Articles.title.isNotNull())
@@ -205,7 +201,7 @@ class AwesomeDevDao {
             }
             query = if (whereClause != null) { Articles.select(whereClause) } else { Articles.selectAll() }
 //            limit?.let { query.limit(it, offset?:DEFAULT_OFFSET) }
-            query.orderBy(Articles.date, isAsc = false)
+            query.orderBy(Articles.timestamp, isAsc = false)
 
             val list = query
                     .map {
@@ -213,7 +209,7 @@ class AwesomeDevDao {
                                 title = it[Articles.title],
                                 url = it[Articles.link],
                                 domain = it[Articles.hostname] ?: URL(it[Articles.link]).host,
-                                date = it[Articles.date].toDate().toString(),
+                                timestamp = it[Articles.timestamp],
                                 screenshot = Screenshot(
                                         data = it[Articles.screenshotData],
                                         mimeType = it[Articles.screenshotMimeType],
@@ -237,15 +233,13 @@ class AwesomeDevDao {
         return result.toList()
     }
 
-    fun getArticlesDates(limit: Int? = null, offset: Int? = null): Set<String> {
-        val result = mutableSetOf<String>()
+    fun getArticlesDates(limit: Int? = null, offset: Int? = null): Set<Long> {
+        val result = mutableSetOf<Long>()
         transaction {
-            val query = Articles.slice(Articles.date).selectAll().orderBy(Articles.date, isAsc = false)
+            val query = Articles.slice(Articles.timestamp).selectAll().orderBy(Articles.timestamp, isAsc = false)
                     .withDistinct()
             limit?.let { query.limit(it, offset?:DEFAULT_OFFSET) }
-            result.addAll(
-                    query.map { it[Articles.date].toDate().toString() }
-                            .toSet())
+            result.addAll(query.map { it[Articles.timestamp] }.toSet())
         }
         return result.toSet()
     }
@@ -253,21 +247,21 @@ class AwesomeDevDao {
     fun getRecentArticles(limit: Int? = null, offset: Int? = null): Collection<Article> {
         val result = mutableListOf<Article>()
         transaction {
-            Articles.slice(Articles.date).selectAll().orderBy(Articles.date, isAsc = false).limit(1)
+            Articles.slice(Articles.timestamp).selectAll().orderBy(Articles.timestamp, isAsc = false).limit(1)
                     .withDistinct()
-                    .map { it[Articles.date] }
+                    .map { it[Articles.timestamp] }
                     .firstOrNull()
                     ?.let {
-                        val query = Articles.select { Articles.date.eq(it) }
+                        val query = Articles.select { Articles.timestamp.eq(it) }
                         limit?.let { query.limit(it, offset?:DEFAULT_OFFSET) }
-                        query.orderBy(Articles.date, isAsc = false)
+                        query.orderBy(Articles.timestamp, isAsc = false)
                         result.addAll(query
                                 .map {
                                     val article = Article(id = it[Articles.id].toLong(),
                                             title = it[Articles.title],
                                             url = it[Articles.link],
                                             domain = it[Articles.hostname] ?: URL(it[Articles.link]).host,
-                                            date = it[Articles.date].toDate().toString(),
+                                            timestamp = it[Articles.timestamp],
                                             screenshot = Screenshot(
                                                     data = it[Articles.screenshotData],
                                                     mimeType = it[Articles.screenshotMimeType],
