@@ -111,7 +111,7 @@ private class DiscoverDevIoCrawlerArchiveFetcherFutureSupplier(private val date:
                                     val titleAndLink = element.select("h1.title a")
                                     Article(
                                             timestamp = LocalDateTime
-                                                    .parse("${date}T00:00:00", DateTimeFormatter.ISO_DATE_TIME)
+                                                    .parse("${date}T12:00:00.000Z", DateTimeFormatter.ISO_INSTANT)
                                                     .toEpochSecond(ZoneOffset.UTC),
                                             title = titleAndLink.text(),
                                             url = titleAndLink.attr("href"),
