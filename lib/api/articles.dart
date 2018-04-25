@@ -6,7 +6,7 @@ import 'package:awesome_dev/api/api.dart';
 
 /*
     id: ID!
-    date: String!
+    timestamp: Long!
     title: String!
     description: String
     url: String!
@@ -17,7 +17,7 @@ import 'package:awesome_dev/api/api.dart';
 class Article {
   final String id;
 
-  final String date;
+  final int timestamp;
 
   final String title;
 
@@ -35,7 +35,7 @@ class Article {
 
   Article(this.title, this.url,
       {this.id,
-      this.date,
+      this.timestamp,
       this.description,
       this.domain,
       this.tags,
@@ -43,7 +43,7 @@ class Article {
 
   Article.fromJson(Map<String, dynamic> json)
       : id = json['id'],
-        date = json['date'],
+        timestamp = json['timestamp'] as int,
         title = json['title'],
         url = json['url'],
         description = json['description'],
@@ -161,7 +161,7 @@ class ArticlesClient {
     final String query = "query { \n "
         " recentArticles { \n "
         "   id \n "
-        "   date \n "
+        "   timestamp \n "
         "   title \n "
         "   description \n "
         "   url \n "
@@ -180,15 +180,13 @@ class ArticlesClient {
 
   Future<List<Article>> getFavoriteArticles(
       List<Article> articlesToLookup) async {
-    final titles =
-        articlesToLookup.map((article) => "\"${article.title}\"").join(",");
     final urls =
         articlesToLookup.map((article) => "\"${article.url}\"").join(",");
     final String query = "query { \n "
         //" articles(filter: {titles: [$titles], urls: [$urls]}) { \n "
         " articles(filter: {urls: [$urls]}) { \n "
         "   id \n "
-        "   date \n "
+        "   timestamp \n "
         "   title \n "
         "   description \n "
         "   url \n "
@@ -209,7 +207,7 @@ class ArticlesClient {
     final String query = "query { \n "
         " allButRecentArticles { \n "
         "   id \n "
-        "   date \n "
+        "   timestamp \n "
         "   title \n "
         "   description \n "
         "   url \n "
@@ -226,11 +224,11 @@ class ArticlesClient {
     return _getArticles(query, "allButRecentArticles");
   }
 
-  Future<List<Article>> getArticlesForDate(int timestamp) async {
+  Future<List<Article>> getArticlesForDate(String date) async {
     final String query = "query { \n "
-        " articles(filter: {from: \"$timestamp\", to: \"$timestamp\"}) { \n "
+        " articles(filter: {from: \"$date\", to: \"$date\"}) { \n "
         "   id \n "
-        "   date \n "
+        "   timestamp \n "
         "   title \n "
         "   description \n "
         "   url \n "
@@ -251,7 +249,7 @@ class ArticlesClient {
     final String query = "query { \n "
         " articles { \n "
         "   id \n "
-        "   date \n "
+        "   timestamp \n "
         "   title \n "
         "   description \n "
         "   url \n "

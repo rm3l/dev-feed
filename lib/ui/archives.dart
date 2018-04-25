@@ -31,8 +31,11 @@ class ArticleArchivesState extends State<ArticleArchives> {
     _refreshIndicatorKey.currentState.show();
     final articlesClient = new ArticlesClient();
     try {
-      final filteredArticles = await articlesClient
-          .getArticlesForDate(_selectedDate.millisecondsSinceEpoch);
+      final dateSlug = "${_selectedDate.year.toString()}-"
+          "${_selectedDate.month.toString().padLeft(2,'0')}-"
+          "${_selectedDate.day.toString().padLeft(2,'0')}";
+      final filteredArticles =
+          await articlesClient.getArticlesForDate(dateSlug);
       final prefs = await SharedPreferences.getInstance();
       final favorites = prefs.getStringList("favs") ?? [];
       for (var article in filteredArticles) {

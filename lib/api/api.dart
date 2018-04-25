@@ -1,6 +1,6 @@
 import 'dart:async';
-import 'dart:io';
 import 'dart:convert' show utf8, json;
+import 'dart:io';
 
 final _apiEndpoint = Uri.parse('http://tools.rm3l.org:9000/graphql');
 final _httpClient = new HttpClient();
@@ -8,7 +8,7 @@ final _httpClient = new HttpClient();
 /*
 Example of query
   recentArticles {
-    date
+    timestamp
     title
     description
     url
