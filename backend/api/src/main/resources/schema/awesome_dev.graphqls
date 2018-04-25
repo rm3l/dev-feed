@@ -42,8 +42,8 @@ type Screenshot {
 }
 
 input ArticleFilter {
-    from: Long
-    to: Long
+    from: String
+    to: String
     search: String
     tags: [String]
     titles: [String]
@@ -51,7 +51,7 @@ input ArticleFilter {
 }
 
 input ArticleInput {
-    timestamp: Long
+    date: String
     title: String!
     description: String
     url: String!

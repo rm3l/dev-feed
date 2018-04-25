@@ -3,14 +3,12 @@ package org.rm3l.awesomedev.crawlers
 import khttp.get
 import org.jsoup.Jsoup
 import org.rm3l.awesomedev.dal.AwesomeDevDao
+import org.rm3l.awesomedev.utils.asSupportedTimestamp
 import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.scheduling.annotation.Scheduled
 import org.springframework.stereotype.Component
 import java.net.URL
-import java.time.LocalDateTime
-import java.time.ZoneOffset
-import java.time.format.DateTimeFormatter
 import java.util.concurrent.CompletableFuture
 import java.util.concurrent.ExecutionException
 import java.util.concurrent.ExecutorService
@@ -110,9 +108,7 @@ private class DiscoverDevIoCrawlerArchiveFetcherFutureSupplier(private val date:
                                 .map { element ->
                                     val titleAndLink = element.select("h1.title a")
                                     Article(
-                                            timestamp = LocalDateTime
-                                                    .parse("${date}T12:00:00.000Z", DateTimeFormatter.ISO_INSTANT)
-                                                    .toEpochSecond(ZoneOffset.UTC),
+                                            timestamp = date.asSupportedTimestamp()!!,
                                             title = titleAndLink.text(),
                                             url = titleAndLink.attr("href"),
                                             description = element.select("p.description").text(),

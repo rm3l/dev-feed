@@ -8,6 +8,7 @@ import org.jetbrains.exposed.sql.transactions.transaction
 import org.rm3l.awesomedev.crawlers.Article
 import org.rm3l.awesomedev.crawlers.Screenshot
 import org.rm3l.awesomedev.graphql.ArticleFilter
+import org.rm3l.awesomedev.utils.asSupportedTimestamp
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.stereotype.Component
 import java.net.URL
@@ -128,10 +129,13 @@ class AwesomeDevDao {
                         if (filter != null) {
                             if (filter.from != null) {
                                 whereClause = whereClause.and(
-                                        Articles.timestamp.between(filter.from, filter.to?: System.currentTimeMillis()))
+                                        Articles.timestamp.between(
+                                                filter.from.asSupportedTimestamp()!!,
+                                                filter.to?.asSupportedTimestamp()?: System.currentTimeMillis()))
                             } else if (filter.to != null) {
                                 whereClause = whereClause.and(
-                                        Articles.timestamp.between(System.currentTimeMillis(), filter.to))
+                                        Articles.timestamp.between(System.currentTimeMillis(),
+                                                filter.to.asSupportedTimestamp()))
                             }
                             if (filter.search != null) {
                                 val searchPattern = "%${filter.search}%"
@@ -188,7 +192,9 @@ class AwesomeDevDao {
             if (filter != null) {
                 val searchPattern = "%${filter.search}%"
                 whereClause = {
-                    Articles.timestamp.between(filter.from?: 0L, filter.to?: System.currentTimeMillis())
+                    Articles.timestamp.between(
+                            filter.from?.asSupportedTimestamp()?: 0L,
+                            filter.to?.asSupportedTimestamp()?: System.currentTimeMillis())
                             .and(if (filter.search != null) (Articles.title.like(searchPattern)
                                     .or(Articles.description like searchPattern).or(Articles.link like searchPattern))
                                 else Articles.title.isNotNull())

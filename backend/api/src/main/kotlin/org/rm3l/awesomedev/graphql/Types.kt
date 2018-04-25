@@ -1,8 +1,8 @@
 package org.rm3l.awesomedev.graphql
 
 data class ArticleFilter(
-        val from: Long? = null,
-        val to: Long? = null,
+        val from: String? = null,
+        val to: String? = null,
         val search: String? = null,
         val tags: List<String>? = null,
         val titles: List<String>? = null,
@@ -10,7 +10,7 @@ data class ArticleFilter(
 )
 
 data class ArticleInput(
-       val timestamp: Long,
+       val date: String,
        val description: String,
        val url: String,
        val tags: List<String>? = null
