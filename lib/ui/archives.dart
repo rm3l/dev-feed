@@ -17,23 +17,24 @@ class ArticleArchivesState extends State<ArticleArchives> {
   final GlobalKey<RefreshIndicatorState> _refreshIndicatorKey =
       new GlobalKey<RefreshIndicatorState>();
 
-  final _articles = <Article>[];
-
-  DateTime _selectedDate = DateTime.now();
+  List<Article> _articles;
+  DateTime _currentDate = new DateTime.now();
 
   @override
   void initState() {
     super.initState();
-    _fetchArticles();
+    _onRefresh();
   }
 
-  Future<Null> _fetchArticles() async {
+  Future<Null> _onRefresh() async => _fetchArticles(_currentDate);
+
+  Future<Null> _fetchArticles(DateTime date) async {
     _refreshIndicatorKey.currentState.show();
     final articlesClient = new ArticlesClient();
     try {
-      final dateSlug = "${_selectedDate.year.toString()}-"
-          "${_selectedDate.month.toString().padLeft(2,'0')}-"
-          "${_selectedDate.day.toString().padLeft(2,'0')}";
+      final dateSlug = "${date.year.toString()}-"
+          "${date.month.toString().padLeft(2,'0')}-"
+          "${date.day.toString().padLeft(2,'0')}";
       final filteredArticles =
           await articlesClient.getArticlesForDate(dateSlug);
       final prefs = await SharedPreferences.getInstance();
@@ -43,8 +44,7 @@ class ArticleArchivesState extends State<ArticleArchives> {
             favorites.contains(article.toSharedPreferencesString());
       }
       setState(() {
-        _articles.clear();
-        _articles.addAll(filteredArticles);
+        _articles = filteredArticles;
       });
     } on Exception catch (e) {
       Scaffold.of(context).showSnackBar(new SnackBar(
@@ -57,7 +57,7 @@ class ArticleArchivesState extends State<ArticleArchives> {
   Widget build(BuildContext context) {
     return new RefreshIndicator(
       key: _refreshIndicatorKey,
-      onRefresh: _fetchArticles,
+      onRefresh: _onRefresh,
       child: new Container(
         child: new Column(
           children: <Widget>[
@@ -66,10 +66,8 @@ class ArticleArchivesState extends State<ArticleArchives> {
               child: new Calendar(
                 isExpandable: true,
                 onDateSelected: (selectedDateTime) {
-                  setState(() {
-                    _selectedDate = selectedDateTime;
-                  });
-                  _fetchArticles();
+                  _currentDate = selectedDateTime;
+                  _fetchArticles(selectedDateTime);
                 },
               ),
             ),
@@ -77,7 +75,7 @@ class ArticleArchivesState extends State<ArticleArchives> {
                 child: new Expanded(
                     child: new ListView.builder(
               padding: new EdgeInsets.all(8.0),
-              itemCount: _articles.length,
+              itemCount: _articles?.length ?? 0,
               itemBuilder: (BuildContext context, int index) {
                 return new ArticleWidget(
                   article: _articles[index],

@@ -16,8 +16,7 @@ class LatestNewsState extends State<LatestNews> {
   final GlobalKey<RefreshIndicatorState> _refreshIndicatorKey =
       new GlobalKey<RefreshIndicatorState>();
 
-  final _recentArticles = <Article>[];
-  DateTime _recentArticlesLastUpdate;
+  List<Article> _recentArticles;
 
   @override
   void initState() {
@@ -27,30 +26,22 @@ class LatestNewsState extends State<LatestNews> {
 
   Future<Null> _fetchArticles() async {
     _refreshIndicatorKey.currentState.show();
-    if (_recentArticles.isNotEmpty &&
-        _recentArticlesLastUpdate != null &&
-        _recentArticlesLastUpdate.day == new DateTime.now().day) {
-      //Same day
-    } else {
-      final articlesClient = new ArticlesClient();
-      try {
-        final recentArticles = await articlesClient.getRecentArticles();
-        final prefs = await SharedPreferences.getInstance();
-        final favorites = prefs.getStringList("favs") ?? [];
-        for (var article in recentArticles) {
-          article.starred =
-              favorites.contains(article.toSharedPreferencesString());
-        }
-        setState(() {
-          _recentArticles.clear();
-          _recentArticles.addAll(recentArticles);
-        });
-        _recentArticlesLastUpdate = new DateTime.now();
-      } on Exception catch (e) {
-        Scaffold.of(context).showSnackBar(new SnackBar(
-              content: new Text("Internal Error: ${e.toString()}"),
-            ));
+    final articlesClient = new ArticlesClient();
+    try {
+      final recentArticles = await articlesClient.getRecentArticles();
+      final prefs = await SharedPreferences.getInstance();
+      final favorites = prefs.getStringList("favs") ?? [];
+      for (var article in recentArticles) {
+        article.starred =
+            favorites.contains(article.toSharedPreferencesString());
       }
+      setState(() {
+        _recentArticles = recentArticles;
+      });
+    } on Exception catch (e) {
+      Scaffold.of(context).showSnackBar(new SnackBar(
+            content: new Text("Internal Error: ${e.toString()}"),
+          ));
     }
   }
 
@@ -67,7 +58,7 @@ class LatestNewsState extends State<LatestNews> {
               new Expanded(
                 child: new ListView.builder(
                   padding: new EdgeInsets.all(8.0),
-                  itemCount: _recentArticles.length,
+                  itemCount: _recentArticles?.length ?? 0,
                   itemBuilder: (BuildContext context, int index) {
                     return new ArticleWidget(
                       article: _recentArticles[index],

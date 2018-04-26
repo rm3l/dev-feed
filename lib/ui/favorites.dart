@@ -17,7 +17,7 @@ class FavoriteNewsState extends State<FavoriteNews> {
   final GlobalKey<RefreshIndicatorState> _refreshIndicatorKey =
       new GlobalKey<RefreshIndicatorState>();
 
-  final _articles = <Article>[];
+  List<Article> _articles;
 
   @override
   void initState() {
@@ -43,8 +43,7 @@ class FavoriteNewsState extends State<FavoriteNews> {
         article.starred = true;
       }
       setState(() {
-        _articles.clear();
-        _articles.addAll(favoriteArticles);
+        _articles = favoriteArticles;
       });
     } on Exception catch (e) {
       Scaffold.of(context).showSnackBar(new SnackBar(
@@ -66,7 +65,7 @@ class FavoriteNewsState extends State<FavoriteNews> {
               new Expanded(
                 child: new ListView.builder(
                   padding: new EdgeInsets.all(8.0),
-                  itemCount: _articles.length,
+                  itemCount: _articles?.length ?? 0,
                   itemBuilder: (BuildContext context, int index) {
                     return new ArticleWidget(
                       article: _articles[index],
