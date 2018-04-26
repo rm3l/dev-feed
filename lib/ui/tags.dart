@@ -8,6 +8,10 @@ import 'package:flutter/material.dart';
 enum IndicatorType { overscroll, refresh }
 
 class Tags extends StatefulWidget {
+  final String search;
+
+  Tags({this.search});
+
   @override
   State<StatefulWidget> createState() => new TagsState();
 }
@@ -34,7 +38,9 @@ class TagsState extends State<Tags> {
     } else {
       final tagsClient = new tagsApi.TagsClient();
       try {
-        final tags = await tagsClient.getTags();
+        final tags = await (widget.search != null && widget.search.isNotEmpty
+            ? tagsClient.getTags()
+            : tagsClient.getTags(search: widget.search));
         setState(() {
           _tags.clear();
           _tags.addAll(tags);
@@ -60,7 +66,8 @@ class TagsState extends State<Tags> {
           itemCount: _tags.length,
           itemBuilder: (BuildContext context, int index) {
             return new GestureDetector(
-                onTap: () => Application.router.navigateTo(context, "/tags/${_tags[index]}",
+                onTap: () => Application.router.navigateTo(
+                    context, "/tags/${_tags[index]}",
                     transition: TransitionType.fadeIn),
                 child: new Column(
                   crossAxisAlignment: CrossAxisAlignment.start,

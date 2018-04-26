@@ -6,7 +6,8 @@ import 'package:awesome_dev/ui/latest_news.dart';
 import 'package:awesome_dev/ui/tags.dart';
 import 'package:fluro/fluro.dart';
 import 'package:flutter/material.dart';
-import 'package:logging/logging.dart'; // Optional
+import 'package:flutter_search_bar/flutter_search_bar.dart';
+import 'package:logging/logging.dart';
 
 void main() => runApp(new AwesomeDevApp());
 
@@ -38,13 +39,56 @@ class AwesomeDev extends StatefulWidget {
 }
 
 class _AwesomeDevState extends State<AwesomeDev> with TickerProviderStateMixin {
+  SearchBar searchBar;
   int _currentIndex = 0;
   List<NavigationIconView> _navigationViews;
+  String _searchValue;
+
+  AppBar buildAppBar(BuildContext context) {
+    return new AppBar(
+      title: const Text('Awesome Dev'),
+      actions: <Widget>[
+        searchBar.getSearchAction(context),
+      ],
+//        actions: <Widget>[
+//          new PopupMenuButton<BottomNavigationBarType>(
+//            onSelected: (BottomNavigationBarType value) {
+//              setState(() {
+//                _type = value;
+//              });
+//            },
+//            itemBuilder: (BuildContext context) => <PopupMenuItem<BottomNavigationBarType>>[
+//              const PopupMenuItem<BottomNavigationBarType>(
+//                value: BottomNavigationBarType.fixed,
+//                child: const Text('Fixed'),
+//              ),
+//              const PopupMenuItem<BottomNavigationBarType>(
+//                value: BottomNavigationBarType.shifting,
+//                child: const Text('Shifting'),
+//              )
+//            ],
+//          )
+//        ],
+    );
+  }
 
   _AwesomeDevState() {
     final router = new Router();
     Routes.configureRoutes(router);
     Application.router = router;
+
+    searchBar = new SearchBar(
+        inBar: true,
+        setState: setState,
+        onSubmitted: (value) {
+          _searchValue = value;
+          setState(() {
+            _navigationViews[_currentIndex].controller.reverse();
+            _currentIndex = _currentIndex;
+            _navigationViews[_currentIndex].controller.forward();
+          });
+        },
+        buildDefaultAppBar: buildAppBar);
   }
 
   @override
@@ -97,16 +141,16 @@ class _AwesomeDevState extends State<AwesomeDev> with TickerProviderStateMixin {
 
   Widget _buildTransitionsStack() {
     if (_currentIndex == 0) {
-      return new LatestNews();
+      return new LatestNews(search: _searchValue);
     }
     if (_currentIndex == 1) {
-      return new FavoriteNews();
+      return new FavoriteNews(search: _searchValue);
     }
     if (_currentIndex == 2) {
-      return new ArticleArchives();
+      return new ArticleArchives(search: _searchValue);
     }
     if (_currentIndex == 3) {
-      return new Tags();
+      return new Tags(search: _searchValue);
     }
 
     final List<FadeTransition> transitions = <FadeTransition>[];
@@ -145,28 +189,7 @@ class _AwesomeDevState extends State<AwesomeDev> with TickerProviderStateMixin {
     );
 
     return new Scaffold(
-      appBar: new AppBar(
-        title: const Text('Awesome Dev'),
-//        actions: <Widget>[
-//          new PopupMenuButton<BottomNavigationBarType>(
-//            onSelected: (BottomNavigationBarType value) {
-//              setState(() {
-//                _type = value;
-//              });
-//            },
-//            itemBuilder: (BuildContext context) => <PopupMenuItem<BottomNavigationBarType>>[
-//              const PopupMenuItem<BottomNavigationBarType>(
-//                value: BottomNavigationBarType.fixed,
-//                child: const Text('Fixed'),
-//              ),
-//              const PopupMenuItem<BottomNavigationBarType>(
-//                value: BottomNavigationBarType.shifting,
-//                child: const Text('Shifting'),
-//              )
-//            ],
-//          )
-//        ],
-      ),
+      appBar: searchBar.build(context),
       body: new Center(child: _buildTransitionsStack()),
       bottomNavigationBar: botNavBar,
     );
