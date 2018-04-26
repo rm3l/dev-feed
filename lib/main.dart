@@ -44,11 +44,27 @@ class _AwesomeDevState extends State<AwesomeDev> with TickerProviderStateMixin {
   List<NavigationIconView> _navigationViews;
   String _searchValue;
 
+  final GlobalKey<ScaffoldState> _scaffoldKey = new GlobalKey<ScaffoldState>();
+
+  void onAppBarMenuItemSelected(String value) {
+    _scaffoldKey.currentState
+        .showSnackBar(new SnackBar(content: new Text(value)));
+  }
+
   AppBar buildAppBar(BuildContext context) {
     return new AppBar(
       title: const Text('Awesome Dev'),
       actions: <Widget>[
         searchBar.getSearchAction(context),
+        new PopupMenuButton<String>(
+          onSelected: onAppBarMenuItemSelected,
+          itemBuilder: (BuildContext context) => <PopupMenuItem<String>>[
+                const PopupMenuItem<String>(
+                    value: 'settings', child: const Text('Settings')),
+                const PopupMenuItem<String>(
+                    value: 'about', child: const Text('About')),
+              ],
+        ),
       ],
 //        actions: <Widget>[
 //          new PopupMenuButton<BottomNavigationBarType>(
