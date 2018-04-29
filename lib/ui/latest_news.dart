@@ -32,33 +32,6 @@ class LatestNewsState extends State<LatestNews> {
     _fetchArticles();
   }
 
-  List<Article> _searchInArticles(
-      List<Article> recentArticlesAll, String search) {
-    if (recentArticlesAll == null) {
-      return new List<Article>(0);
-    }
-    var recentArticlesFiltered = recentArticlesAll;
-    if (search != null && search.isNotEmpty) {
-      final searchLowerCase = search.toLowerCase();
-      recentArticlesFiltered = recentArticlesAll.where((article) {
-        if (article.title.toLowerCase().contains(searchLowerCase)) {
-          return true;
-        }
-        if (article.domain.toLowerCase().contains(searchLowerCase)) {
-          return true;
-        }
-        if (article.tags != null &&
-            article.tags
-                .map((tag) => tag.toLowerCase())
-                .any((tag) => tag.contains(searchLowerCase))) {
-          return true;
-        }
-        return false;
-      }).toList();
-    }
-    return recentArticlesFiltered;
-  }
-
   Future<List<Article>> _loadArticles() async {
     _refreshIndicatorKey.currentState.show();
     final articlesClient = new ArticlesClient();
@@ -73,10 +46,10 @@ class LatestNewsState extends State<LatestNews> {
   }
 
   Future<Null> _fetchArticles() async {
-    _refreshIndicatorKey.currentState.show();
     try {
       final recentArticles = await _loadArticles();
-      final recentArticlesFiltered = _searchInArticles(recentArticles, _search);
+      final recentArticlesFiltered =
+          ArticlesClient.searchInArticles(recentArticles, _search);
       setState(() {
         _articles = recentArticles;
         _searchInputVisible = _articles.isNotEmpty;
@@ -111,8 +84,8 @@ class LatestNewsState extends State<LatestNews> {
                               border: const UnderlineInputBorder(),
                               hintText: 'Search...'),
                           onChanged: (String criteria) {
-                            final recentArticlesFiltered =
-                                _searchInArticles(_articles, criteria);
+                            final recentArticlesFiltered = ArticlesClient
+                                .searchInArticles(_articles, criteria);
                             setState(() {
                               _search = criteria;
                               _articlesFiltered = recentArticlesFiltered;

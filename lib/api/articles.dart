@@ -142,6 +142,33 @@ class ArticlesClient {
 //    }
 //  }
 
+  static List<Article> searchInArticles(
+      List<Article> allArticles, String search) {
+    if (allArticles == null) {
+      return new List<Article>(0);
+    }
+    var articlesFiltered = allArticles;
+    if (search != null && search.isNotEmpty) {
+      final searchLowerCase = search.toLowerCase();
+      articlesFiltered = allArticles.where((article) {
+        if (article.title.toLowerCase().contains(searchLowerCase)) {
+          return true;
+        }
+        if (article.domain.toLowerCase().contains(searchLowerCase)) {
+          return true;
+        }
+        if (article.tags != null &&
+            article.tags
+                .map((tag) => tag.toLowerCase())
+                .any((tag) => tag.contains(searchLowerCase))) {
+          return true;
+        }
+        return false;
+      }).toList();
+    }
+    return articlesFiltered;
+  }
+
   Future<List<Article>> _getArticles(
       String graphqlQuery, String queryKey) async {
     var map = await issueGraphQLQuery(graphqlQuery);
