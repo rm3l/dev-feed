@@ -9,9 +9,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 enum IndicatorType { overscroll, refresh }
 
 class ArticleArchives extends StatefulWidget {
-  final String search;
-
-  ArticleArchives({this.search});
+  const ArticleArchives();
 
   @override
   State<StatefulWidget> createState() => new ArticleArchivesState();

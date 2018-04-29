@@ -8,9 +8,7 @@ import 'package:flutter/material.dart';
 enum IndicatorType { overscroll, refresh }
 
 class Tags extends StatefulWidget {
-  final String search;
-
-  Tags({this.search});
+  const Tags();
 
   @override
   State<StatefulWidget> createState() => new TagsState();
@@ -22,6 +20,7 @@ class TagsState extends State<Tags> {
 
   final _tags = <String>[];
   DateTime _tagsLastUpdate;
+  String _search;
 
   @override
   void initState() {
@@ -38,9 +37,9 @@ class TagsState extends State<Tags> {
     } else {
       final tagsClient = new tagsApi.TagsClient();
       try {
-        final tags = await (widget.search != null && widget.search.isNotEmpty
+        final tags = await (_search != null && _search.isNotEmpty
             ? tagsClient.getTags()
-            : tagsClient.getTags(search: widget.search));
+            : tagsClient.getTags(search: _search));
         setState(() {
           _tags.clear();
           _tags.addAll(tags);

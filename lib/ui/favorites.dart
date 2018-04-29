@@ -9,9 +9,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 enum IndicatorType { overscroll, refresh }
 
 class FavoriteNews extends StatefulWidget {
-  final String search;
-
-  FavoriteNews({this.search});
+  const FavoriteNews();
 
   @override
   State<StatefulWidget> createState() => new FavoriteNewsState();

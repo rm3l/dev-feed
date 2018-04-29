@@ -8,9 +8,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 enum IndicatorType { overscroll, refresh }
 
 class LatestNews extends StatefulWidget {
-  final String search;
-
-  LatestNews({this.search});
+  const LatestNews();
 
   @override
   State<StatefulWidget> createState() => new LatestNewsState();
@@ -21,6 +19,7 @@ class LatestNewsState extends State<LatestNews> {
       new GlobalKey<RefreshIndicatorState>();
 
   List<Article> _recentArticles;
+  String _search;
 
   @override
   void initState() {
@@ -34,8 +33,8 @@ class LatestNewsState extends State<LatestNews> {
     try {
       final recentArticlesAll = await articlesClient.getRecentArticles();
       var recentArticles = recentArticlesAll;
-      if (widget.search != null && widget.search.isNotEmpty) {
-        final searchLowerCase = widget.search.toLowerCase();
+      if (_search != null && _search.isNotEmpty) {
+        final searchLowerCase = _search.toLowerCase();
         recentArticles = recentArticlesAll.where((article) {
           if (article.title.toLowerCase().contains(searchLowerCase)) {
             return true;
