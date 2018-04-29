@@ -32,7 +32,26 @@ class LatestNewsState extends State<LatestNews> {
     _refreshIndicatorKey.currentState.show();
     final articlesClient = new ArticlesClient();
     try {
-      final recentArticles = await articlesClient.getRecentArticles();
+      final recentArticlesAll = await articlesClient.getRecentArticles();
+      var recentArticles = recentArticlesAll;
+      if (widget.search != null && widget.search.isNotEmpty) {
+        final searchLowerCase = widget.search.toLowerCase();
+        recentArticles = recentArticlesAll.where((article) {
+          if (article.title.toLowerCase().contains(searchLowerCase)) {
+            return true;
+          }
+          if (article.domain.toLowerCase().contains(searchLowerCase)) {
+            return true;
+          }
+          if (article.tags != null &&
+              article.tags
+                  .map((tag) => tag.toLowerCase())
+                  .any((tag) => tag.contains(searchLowerCase))) {
+            return true;
+          }
+          return false;
+        }).toList();
+      }
       final prefs = await SharedPreferences.getInstance();
       final favorites = prefs.getStringList("favs") ?? [];
       for (var article in recentArticles) {

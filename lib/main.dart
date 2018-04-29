@@ -36,6 +36,12 @@ class AwesomeDev extends StatefulWidget {
 
   @override
   State<StatefulWidget> createState() => new _AwesomeDevState();
+
+  static _AwesomeDevState of(BuildContext context) {
+    return (context.inheritFromWidgetOfExactType(_AwesomeDevInheritedWidget)
+            as _AwesomeDevInheritedWidget)
+        .data;
+  }
 }
 
 class _AwesomeDevState extends State<AwesomeDev> with TickerProviderStateMixin {
@@ -66,25 +72,6 @@ class _AwesomeDevState extends State<AwesomeDev> with TickerProviderStateMixin {
               ],
         ),
       ],
-//        actions: <Widget>[
-//          new PopupMenuButton<BottomNavigationBarType>(
-//            onSelected: (BottomNavigationBarType value) {
-//              setState(() {
-//                _type = value;
-//              });
-//            },
-//            itemBuilder: (BuildContext context) => <PopupMenuItem<BottomNavigationBarType>>[
-//              const PopupMenuItem<BottomNavigationBarType>(
-//                value: BottomNavigationBarType.fixed,
-//                child: const Text('Fixed'),
-//              ),
-//              const PopupMenuItem<BottomNavigationBarType>(
-//                value: BottomNavigationBarType.shifting,
-//                child: const Text('Shifting'),
-//              )
-//            ],
-//          )
-//        ],
     );
   }
 
@@ -97,11 +84,9 @@ class _AwesomeDevState extends State<AwesomeDev> with TickerProviderStateMixin {
         inBar: true,
         setState: setState,
         onSubmitted: (value) {
-          _searchValue = value;
+          print("Input search value: $value");
           setState(() {
-            _navigationViews[_currentIndex].controller.reverse();
-            _currentIndex = _currentIndex;
-            _navigationViews[_currentIndex].controller.forward();
+            _searchValue = value;
           });
         },
         buildDefaultAppBar: buildAppBar);
@@ -110,6 +95,7 @@ class _AwesomeDevState extends State<AwesomeDev> with TickerProviderStateMixin {
   @override
   void initState() {
     super.initState();
+
     _navigationViews = <NavigationIconView>[
       new NavigationIconView(
         icon: const Icon(Icons.new_releases),
@@ -204,12 +190,25 @@ class _AwesomeDevState extends State<AwesomeDev> with TickerProviderStateMixin {
       },
     );
 
-    return new Scaffold(
-      appBar: searchBar.build(context),
-      body: new Center(child: _buildTransitionsStack()),
-      bottomNavigationBar: botNavBar,
+    return new _AwesomeDevInheritedWidget(
+      data: this,
+      child: new Scaffold(
+        appBar: searchBar.build(context),
+        body: new Center(child: _buildTransitionsStack()),
+        bottomNavigationBar: botNavBar,
+      ),
     );
   }
+}
+
+class _AwesomeDevInheritedWidget extends InheritedWidget {
+  final _AwesomeDevState data;
+
+  _AwesomeDevInheritedWidget({Key key, this.data, Widget child})
+      : super(key: key, child: child);
+
+  @override
+  bool updateShouldNotify(_AwesomeDevInheritedWidget old) => true;
 }
 
 class NavigationIconView {
