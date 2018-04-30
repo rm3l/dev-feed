@@ -114,7 +114,7 @@ class TagsState extends State<Tags> {
                 child: new Expanded(
                     child: new ListView.builder(
                   padding: new EdgeInsets.all(8.0),
-                  itemCount: _tagsFiltered.length,
+                  itemCount: _tagsFiltered?.length ?? 0,
                   itemBuilder: (BuildContext context, int index) {
                     return new GestureDetector(
                         onTap: () => Application.router.navigateTo(
