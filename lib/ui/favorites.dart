@@ -141,43 +141,4 @@ class FavoriteNewsState extends State<FavoriteNews> {
           ),
         ));
   }
-
-//  @override
-//  Widget build(BuildContext context) {
-//    return new RefreshIndicator(
-//        key: _refreshIndicatorKey,
-//        onRefresh: _fetchArticles,
-//        child: new Container(
-//          padding: new EdgeInsets.all(8.0),
-//          child: new Column(
-//            mainAxisAlignment: MainAxisAlignment.start,
-//            children: <Widget>[
-//              new Expanded(
-//                child: new ListView.builder(
-//                  padding: new EdgeInsets.all(8.0),
-//                  itemCount: _articles?.length ?? 0,
-//                  itemBuilder: (BuildContext context, int index) {
-//                    return new ArticleWidget(
-//                      article: _articles[index],
-////                    onCardClick: () {
-////  //                      Navigator.of(context).push(
-////  //                          new FadeRoute(
-////  //                            builder: (BuildContext context) => new BookNotesPage(_items[index]),
-////  //                            settings: new RouteSettings(name: '/notes', isInitialRoute: false),
-////  //                          ));
-////                    },
-//                      onStarClick: () {
-//                        setState(() {
-//                          _articles[index].starred = !_articles[index].starred;
-//                        });
-//                        //                      Repository.get().updateBook(_items[index]);
-//                      },
-//                    );
-//                  },
-//                ),
-//              ),
-//            ],
-//          ),
-//        ));
-//  }
 }
