@@ -18,9 +18,13 @@ class TagsState extends State<Tags> {
   final GlobalKey<RefreshIndicatorState> _refreshIndicatorKey =
       new GlobalKey<RefreshIndicatorState>();
 
-  final _tags = <String>[];
-  DateTime _tagsLastUpdate;
+  List<String> _tags;
+  List<String> _tagsFiltered;
+
+  final _searchInputController = new TextEditingController();
+
   String _search;
+  bool _searchInputVisible = false;
 
   @override
   void initState() {
@@ -28,57 +32,109 @@ class TagsState extends State<Tags> {
     _fetchTags();
   }
 
-  Future<Null> _fetchTags() async {
+  Future<List<String>> _loadTags() async {
     _refreshIndicatorKey.currentState.show();
-    if (_tags.isNotEmpty &&
-        _tagsLastUpdate != null &&
-        _tagsLastUpdate.day == new DateTime.now().day) {
-      //Same day
-    } else {
-      final tagsClient = new tagsApi.TagsClient();
-      try {
-        final tags = await (_search != null && _search.isNotEmpty
-            ? tagsClient.getTags()
-            : tagsClient.getTags(search: _search));
-        setState(() {
-          _tags.clear();
-          _tags.addAll(tags);
-          _tags.sort();
-        });
-        _tagsLastUpdate = new DateTime.now();
-      } on Exception catch (e) {
-        Scaffold.of(context).showSnackBar(new SnackBar(
+    final tagsClient = new tagsApi.TagsClient();
+    final tags = await tagsClient.getTags();
+    return tags;
+  }
+
+  List<String> _searchInTags(List<String> allTags, String search) {
+    if (allTags == null) {
+      return new List<String>(0);
+    }
+    var tagsFiltered = allTags;
+    if (search != null && search.isNotEmpty) {
+      final searchLowerCase = search.toLowerCase();
+      tagsFiltered = allTags
+        .where((tag) => tag.toLowerCase().contains(searchLowerCase))
+        .toList();
+    }
+    return tagsFiltered;
+  }
+
+  Future<Null> _fetchTags() async {
+    try {
+      final allTags = await _loadTags();
+      final tagsFiltered = _searchInTags(allTags, _search);
+      setState(() {
+        _tags = allTags;
+        _searchInputVisible = _tags.isNotEmpty;
+        _tagsFiltered = tagsFiltered;
+      });
+    } on Exception catch (e) {
+      Scaffold.of(context).showSnackBar(new SnackBar(
               content: new Text("Internal Error: ${e.toString()}"),
             ));
-      }
     }
   }
 
   @override
   Widget build(BuildContext context) {
     return new RefreshIndicator(
-      key: _refreshIndicatorKey,
-      onRefresh: _fetchTags,
-      child: new ListView.builder(
-          padding: new EdgeInsets.all(8.0),
-//          itemExtent: 20.0,
-          itemCount: _tags.length,
-          itemBuilder: (BuildContext context, int index) {
-            return new GestureDetector(
-                onTap: () => Application.router.navigateTo(
-                    context, "/tags/${_tags[index]}",
-                    transition: TransitionType.fadeIn),
-                child: new Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: <Widget>[
-                    new Padding(
-                        padding: new EdgeInsets.all(10.0),
-                        child: new Text(_tags[index])),
-                    new Divider(
-                        height: 10.0, color: Theme.of(context).primaryColor),
-                  ],
-                ));
-          }),
-    );
+        key: _refreshIndicatorKey,
+        onRefresh: _fetchTags,
+        child: new Container(
+          child: new Column(
+            children: <Widget>[
+              new Align(
+                  alignment: Alignment.topCenter,
+                  child: new Container(
+                    padding: const EdgeInsets.only(left: 8.0),
+                    child: new Stack(
+                      alignment: const Alignment(1.0, 1.0),
+                      children: <Widget>[
+                        new TextField(
+                          controller: _searchInputController,
+                          enabled: _searchInputVisible,
+                          decoration: new InputDecoration(
+                              border: const UnderlineInputBorder(),
+                              hintText: 'Search...'),
+                          onChanged: (String criteria) {
+                            final tagsFiltered = _searchInTags(_tags, criteria);
+                            setState(() {
+                              _search = criteria;
+                              _tagsFiltered = tagsFiltered;
+                            });
+                          },
+                        ),
+                        new FlatButton(
+                            onPressed: () {
+                              _searchInputController.clear();
+                              setState(() {
+                                _search = null;
+                                _tagsFiltered = _tags;
+                              });
+                            },
+                            child: new Icon(Icons.clear))
+                      ],
+                    ),
+                  )),
+              new Container(
+                child: new Expanded(
+                    child: new ListView.builder(
+                  padding: new EdgeInsets.all(8.0),
+                  itemCount: _tagsFiltered.length,
+                  itemBuilder: (BuildContext context, int index) {
+                    return new GestureDetector(
+                        onTap: () => Application.router.navigateTo(
+                            context, "/tags/${_tagsFiltered[index]}",
+                            transition: TransitionType.fadeIn),
+                        child: new Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: <Widget>[
+                            new Padding(
+                                padding: new EdgeInsets.all(10.0),
+                                child: new Text(_tagsFiltered[index])),
+                            new Divider(
+                                height: 10.0, color: Theme.of(context).primaryColor),
+                          ],
+                        ));
+                  },
+                )),
+              ),
+            ],
+          ),
+        ));
   }
 }
