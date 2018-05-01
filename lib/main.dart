@@ -57,8 +57,11 @@ class _AwesomeDevState extends State<AwesomeDev> with TickerProviderStateMixin {
   List<NavigationIconView> _navigationViews;
 
   void onAppBarMenuItemSelected(String value) {
+    print("Selected value from popup menu: [$value]");
     if (value == "about") {
       showGalleryAboutDialog(context);
+    } else if (value == 'send-feedback') {
+      //TODO
     }
   }
 
@@ -177,6 +180,9 @@ class _AwesomeDevState extends State<AwesomeDev> with TickerProviderStateMixin {
 //                      value: 'settings', child: const Text('Settings')),
                   const PopupMenuItem<String>(
                       value: 'about', child: const Text('About')),
+                  const PopupMenuItem<String>(
+                      value: 'send-feedback',
+                      child: const Text('Send Feedback')),
                 ],
           ),
         ],
