@@ -2,6 +2,7 @@ import 'dart:io';
 
 import 'package:awesome_dev/config/application.dart';
 import 'package:awesome_dev/config/routes.dart';
+import 'package:awesome_dev/ui/about.dart';
 import 'package:awesome_dev/ui/archives.dart';
 import 'package:awesome_dev/ui/favorites.dart';
 import 'package:awesome_dev/ui/latest_news.dart';
@@ -55,46 +56,16 @@ class _AwesomeDevState extends State<AwesomeDev> with TickerProviderStateMixin {
   int _currentIndex = 0;
   List<NavigationIconView> _navigationViews;
 
-  final GlobalKey<ScaffoldState> _scaffoldKey = new GlobalKey<ScaffoldState>();
-
   void onAppBarMenuItemSelected(String value) {
-    _scaffoldKey.currentState
-        .showSnackBar(new SnackBar(content: new Text(value)));
+    if (value == "about") {
+      showGalleryAboutDialog(context);
+    }
   }
-
-//  AppBar buildAppBar(BuildContext context) {
-//    return new AppBar(
-//      title: const Text('Awesome Dev'),
-//      actions: <Widget>[
-////        searchBar.getSearchAction(context),
-//        new PopupMenuButton<String>(
-//          onSelected: onAppBarMenuItemSelected,
-//          itemBuilder: (BuildContext context) => <PopupMenuItem<String>>[
-//                const PopupMenuItem<String>(
-//                    value: 'settings', child: const Text('Settings')),
-//                const PopupMenuItem<String>(
-//                    value: 'about', child: const Text('About')),
-//              ],
-//        ),
-//      ],
-//    );
-//  }
 
   _AwesomeDevState() {
     final router = new Router();
     Routes.configureRoutes(router);
     Application.router = router;
-
-//    searchBar = new SearchBar(
-//        inBar: true,
-//        setState: setState,
-//        onSubmitted: (value) {
-//          print("Input search value: $value");
-//          setState(() {
-//            _searchValue = value;
-//          });
-//        },
-//        buildDefaultAppBar: buildAppBar);
   }
 
   @override
@@ -199,12 +170,11 @@ class _AwesomeDevState extends State<AwesomeDev> with TickerProviderStateMixin {
       appBar: new AppBar(
         title: const Text('Awesome Dev'),
         actions: <Widget>[
-//        searchBar.getSearchAction(context),
           new PopupMenuButton<String>(
             onSelected: onAppBarMenuItemSelected,
             itemBuilder: (BuildContext context) => <PopupMenuItem<String>>[
-                  const PopupMenuItem<String>(
-                      value: 'settings', child: const Text('Settings')),
+//                  const PopupMenuItem<String>(
+//                      value: 'settings', child: const Text('Settings')),
                   const PopupMenuItem<String>(
                       value: 'about', child: const Text('About')),
                 ],
@@ -214,41 +184,8 @@ class _AwesomeDevState extends State<AwesomeDev> with TickerProviderStateMixin {
       body: new Center(child: _buildTransitionsStack()),
       bottomNavigationBar: botNavBar,
     );
-
-//    return new _AwesomeDevInheritedWidget(
-//      data: this,
-//      child: new Scaffold(
-//        appBar: new AppBar(
-//          title: const Text('Awesome Dev'),
-//          actions: <Widget>[
-////        searchBar.getSearchAction(context),
-//            new PopupMenuButton<String>(
-//              onSelected: onAppBarMenuItemSelected,
-//              itemBuilder: (BuildContext context) => <PopupMenuItem<String>>[
-//                    const PopupMenuItem<String>(
-//                        value: 'settings', child: const Text('Settings')),
-//                    const PopupMenuItem<String>(
-//                        value: 'about', child: const Text('About')),
-//                  ],
-//            ),
-//          ],
-//        ),
-//        body: new Center(child: _buildTransitionsStack()),
-//        bottomNavigationBar: botNavBar,
-//      ),
-//    );
   }
 }
-//
-//class _AwesomeDevInheritedWidget extends InheritedWidget {
-//  final _AwesomeDevState data;
-//
-//  _AwesomeDevInheritedWidget({Key key, this.data, Widget child})
-//      : super(key: key, child: child);
-//
-//  @override
-//  bool updateShouldNotify(_AwesomeDevInheritedWidget old) => true;
-//}
 
 class NavigationIconView {
   NavigationIconView({
