@@ -25,6 +25,8 @@ dev_dependencies:
   flutter_test:
     sdk: flutter
 
+  flutter_stetho: 0.1.1
+
 # https://pub.dartlang.org/packages/flutter_launcher_icons
 #flutter_icons:
 #  image_path: "icon/icon.png"

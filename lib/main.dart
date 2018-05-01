@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:awesome_dev/config/application.dart';
 import 'package:awesome_dev/config/routes.dart';
 import 'package:awesome_dev/ui/archives.dart';
@@ -6,9 +8,20 @@ import 'package:awesome_dev/ui/latest_news.dart';
 import 'package:awesome_dev/ui/tags.dart';
 import 'package:fluro/fluro.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_stetho/flutter_stetho.dart';
 import 'package:logging/logging.dart';
 
-void main() => runApp(new AwesomeDevApp());
+void main() {
+  assert(() {
+    //assert will execute only in Debug Mode
+    //Note in particular the () at the end of the call -
+    // assert can only operate on a boolean, so just passing in a function doesn't work.
+    HttpOverrides.global = new StethoHttpOverrides();
+    return true;
+  }());
+
+  runApp(new AwesomeDevApp());
+}
 
 class AwesomeDevApp extends StatelessWidget {
   @override
