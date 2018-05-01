@@ -33,7 +33,7 @@ build_mobile_apps_android:
   before_script:
     - flutter upgrade
   script:
-    - flutter build apk
+    - flutter build apk --debug
   artifacts:
     when: always
     paths:
@@ -46,7 +46,8 @@ build_mobile_apps_ios:
   before_script:
     - flutter upgrade
   script:
-    - flutter build ios || echo "TODO | Not Implemented as yet"
+    - flutter build ios --debug
+     || echo "TODO | Not Implemented as yet"
   artifacts:
     when: always
     paths:
