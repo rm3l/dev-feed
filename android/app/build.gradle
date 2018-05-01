@@ -23,17 +23,17 @@ def getPlayStoreConfig = {
     return file(homePath + "/.droid/PlayStore.keys.json")
 }
 
-final propsFile = new File(homePath + "/.droid/awesome_dev.keystore.properties")
-def storeFile = file('/dev/null')
-def keyPassword = ""
-if (propsFile.exists()) {
-    logger.debug("[Signing] Using properties file located at ${propsFile.absolutePath}")
-    final props = new Properties()
-    props.load(new FileInputStream(propsFile))
-    storeFile = new File(props['keystore'].toString())
-    keyPassword = props['keyPassword']
-}
 def getReleaseSigningConfig = {
+    final propsFile = new File(homePath + "/.droid/awesome_dev.keystore.properties")
+    def storeFile = file('/dev/null')
+    def keyPassword = ""
+    if (propsFile.exists()) {
+        logger.debug("[Signing] Using properties file located at ${propsFile.absolutePath}")
+        final props = new Properties()
+        props.load(new FileInputStream(propsFile))
+        storeFile = new File(props['keystore'].toString())
+        keyPassword = props['keyPassword']
+    }
     return ['AwesomeDevKey', storeFile, keyPassword, keyPassword]
 }
 def getDebugSigningConfig = {
@@ -107,7 +107,6 @@ android {
                 "- NAME: " +
                 versionName +
                 "\n----------------------------\n")
-
     }
 
     buildTypes {
