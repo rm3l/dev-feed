@@ -1,0 +1,70 @@
+buildscript {
+    ext {
+        kotlinVersion = '1.2.40'
+        springBootVersion = '2.0.1.RELEASE'
+    }
+    repositories {
+        mavenCentral()
+    }
+    dependencies {
+        classpath("org.springframework.boot:spring-boot-gradle-plugin:${springBootVersion}")
+        classpath("org.jetbrains.kotlin:kotlin-gradle-plugin:${kotlinVersion}")
+        classpath("org.jetbrains.kotlin:kotlin-allopen:${kotlinVersion}")
+    }
+}
+
+apply plugin: 'kotlin'
+apply plugin: 'kotlin-spring'
+apply plugin: 'eclipse'
+apply plugin: 'org.springframework.boot'
+apply plugin: 'io.spring.dependency-management'
+
+group = 'org.rm3l'
+version = '0.0.1-SNAPSHOT'
+sourceCompatibility = 1.8
+compileKotlin {
+    kotlinOptions {
+        freeCompilerArgs = ["-Xjsr305=strict"]
+        jvmTarget = "1.8"
+    }
+}
+compileTestKotlin {
+    kotlinOptions {
+        freeCompilerArgs = ["-Xjsr305=strict"]
+        jvmTarget = "1.8"
+    }
+}
+
+repositories {
+    jcenter()
+    mavenCentral()
+    maven { url 'https://dl.bintray.com/kotlin/exposed' }
+}
+
+dependencies {
+    compile('org.springframework.boot:spring-boot-starter-actuator')
+    compile('org.springframework.boot:spring-boot-starter-web')
+    compile('org.springframework.boot:spring-boot-starter-security')
+    compile('com.fasterxml.jackson.module:jackson-module-kotlin')
+    compile("org.jetbrains.kotlin:kotlin-stdlib-jdk8")
+    compile("org.jetbrains.kotlin:kotlin-reflect")
+
+    compile ("org.jsoup:jsoup:1.11.2")
+
+    compile ("org.jetbrains.exposed:exposed:0.10.1")
+
+    //JDBC Drivers
+    compile 'org.xerial:sqlite-jdbc:3.21.0.1'
+    compile 'com.h2database:h2:1.4.197'
+
+    // GraphQL and GraphiQL
+    compile 'com.graphql-java:graphql-spring-boot-starter:4.0.0'
+    compile 'com.graphql-java:graphiql-spring-boot-starter:4.0.0'
+    compile 'com.graphql-java:graphql-java-tools:4.3.0'
+
+    compile 'khttp:khttp:0.1.0'
+
+    testCompile('org.springframework.boot:spring-boot-starter-test')
+    testCompile('org.springframework.security:spring-security-test')
+    testCompile('io.projectreactor:reactor-test')
+}

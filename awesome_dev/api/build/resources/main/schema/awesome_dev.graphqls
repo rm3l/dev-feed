@@ -1,0 +1,57 @@
+schema {
+    query: Query
+    mutation: Mutation
+}
+
+type Query {
+    articleDates(limit: Int, offset: Int): [String]
+    articles(limit: Int, offset: Int, filter: ArticleFilter): [Article]
+    recentArticles(limit: Int, offset: Int): [Article]
+
+    allButRecentArticles(limit: Int, offset: Int, filter: ArticleFilter): [Article]
+
+    tags(limit: Int, offset: Int, search: [String]): [String]
+}
+
+type Mutation {
+    addArticle(input: ArticleInput!): Article
+    deleteArticle(id: ID!): Boolean
+    updateArticle(id: ID!, input: ArticleInput!): Article
+
+    addTag(input: String): String
+    tagArticle(articleId: ID!, tags: [String]): Article!
+    untagArticle(articleId: ID!, tagsToRemove: [String]): Article!
+}
+
+type Article {
+    id: ID!
+    date: String!
+    title: String!
+    description: String
+    url: String!
+    domain: String!
+    tags: [String]
+    screenshot: Screenshot
+}
+
+type Screenshot {
+    data: String
+    height: Int
+    width: Int
+    mimeType: String
+}
+
+input ArticleFilter {
+    from: String
+    to: String
+    search: String
+    tags: [String]
+}
+
+input ArticleInput {
+    date: String
+    title: String!
+    description: String
+    url: String!
+    tags: [String]
+}
