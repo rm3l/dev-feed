@@ -113,6 +113,18 @@ class AwesomeDevDao {
         }
     }
 
+    @Synchronized
+    fun updateArticleScreenshotData(article: Article) {
+        transaction {
+            Articles.update({ Articles.id eq article.id!!.toInt() }) {
+                it[screenshotData] = article.screenshot?.data
+                it[screenshotMimeType] = article.screenshot?.mimeType
+                it[screenshotWidth] = article.screenshot?.width
+                it[screenshotHeight] = article.screenshot?.height
+            }
+        }
+    }
+
     fun allButRecentArticles(limit: Int? = null, offset: Int? = null, filter: ArticleFilter? = null): Collection<Article> {
         val result = mutableListOf<Article>()
         transaction {
@@ -181,6 +193,27 @@ class AwesomeDevDao {
                     }
         }
         return result
+    }
+
+    fun getArticlesWithNoScreenshots(): Collection<Article> {
+        val result = mutableListOf<Article>()
+        transaction {
+            result.addAll(Articles
+                    .select { Articles.screenshotData.isNull().or(Articles.screenshotData eq "") }
+                    .map { Article(id = it[Articles.id].toLong(),
+                            title = it[Articles.title],
+                            url = it[Articles.link],
+                            domain = it[Articles.hostname] ?: URL(it[Articles.link]).host,
+                            timestamp = it[Articles.timestamp],
+                            screenshot = Screenshot(
+                                    data = it[Articles.screenshotData],
+                                    mimeType = it[Articles.screenshotMimeType],
+                                    width = it[Articles.screenshotWidth],
+                                    height = it[Articles.screenshotHeight]
+                            )) }
+                    .toSet())
+        }
+        return result.toList()
     }
 
     fun getArticles(limit: Int? = null, offset: Int? = null, filter: ArticleFilter? = null): Collection<Article> {

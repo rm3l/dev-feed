@@ -19,4 +19,6 @@ class Query(private val dao: AwesomeDevDao): GraphQLQueryResolver {
             dao.allButRecentArticles(limit, offset, filter)
 
     fun tags(limit: Int?, offset: Int?, search: List<String>?) = dao.getTags(limit, offset, search)
+
+    fun articlesWithNoScreenshots() = dao.getArticlesWithNoScreenshots()
 }

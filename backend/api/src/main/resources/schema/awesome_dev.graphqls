@@ -10,6 +10,8 @@ type Query {
 
     allButRecentArticles(limit: Int, offset: Int, filter: ArticleFilter): [Article]
 
+    articlesWithNoScreenshots: [Article]
+
     tags(limit: Int, offset: Int, search: [String]): [String]
 }
 

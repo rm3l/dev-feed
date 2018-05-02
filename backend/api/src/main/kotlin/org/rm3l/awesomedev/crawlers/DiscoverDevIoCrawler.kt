@@ -48,10 +48,46 @@ class DiscoverDevIoCrawler(val dao: AwesomeDevDao) {
 
     private lateinit var executorService: ExecutorService
 
+    @Value("\${crawlers.screenshot-grabber.task.thread-pool-size}")
+    private lateinit var screenshotUpdaterThreadPoolSize: String
+
+    private lateinit var screenshotUpdaterExecutorService: ExecutorService
+
     @PostConstruct
     fun init() {
+        this.screenshotUpdaterExecutorService = Executors.newFixedThreadPool(screenshotUpdaterThreadPoolSize.toInt())
         this.executorService = Executors.newFixedThreadPool(threadPoolSize.toInt())
+        this.triggerScreenshotUpdater()
         this.triggerRemoteWebsiteCrawling()
+    }
+
+    @Scheduled(cron = "\${crawlers.screenshot-updater.task.cron-expression}")
+    fun triggerScreenshotUpdater() {
+        try {
+            val articleIdsWithNoScreenshots = dao.getArticlesWithNoScreenshots()
+            logger.info(">>> Inspecting (and trying to update) ${articleIdsWithNoScreenshots.size} articles with no screenshots")
+            val futures = articleIdsWithNoScreenshots
+                    .map {
+                        CompletableFuture.supplyAsync(
+                                DiscoverDevIoArticleScreenshotGrabber(dao, it, true),
+                                screenshotUpdaterExecutorService)
+                    }
+                    .map { it.join() }
+                    .filter { it.screenshot?.data != null }
+                    .map {
+                        CompletableFuture.supplyAsync(
+                                DiscoverDevIoArchiveCrawler(dao, it, true),
+                                executorService)
+                    }.toTypedArray()
+            CompletableFuture.allOf(*futures).get() //Wait for all of them to finish
+            logger.info("<<< Done inspecting and updating ${articleIdsWithNoScreenshots.size} articles with no screenshots. " +
+                    "Now, there remains ${dao.getArticlesWithNoScreenshots().size} articles with no screenshots " +
+                    "=> will check again in a near future.")
+        } catch (e: ExecutionException) {
+            if (logger.isDebugEnabled) {
+                logger.debug("Updating missing screenshots could not complete successfully - will try again later", e)
+            }
+        }
     }
 
     @Scheduled(cron = "\${crawlers.task.cron-expression}")
@@ -70,7 +106,8 @@ class DiscoverDevIoCrawler(val dao: AwesomeDevDao) {
                                             DiscoverDevIoCrawlerArchiveFetcherFutureSupplier(it), executorService) }
                                 .flatMap { it.join() }
                                 .map { CompletableFuture.supplyAsync(
-                                        DiscoverDevIoArticleScreenshotGrabber(dao, it), executorService) }
+                                        DiscoverDevIoArticleScreenshotGrabber(dao, it),
+                                        screenshotUpdaterExecutorService) }
                                 .map { it.join() }
                                 .map { CompletableFuture.supplyAsync(
                                         DiscoverDevIoArchiveCrawler(dao, it), executorService) }
@@ -126,7 +163,9 @@ private class DiscoverDevIoCrawlerArchiveFetcherFutureSupplier(private val date:
 /**
  * Remote Website screenshot grabber. Based upon this article: https://shkspr.mobi/blog/2015/11/google-secret-screenshot-api/
  */
-private class DiscoverDevIoArticleScreenshotGrabber(private val dao: AwesomeDevDao, private val article: Article):
+private class DiscoverDevIoArticleScreenshotGrabber(private val dao: AwesomeDevDao,
+                                                    private val article: Article,
+                                                    private val updater: Boolean = false):
         Supplier<Article> {
 
     companion object {
@@ -142,11 +181,7 @@ private class DiscoverDevIoArticleScreenshotGrabber(private val dao: AwesomeDevD
         val url = GOOGLE_PAGESPEED_URL_FORMAT.format(article.url)
         try {
             //Check if (title, url) pair already exist in the DB
-            val existArticlesByTitleAndUrl = dao.existArticlesByTitleAndUrl(article.title, article.url)
-            if (logger.isDebugEnabled) {
-                logger.debug("$existArticlesByTitleAndUrl = existArticlesByTitleAndUrl(${article.title}, ${article.url})")
-            }
-            if (!existArticlesByTitleAndUrl) {
+            if (updater || !dao.existArticlesByTitleAndUrl(article.title, article.url)) {
                 val screenshotJsonObject =
                         get(url).jsonObject.getJSONObject("screenshot")
                 //Weird, but for reasons best known to Google, / is replaced with _, and + is replaced with -
@@ -173,7 +208,9 @@ private class DiscoverDevIoArticleScreenshotGrabber(private val dao: AwesomeDevD
 
 }
 
-private class DiscoverDevIoArchiveCrawler(private val dao: AwesomeDevDao, private val article: Article):
+private class DiscoverDevIoArchiveCrawler(private val dao: AwesomeDevDao,
+                                          private val article: Article,
+                                          private val updater: Boolean = false):
         Supplier<Unit> {
 
     companion object {
@@ -186,13 +223,17 @@ private class DiscoverDevIoArchiveCrawler(private val dao: AwesomeDevDao, privat
             logger.debug(">>> Handling article crawled: $article")
         }
 
-        //Check if (title, url) pair already exist in the DB
-        val existArticlesByTitleAndUrl = dao.existArticlesByTitleAndUrl(article.title, article.url)
-        if (logger.isDebugEnabled) {
-            logger.debug("$existArticlesByTitleAndUrl = existArticlesByTitleAndUrl(${article.title}, ${article.url})")
-        }
-        if (!existArticlesByTitleAndUrl) {
-            dao.insertArticle(article)
+        if (updater) {
+            dao.updateArticleScreenshotData(article)
+        } else {
+            //Check if (title, url) pair already exist in the DB
+            val existArticlesByTitleAndUrl = dao.existArticlesByTitleAndUrl(article.title, article.url)
+            if (logger.isDebugEnabled) {
+                logger.debug("$existArticlesByTitleAndUrl = existArticlesByTitleAndUrl(${article.title}, ${article.url})")
+            }
+            if (!existArticlesByTitleAndUrl) {
+                dao.insertArticle(article)
+            }
         }
     }
 }
