@@ -23,6 +23,8 @@ dependencies:
   fluro: "^1.3.1"
   pigment: "^0.1.3"
 
+  flutter_billing: "^0.2.2"
+
 dev_dependencies:
   flutter_test:
     sdk: flutter
