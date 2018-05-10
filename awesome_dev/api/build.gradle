@@ -39,6 +39,7 @@ repositories {
     jcenter()
     mavenCentral()
     maven { url 'https://dl.bintray.com/kotlin/exposed' }
+    maven { url "https://jitpack.io" }
 }
 
 dependencies {
@@ -63,6 +64,12 @@ dependencies {
     compile 'com.graphql-java:graphql-java-tools:4.3.0'
 
     compile 'khttp:khttp:0.1.0'
+
+    compile ('com.github.karussell:snacktory:-SNAPSHOT') {
+        exclude group: 'org.jsoup', module: 'jsoup'
+        exclude group: 'org.slf4j'
+        exclude group: 'log4j', module: 'log4j'
+    }
 
     testCompile('org.springframework.boot:spring-boot-starter-test')
     // testCompile('org.springframework.security:spring-security-test')
