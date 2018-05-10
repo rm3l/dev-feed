@@ -57,8 +57,13 @@ class DiscoverDevIoCrawler(val dao: AwesomeDevDao) {
     fun init() {
         this.screenshotUpdaterExecutorService = Executors.newFixedThreadPool(screenshotUpdaterThreadPoolSize.toInt())
         this.executorService = Executors.newFixedThreadPool(threadPoolSize.toInt())
-        this.triggerScreenshotUpdater()
-        this.triggerRemoteWebsiteCrawling()
+        CompletableFuture.runAsync {
+            triggerRemoteWebsiteCrawling()
+            triggerScreenshotUpdater()
+        }.exceptionally { t ->
+            logger.info(t.message, t)
+            null
+        }
     }
 
     @Scheduled(cron = "\${crawlers.screenshot-updater.task.cron-expression}")
