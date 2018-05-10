@@ -5,14 +5,18 @@ import org.jsoup.Jsoup
 import org.rm3l.awesomedev.dal.AwesomeDevDao
 import org.rm3l.awesomedev.utils.asSupportedTimestamp
 import org.slf4j.LoggerFactory
+import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.beans.factory.annotation.Value
+import org.springframework.boot.web.client.RestTemplateBuilder
 import org.springframework.scheduling.annotation.Scheduled
 import org.springframework.stereotype.Component
+import org.springframework.web.client.RestTemplate
 import java.net.URL
 import java.util.concurrent.CompletableFuture
 import java.util.concurrent.ExecutionException
 import java.util.concurrent.ExecutorService
 import java.util.concurrent.Executors
+import java.util.concurrent.atomic.AtomicBoolean
 import java.util.function.Supplier
 import javax.annotation.PostConstruct
 import javax.annotation.PreDestroy
@@ -28,12 +32,23 @@ data class Article(val id: Long?= null,
                    val url: String,
                    val domain: String = URL(url).host,
                    var tags: Collection<String>? = setOf(),
-                   var screenshot: Screenshot? = null)
+                   var screenshot: Screenshot? = null,
+                   var parsed: ArticleParsed? = null)
 
 data class Screenshot(val data: String?= null,
                       val height: Int?= null,
                       val width: Int?= null,
                       val mimeType: String?= null)
+
+data class ArticleParsed(val url: String,
+                         val title: String? = null,
+                         val author: String? = null,
+                         val published: String? = null, //TODO Use DateTime
+                         val image: String? = null,
+                         val videos: Collection<String>? = null,
+                         val keywords: Collection<String>? = null,
+                         val description: String? = null,
+                         val body: String)
 
 @Component
 class DiscoverDevIoCrawler(val dao: AwesomeDevDao) {
@@ -53,10 +68,13 @@ class DiscoverDevIoCrawler(val dao: AwesomeDevDao) {
 
     private lateinit var screenshotUpdaterExecutorService: ExecutorService
 
+    private lateinit var articleExtractorExecutorService: ExecutorService
+
     @PostConstruct
     fun init() {
         this.screenshotUpdaterExecutorService = Executors.newFixedThreadPool(screenshotUpdaterThreadPoolSize.toInt())
         this.executorService = Executors.newFixedThreadPool(threadPoolSize.toInt())
+        this.articleExtractorExecutorService = Executors.newFixedThreadPool(screenshotUpdaterThreadPoolSize.toInt())
         CompletableFuture.runAsync {
             triggerRemoteWebsiteCrawling()
             triggerScreenshotUpdater()
@@ -113,6 +131,11 @@ class DiscoverDevIoCrawler(val dao: AwesomeDevDao) {
                                 .map { CompletableFuture.supplyAsync(
                                         DiscoverDevIoArticleScreenshotGrabber(dao, it),
                                         screenshotUpdaterExecutorService) }
+                                .map { it.join() }
+                                .map { CompletableFuture.supplyAsync(
+                                        ArticleExtractor(dao, it),
+                                        articleExtractorExecutorService
+                                ) }
                                 .map { it.join() }
                                 .map { CompletableFuture.supplyAsync(
                                         DiscoverDevIoArchiveCrawler(dao, it), executorService) }
@@ -188,14 +211,14 @@ private class DiscoverDevIoArticleScreenshotGrabber(private val dao: AwesomeDevD
             //Check if (title, url) pair already exist in the DB
             if (updater || !dao.existArticlesByTitleAndUrl(article.title, article.url)) {
                 val screenshotJsonObject =
-                        get(url).jsonObject.getJSONObject("screenshot")
+                        get(url).jsonObject.optJSONObject("screenshot")
                 //Weird, but for reasons best known to Google, / is replaced with _, and + is replaced with -
-                val base64ImageData = screenshotJsonObject.getString("data")
+                val base64ImageData = screenshotJsonObject.optString("data")
                         .replace("_", "/")
                         .replace("-", "+")
-                val mimeType = screenshotJsonObject.getString("mime_type")
-                val height = screenshotJsonObject.getInt("height")
-                val width = screenshotJsonObject.getInt("width")
+                val mimeType = screenshotJsonObject.optString("mime_type")
+                val height = screenshotJsonObject.optInt("height")
+                val width = screenshotJsonObject.optInt("width")
                 if (!base64ImageData.isBlank()) {
                     article.screenshot = Screenshot(data = base64ImageData,
                             mimeType = mimeType,
@@ -206,6 +229,59 @@ private class DiscoverDevIoArticleScreenshotGrabber(private val dao: AwesomeDevD
         } catch (e: Exception) {
             if (logger.isDebugEnabled) {
                 logger.debug("Could not fetch screenshot data for ${article.url}: $url", e)
+            }
+        }
+        return article
+    }
+
+}
+
+private class ArticleExtractor(private val dao: AwesomeDevDao, private val article: Article): Supplier<Article> {
+
+    companion object {
+
+        private const val ARTICLE_EXTRACTION_API_URL_FORMAT = "https://document-parser-api.lateral.io/?url=%s"
+        private const val ARTICLE_EXTRACTION_API_SUBSCRIPTION_KEY = "e6c16b3ec541b7ed385921023a9704e1"
+
+        @JvmStatic
+        private val logger = LoggerFactory.getLogger(ArticleExtractor::class.java)
+
+        private val debugDone = AtomicBoolean(false)
+    }
+
+    override fun get(): Article {
+        val url = ARTICLE_EXTRACTION_API_URL_FORMAT.format(article.url)
+        try {
+            //FIXME Remove in DEBUG mode
+//            if (debugDone.getAndSet(true)) {
+//                return article
+//            }
+            if (!dao.existArticleParsed(article.url)) {
+                if (logger.isDebugEnabled) {
+                    logger.debug("Getting article extraction data from url: $url")
+                }
+                val articleExtractionJsonObject =
+                        get(url,
+                                headers = mapOf(
+                                        "Content-Type" to "application/json",
+                                        "subscription-key" to ARTICLE_EXTRACTION_API_SUBSCRIPTION_KEY
+                                )).jsonObject
+
+                article.parsed = ArticleParsed(
+                        url = article.url,
+                        title = articleExtractionJsonObject.optString("title"),
+                        published = articleExtractionJsonObject.optString("published"),
+                        author = articleExtractionJsonObject.optString("author"),
+                        image = articleExtractionJsonObject.optString("image"),
+                        description = articleExtractionJsonObject.optString("description"),
+                        body = articleExtractionJsonObject.optString("body"),
+                        videos = articleExtractionJsonObject.optJSONArray("videos")?.map { it.toString() }?.toSet(),
+                        keywords = articleExtractionJsonObject.optJSONArray("keywords")?.map { it.toString() }?.toSet()
+                )
+            }
+        } catch (e: Exception) {
+            if (logger.isDebugEnabled) {
+                logger.debug("Could not fetch article extraction data for ${article.url}: $url", e)
             }
         }
         return article

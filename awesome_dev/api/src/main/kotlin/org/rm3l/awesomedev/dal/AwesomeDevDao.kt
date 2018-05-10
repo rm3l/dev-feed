@@ -1,17 +1,22 @@
 package org.rm3l.awesomedev.dal
 
+import com.fasterxml.jackson.databind.ObjectMapper
 import org.jetbrains.exposed.sql.*
 import org.jetbrains.exposed.sql.SchemaUtils.createMissingTablesAndColumns
 import org.jetbrains.exposed.sql.SqlExpressionBuilder.between
 import org.jetbrains.exposed.sql.SqlExpressionBuilder.like
 import org.jetbrains.exposed.sql.transactions.transaction
 import org.rm3l.awesomedev.crawlers.Article
+import org.rm3l.awesomedev.crawlers.ArticleParsed
 import org.rm3l.awesomedev.crawlers.Screenshot
 import org.rm3l.awesomedev.graphql.ArticleFilter
 import org.rm3l.awesomedev.utils.asSupportedTimestamp
+import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.beans.factory.annotation.Value
+import org.springframework.http.converter.json.Jackson2ObjectMapperBuilder
 import org.springframework.stereotype.Component
 import java.net.URL
+import java.util.ArrayList
 import javax.annotation.PostConstruct
 
 object Articles : Table(name = "articles") {
@@ -36,6 +41,18 @@ object ArticlesTags : Table(name = "articles_tags") {
     val tagName = (varchar("tag_name", length = 255) references Tags.name)
 }
 
+object ArticlesParsed : Table(name = "articles_parsed") {
+    val url = (varchar(name = "link", length = 255).primaryKey() references Articles.link)
+    val title = varchar(name = "title", length = 255).nullable()
+    val author = varchar(name = "author", length = 255).nullable()
+    val published = varchar(name = "published", length = 255).nullable() //TODO Use DateTime
+    val image = varchar(name = "image", length = 255).nullable()
+    val videos = text(name = "videos").nullable()
+    val keywords = text(name = "keywords").nullable()
+    val description = text(name = "description").nullable()
+    val body = text(name = "body")
+}
+
 const val DEFAULT_OFFSET = 0
 
 @Component
@@ -53,18 +70,25 @@ class AwesomeDevDao {
     @Value("\${datasource.password}")
     private lateinit var datasourcePassword: String
 
+    @Autowired
+    private lateinit var jackson2ObjectMapperBuilder: Jackson2ObjectMapperBuilder
+
+    private lateinit var objectMapper: ObjectMapper
+
     @PostConstruct
     fun init() {
+        this.objectMapper = jackson2ObjectMapperBuilder.build()
         Database.connect(
                 url = datasourceUrl,
                 driver = datasourceDriver,
                 user = datasourceUser,
                 password = datasourcePassword)
         transaction {
-            createMissingTablesAndColumns(Articles, Tags, ArticlesTags)
+            createMissingTablesAndColumns(Articles, Tags, ArticlesTags, ArticlesParsed)
         }
     }
 
+    @Synchronized
     fun existArticlesByTitleAndUrl(title: String, url: String): Boolean {
         var result = false
         transaction {
@@ -73,6 +97,16 @@ class AwesomeDevDao {
         return result
     }
 
+    @Synchronized
+    fun existArticleParsed(url: String): Boolean {
+        var result = false
+        transaction {
+            result = !ArticlesParsed.select { ArticlesParsed.url.eq(url) }.empty()
+        }
+        return result
+    }
+
+    @Synchronized
     fun existTagByName(name: String): Boolean {
         var result = false
         transaction {
@@ -96,6 +130,20 @@ class AwesomeDevDao {
                 it[screenshotWidth] = article.screenshot?.width
                 it[screenshotHeight] = article.screenshot?.height
             } get Articles.id
+
+            article.parsed?.let { articleParsed ->
+                ArticlesParsed.insert {
+                    it[url] = articleParsed.url
+                    it[title] = articleParsed.title
+                    it[author] = articleParsed.author
+                    it[published] = articleParsed.published
+                    it[image] = articleParsed.image
+                    it[description] = articleParsed.description
+                    it[body] = articleParsed.body
+                    it[videos] = objectMapper.writeValueAsString(articleParsed.videos?: emptyList<String>())
+                    it[keywords] = objectMapper.writeValueAsString(articleParsed.keywords?: emptyList<String>())
+                }
+            }
 
             article.tags?.map { articleTag ->
                 if (!existTagByName(articleTag)) {
@@ -165,20 +213,34 @@ class AwesomeDevDao {
                         query.orderBy(Articles.timestamp, isAsc = false)
 
                         val list = query
-                                .map {
-                                    val article = Article(id = it[Articles.id].toLong(),
-                                            title = it[Articles.title],
-                                            url = it[Articles.link],
-                                            domain = it[Articles.hostname] ?: URL(it[Articles.link]).host,
-                                            timestamp = it[Articles.timestamp],
+                                .map {articleResultRow ->
+                                    val article = Article(id = articleResultRow[Articles.id].toLong(),
+                                            title = articleResultRow[Articles.title],
+                                            url = articleResultRow[Articles.link],
+                                            domain = articleResultRow[Articles.hostname] ?: URL(articleResultRow[Articles.link]).host,
+                                            timestamp = articleResultRow[Articles.timestamp],
                                             screenshot = Screenshot(
-                                                    data = it[Articles.screenshotData],
-                                                    mimeType = it[Articles.screenshotMimeType],
-                                                    width = it[Articles.screenshotWidth],
-                                                    height = it[Articles.screenshotHeight]
-                                            ))
+                                                    data = articleResultRow[Articles.screenshotData],
+                                                    mimeType = articleResultRow[Articles.screenshotMimeType],
+                                                    width = articleResultRow[Articles.screenshotWidth],
+                                                    height = articleResultRow[Articles.screenshotHeight]
+                                            ),
+                                            parsed = ArticlesParsed.select { ArticlesParsed.url.eq(articleResultRow[Articles.link])}
+                                                    .map {
+                                                        ArticleParsed(
+                                                                url = articleResultRow[Articles.link],
+                                                                title = it[ArticlesParsed.title],
+                                                                description = it[ArticlesParsed.description],
+                                                                body = it[ArticlesParsed.body],
+                                                                author = it[ArticlesParsed.author],
+                                                                image = it[ArticlesParsed.image],
+                                                                published = it[ArticlesParsed.published]
+                                                                //TODO Fix videos and keywords
+//                                                        videos = objectMapper.readValue(it[ArticlesParsed.videos]?:"", ArrayList::class.java)
+                                                        )
+                                                    }.firstOrNull())
                                     val tags = ArticlesTags.slice(ArticlesTags.tagName)
-                                            .select { ArticlesTags.articleId.eq(it[Articles.id]) }
+                                            .select { ArticlesTags.articleId.eq(articleResultRow[Articles.id]) }
                                             .map { it[ArticlesTags.tagName] }
                                             .toSet()
                                     article to tags
@@ -200,17 +262,32 @@ class AwesomeDevDao {
         transaction {
             result.addAll(Articles
                     .select { Articles.screenshotData.isNull().or(Articles.screenshotData eq "") }
-                    .map { Article(id = it[Articles.id].toLong(),
-                            title = it[Articles.title],
-                            url = it[Articles.link],
-                            domain = it[Articles.hostname] ?: URL(it[Articles.link]).host,
-                            timestamp = it[Articles.timestamp],
+                    .map { articleResultRow ->
+                        Article(id = articleResultRow[Articles.id].toLong(),
+                            title = articleResultRow[Articles.title],
+                            url = articleResultRow[Articles.link],
+                            domain = articleResultRow[Articles.hostname] ?: URL(articleResultRow[Articles.link]).host,
+                            timestamp = articleResultRow[Articles.timestamp],
                             screenshot = Screenshot(
-                                    data = it[Articles.screenshotData],
-                                    mimeType = it[Articles.screenshotMimeType],
-                                    width = it[Articles.screenshotWidth],
-                                    height = it[Articles.screenshotHeight]
-                            )) }
+                                    data = articleResultRow[Articles.screenshotData],
+                                    mimeType = articleResultRow[Articles.screenshotMimeType],
+                                    width = articleResultRow[Articles.screenshotWidth],
+                                    height = articleResultRow[Articles.screenshotHeight]
+                            ),
+                                parsed = ArticlesParsed.select { ArticlesParsed.url.eq(articleResultRow[Articles.link])}
+                                        .map {
+                                            ArticleParsed(
+                                                    url = articleResultRow[Articles.link],
+                                                    title = it[ArticlesParsed.title],
+                                                    description = it[ArticlesParsed.description],
+                                                    body = it[ArticlesParsed.body],
+                                                    author = it[ArticlesParsed.author],
+                                                    image = it[ArticlesParsed.image],
+                                                    published = it[ArticlesParsed.published]
+                                                    //TODO Fix videos and keywords
+//                                                        videos = objectMapper.readValue(it[ArticlesParsed.videos]?:"", ArrayList::class.java)
+                                            )
+                                        }.firstOrNull()) }
                     .toSet())
         }
         return result.toList()
@@ -243,20 +320,34 @@ class AwesomeDevDao {
             query.orderBy(Articles.timestamp, isAsc = false)
 
             val list = query
-                    .map {
-                        val article = Article(id = it[Articles.id].toLong(),
-                                title = it[Articles.title],
-                                url = it[Articles.link],
-                                domain = it[Articles.hostname] ?: URL(it[Articles.link]).host,
-                                timestamp = it[Articles.timestamp],
+                    .map { articleResultRow ->
+                        val article = Article(id = articleResultRow[Articles.id].toLong(),
+                                title = articleResultRow[Articles.title],
+                                url = articleResultRow[Articles.link],
+                                domain = articleResultRow[Articles.hostname] ?: URL(articleResultRow[Articles.link]).host,
+                                timestamp = articleResultRow[Articles.timestamp],
                                 screenshot = Screenshot(
-                                        data = it[Articles.screenshotData],
-                                        mimeType = it[Articles.screenshotMimeType],
-                                        width = it[Articles.screenshotWidth],
-                                        height = it[Articles.screenshotHeight]
-                                ))
+                                        data = articleResultRow[Articles.screenshotData],
+                                        mimeType = articleResultRow[Articles.screenshotMimeType],
+                                        width = articleResultRow[Articles.screenshotWidth],
+                                        height = articleResultRow[Articles.screenshotHeight]
+                                ),
+                                parsed = ArticlesParsed.select { ArticlesParsed.url.eq(articleResultRow[Articles.link])}
+                                        .map {
+                                            ArticleParsed(
+                                                    url = articleResultRow[Articles.link],
+                                                    title = it[ArticlesParsed.title],
+                                                    description = it[ArticlesParsed.description],
+                                                    body = it[ArticlesParsed.body],
+                                                    author = it[ArticlesParsed.author],
+                                                    image = it[ArticlesParsed.image],
+                                                    published = it[ArticlesParsed.published]
+                                                    //TODO Fix videos and keywords
+//                                                        videos = objectMapper.readValue(it[ArticlesParsed.videos]?:"", ArrayList::class.java)
+                                            )
+                                        }.firstOrNull())
                         val tags = ArticlesTags.slice(ArticlesTags.tagName)
-                                .select { ArticlesTags.articleId.eq(it[Articles.id]) }
+                                .select { ArticlesTags.articleId.eq(articleResultRow[Articles.id]) }
                                 .map { it[ArticlesTags.tagName] }
                                 .toSet()
                         article to tags
@@ -295,20 +386,34 @@ class AwesomeDevDao {
                         limit?.let { query.limit(it, offset?:DEFAULT_OFFSET) }
                         query.orderBy(Articles.timestamp, isAsc = false)
                         result.addAll(query
-                                .map {
-                                    val article = Article(id = it[Articles.id].toLong(),
-                                            title = it[Articles.title],
-                                            url = it[Articles.link],
-                                            domain = it[Articles.hostname] ?: URL(it[Articles.link]).host,
-                                            timestamp = it[Articles.timestamp],
+                                .map {articleResultRow ->
+                                    val article = Article(id = articleResultRow[Articles.id].toLong(),
+                                            title = articleResultRow[Articles.title],
+                                            url = articleResultRow[Articles.link],
+                                            domain = articleResultRow[Articles.hostname] ?: URL(articleResultRow[Articles.link]).host,
+                                            timestamp = articleResultRow[Articles.timestamp],
                                             screenshot = Screenshot(
-                                                    data = it[Articles.screenshotData],
-                                                    mimeType = it[Articles.screenshotMimeType],
-                                                    width = it[Articles.screenshotWidth],
-                                                    height = it[Articles.screenshotHeight]
-                                            ))
+                                                    data = articleResultRow[Articles.screenshotData],
+                                                    mimeType = articleResultRow[Articles.screenshotMimeType],
+                                                    width = articleResultRow[Articles.screenshotWidth],
+                                                    height = articleResultRow[Articles.screenshotHeight]
+                                            ),
+                                            parsed = ArticlesParsed.select { ArticlesParsed.url.eq(articleResultRow[Articles.link])}
+                                                    .map {
+                                                        ArticleParsed(
+                                                                url = articleResultRow[Articles.link],
+                                                                title = it[ArticlesParsed.title],
+                                                                description = it[ArticlesParsed.description],
+                                                                body = it[ArticlesParsed.body],
+                                                                author = it[ArticlesParsed.author],
+                                                                image = it[ArticlesParsed.image],
+                                                                published = it[ArticlesParsed.published]
+                                                                //TODO Fix videos and keywords
+//                                                        videos = objectMapper.readValue(it[ArticlesParsed.videos]?:"", ArrayList::class.java)
+                                                        )
+                                                    }.firstOrNull())
                                     val tags = ArticlesTags.slice(ArticlesTags.tagName)
-                                            .select { ArticlesTags.articleId.eq(it[Articles.id]) }
+                                            .select { ArticlesTags.articleId.eq(articleResultRow[Articles.id]) }
                                             .map { it[ArticlesTags.tagName] }
                                             .toSet()
                                     article to tags

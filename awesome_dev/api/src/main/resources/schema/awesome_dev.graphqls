@@ -34,6 +34,7 @@ type Article {
     domain: String!
     tags: [String]
     screenshot: Screenshot
+    parsed: ArticleParsed
 }
 
 type Screenshot {
@@ -41,6 +42,18 @@ type Screenshot {
     height: Int
     width: Int
     mimeType: String
+}
+
+type ArticleParsed {
+    url: ID!
+    title: String
+    author: String
+    published: String
+    image: String
+    videos: [String]
+    keywords: [String]
+    description: String
+    body: String
 }
 
 input ArticleFilter {
