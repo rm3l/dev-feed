@@ -49,7 +49,7 @@ class Article {
         description = json['description'],
         domain = json['domain'],
         tags = convertTags(json['tags']),
-        screenshot = new ArticleLinkScreenshot.fromJson(json['screenshot']);
+        screenshot = ArticleLinkScreenshot.fromJson(json['screenshot']);
 
   static List<String> convertTags(List<dynamic> tags) {
     final result = <String>[];
@@ -119,7 +119,7 @@ class ArticleLinkScreenshot {
 class ArticlesClient {
 //  LoadingCache<String,List<Article>> _recentArticlesCache;
 
-  static final ArticlesClient _singleton = new ArticlesClient._internal();
+  static final ArticlesClient _singleton = ArticlesClient._internal();
 
   //Leveraging Dart Factory constructors to build singletons
   factory ArticlesClient() {
@@ -127,7 +127,7 @@ class ArticlesClient {
   }
 
   ArticlesClient._internal() {
-//    _recentArticlesCache = new LoadingCache<String,List<Article>>(
+//    _recentArticlesCache = LoadingCache<String,List<Article>>(
 //        _retrieveData,
 //        maximumSize: 1,
 //        expiresAfterWrite: const Duration(days: 1)
@@ -138,14 +138,14 @@ class ArticlesClient {
 //    if (key == "recentArticles") {
 //      return _fetchRecentArticles();
 //    } else {
-//      throw new UnsupportedError("operation not supported: $key");
+//      throw UnsupportedError("operation not supported: $key");
 //    }
 //  }
 
   static List<Article> searchInArticles(
       List<Article> allArticles, String search) {
     if (allArticles == null) {
-      return new List<Article>(0);
+      return List<Article>(0);
     }
     var articlesFiltered = allArticles;
     if (search != null && search.isNotEmpty) {
@@ -175,11 +175,11 @@ class ArticlesClient {
     final dataMap = map["data"];
     var recentArticlesList = dataMap[queryKey];
     if (recentArticlesList == null) {
-      throw new StateError('No content');
+      throw StateError('No content');
     }
     List<Article> result = [];
     for (var recentArticle in recentArticlesList) {
-      result.add(new Article.fromJson(recentArticle));
+      result.add(Article.fromJson(recentArticle));
     }
     return result;
   }

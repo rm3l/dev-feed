@@ -17,11 +17,11 @@ void main() {
     //assert will execute only in Debug Mode
     //Note in particular the () at the end of the call -
     // assert can only operate on a boolean, so just passing in a function doesn't work.
-    HttpOverrides.global = new StethoHttpOverrides();
+    HttpOverrides.global = StethoHttpOverrides();
     return true;
   }());
 
-  runApp(new AwesomeDevApp());
+  runApp(AwesomeDevApp());
 }
 
 class AwesomeDevApp extends StatelessWidget {
@@ -33,13 +33,13 @@ class AwesomeDevApp extends StatelessWidget {
         print('${rec.level.name}: ${rec.time}: ${rec.message}');
       });
 
-    return new MaterialApp(
+    return MaterialApp(
       title: 'Awesome Dev',
-      theme: new ThemeData(
+      theme: ThemeData(
         primaryColor: Colors.green,
         backgroundColor: Colors.white,
       ),
-      home: new AwesomeDev(),
+      home: AwesomeDev(),
     );
   }
 }
@@ -48,7 +48,7 @@ class AwesomeDev extends StatefulWidget {
   static const String routeName = '/material/bottom_navigation';
 
   @override
-  State<StatefulWidget> createState() => new _AwesomeDevState();
+  State<StatefulWidget> createState() => _AwesomeDevState();
 }
 
 class _AwesomeDevState extends State<AwesomeDev> with TickerProviderStateMixin {
@@ -66,7 +66,7 @@ class _AwesomeDevState extends State<AwesomeDev> with TickerProviderStateMixin {
   }
 
   _AwesomeDevState() {
-    final router = new Router();
+    final router = Router();
     Routes.configureRoutes(router);
     Application.router = router;
   }
@@ -76,25 +76,25 @@ class _AwesomeDevState extends State<AwesomeDev> with TickerProviderStateMixin {
     super.initState();
 
     _navigationViews = <NavigationIconView>[
-      new NavigationIconView(
+      NavigationIconView(
         icon: const Icon(Icons.new_releases),
         title: 'Latest',
 //        color: Colors.deepPurple,
         vsync: this,
       ),
-      new NavigationIconView(
+      NavigationIconView(
         icon: const Icon(Icons.favorite),
         title: 'Favorites',
         color: Colors.indigo,
         vsync: this,
       ),
-      new NavigationIconView(
+      NavigationIconView(
         icon: const Icon(Icons.archive),
         title: 'Archives',
         color: Colors.deepOrange,
         vsync: this,
       ),
-      new NavigationIconView(
+      NavigationIconView(
         icon: const Icon(Icons.label),
         title: 'Tags',
         color: Colors.teal,
@@ -149,12 +149,12 @@ class _AwesomeDevState extends State<AwesomeDev> with TickerProviderStateMixin {
       return aValue.compareTo(bValue);
     });
 
-    return new Stack(children: transitions);
+    return Stack(children: transitions);
   }
 
   @override
   Widget build(BuildContext context) {
-    final BottomNavigationBar botNavBar = new BottomNavigationBar(
+    final BottomNavigationBar botNavBar = BottomNavigationBar(
       items: _navigationViews
           .map((NavigationIconView navigationView) => navigationView.item)
           .toList(),
@@ -169,11 +169,11 @@ class _AwesomeDevState extends State<AwesomeDev> with TickerProviderStateMixin {
       },
     );
 
-    return new Scaffold(
-      appBar: new AppBar(
+    return Scaffold(
+      appBar: AppBar(
         title: const Text('Awesome Dev'),
         actions: <Widget>[
-          new PopupMenuButton<String>(
+          PopupMenuButton<String>(
             onSelected: onAppBarMenuItemSelected,
             itemBuilder: (BuildContext context) => <PopupMenuItem<String>>[
 //                  const PopupMenuItem<String>(
@@ -187,7 +187,7 @@ class _AwesomeDevState extends State<AwesomeDev> with TickerProviderStateMixin {
           ),
         ],
       ),
-      body: new Center(child: _buildTransitionsStack()),
+      body: Center(child: _buildTransitionsStack()),
       bottomNavigationBar: botNavBar,
     );
   }
@@ -202,16 +202,16 @@ class NavigationIconView {
   })  : _icon = icon,
         _color = color,
         _title = title,
-        item = new BottomNavigationBarItem(
+        item = BottomNavigationBarItem(
           icon: icon,
-          title: new Text(title),
+          title: Text(title),
           backgroundColor: color,
         ),
-        controller = new AnimationController(
+        controller = AnimationController(
           duration: kThemeAnimationDuration,
           vsync: vsync,
         ) {
-    _animation = new CurvedAnimation(
+    _animation = CurvedAnimation(
       parent: controller,
       curve: const Interval(0.5, 1.0, curve: Curves.fastOutSlowIn),
     );
@@ -236,19 +236,19 @@ class NavigationIconView {
           : themeData.accentColor;
     }
 
-    return new FadeTransition(
+    return FadeTransition(
       opacity: _animation,
-      child: new SlideTransition(
-        position: new Tween<Offset>(
+      child: SlideTransition(
+        position: Tween<Offset>(
           begin: const Offset(0.0, 0.02), // Slightly down.
           end: Offset.zero,
         ).animate(_animation),
-        child: new IconTheme(
-          data: new IconThemeData(
+        child: IconTheme(
+          data: IconThemeData(
             color: iconColor,
             size: 120.0,
           ),
-          child: new Semantics(
+          child: Semantics(
             label: 'Placeholder for $_title tab',
             child: _icon,
           ),

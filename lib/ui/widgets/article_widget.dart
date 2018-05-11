@@ -18,7 +18,7 @@ class ArticleWidget extends StatefulWidget {
   final VoidCallback onStarClick;
 
   @override
-  State<StatefulWidget> createState() => new ArticleWidgetState();
+  State<StatefulWidget> createState() => ArticleWidgetState();
 }
 
 class ArticleWidgetState extends State<ArticleWidget> {
@@ -26,7 +26,7 @@ class ArticleWidgetState extends State<ArticleWidget> {
     try {
       await launch(
         widget.article.url,
-        option: new CustomTabsOption(
+        option: CustomTabsOption(
           toolbarColor: Theme.of(context).primaryColor,
           enableDefaultShare: true,
           enableUrlBarHiding: true,
@@ -36,8 +36,8 @@ class ArticleWidgetState extends State<ArticleWidget> {
     } catch (e) {
       // An exception is thrown if browser app is not installed on Android device.
       debugPrint(e.toString());
-      Scaffold.of(context).showSnackBar(new SnackBar(
-          content: new Text(
+      Scaffold.of(context).showSnackBar(SnackBar(
+          content: Text(
               'Could not launch URL ($this.article.url): ${e.toString()}')));
     }
   }
@@ -65,39 +65,39 @@ class ArticleWidgetState extends State<ArticleWidget> {
     final tagsWidgets = <Widget>[];
     if (widget.article.tags != null) {
       for (var tag in widget.article.tags) {
-        tagsWidgets.add(new Expanded(
-            child: new GestureDetector(
+        tagsWidgets.add(Expanded(
+            child: GestureDetector(
           onTap: () => Application.router.navigateTo(context, "/tags/$tag",
               transition: TransitionType.fadeIn),
-          child: new Text(tag),
+          child: Text(tag),
         )));
       }
     }
 
-    return new GestureDetector(
+    return GestureDetector(
         onTap: widget.onCardClick != null ? widget.onCardClick : _launchURL,
-        child: new Container(
+        child: Container(
             padding: const EdgeInsets.only(top: 8.0),
-            child: new Column(
+            child: Column(
               children: <Widget>[
-                new Row(
+                Row(
                   children: <Widget>[
-                    new Expanded(
-                      child: new Align(
+                    Expanded(
+                      child: Align(
                         alignment: Alignment.topLeft,
-                        child: new Column(
+                        child: Column(
                           children: <Widget>[
-                            new Align(
+                            Align(
                                 alignment: Alignment.topLeft,
-                                child: new Text(widget.article.title,
+                                child: Text(widget.article.title,
                                     textAlign: TextAlign.left,
                                     style: const TextStyle(
                                         fontWeight: FontWeight.bold,
                                         fontSize: 15.0))),
-                            new Padding(padding: const EdgeInsets.all(3.0)),
-                            new Align(
+                            Padding(padding: const EdgeInsets.all(3.0)),
+                            Align(
                               alignment: Alignment.topLeft,
-                              child: new Text(widget.article.domain,
+                              child: Text(widget.article.domain,
                                   style: const TextStyle(color: Colors.black38),
                                   textAlign: TextAlign.left),
                             )
@@ -105,22 +105,22 @@ class ArticleWidgetState extends State<ArticleWidget> {
                         ),
                       ),
                     ),
-                    new Stack(
+                    Stack(
                       children: <Widget>[
                         widget.article.screenshot != null &&
                                 widget.article.screenshot.dataBytes != null
-                            ? new Hero(
-                                child: new Image.memory(
+                            ? Hero(
+                                child: Image.memory(
                                   widget.article.screenshot.dataBytes,
                                   width: 110.0,
                                 ),
                                 tag: widget.article.id,
                               )
-                            : new Container(),
-                        new IconButton(
+                            : Container(),
+                        IconButton(
                             icon: widget.article.starred
-                                ? new Icon(Icons.favorite)
-                                : new Icon(Icons.favorite_border),
+                                ? Icon(Icons.favorite)
+                                : Icon(Icons.favorite_border),
                             color: widget.article.starred ? Colors.red : null,
                             onPressed: _handleStarClick,
                             alignment: Alignment.topRight,
@@ -130,16 +130,16 @@ class ArticleWidgetState extends State<ArticleWidget> {
                   ],
                 ),
 
-                new Padding(padding: const EdgeInsets.all(3.0)),
+                Padding(padding: const EdgeInsets.all(3.0)),
 
                 //Tags
-                new Row(
+                Row(
                     mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                     children: tagsWidgets),
 
-                new Padding(padding: const EdgeInsets.all(3.0)),
+                Padding(padding: const EdgeInsets.all(3.0)),
 
-                new Divider(height: 10.0, color: Theme.of(context).primaryColor)
+                Divider(height: 10.0, color: Theme.of(context).primaryColor)
               ],
             )));
   }

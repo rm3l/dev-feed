@@ -11,17 +11,17 @@ class LatestNews extends StatefulWidget {
   const LatestNews();
 
   @override
-  State<StatefulWidget> createState() => new LatestNewsState();
+  State<StatefulWidget> createState() => LatestNewsState();
 }
 
 class LatestNewsState extends State<LatestNews> {
   final GlobalKey<RefreshIndicatorState> _refreshIndicatorKey =
-      new GlobalKey<RefreshIndicatorState>();
+      GlobalKey<RefreshIndicatorState>();
 
   List<Article> _articles;
   List<Article> _articlesFiltered;
 
-  final _searchInputController = new TextEditingController();
+  final _searchInputController = TextEditingController();
 
   String _search;
   bool _searchInputVisible = false;
@@ -34,7 +34,7 @@ class LatestNewsState extends State<LatestNews> {
 
   Future<List<Article>> _loadArticles() async {
     _refreshIndicatorKey.currentState.show();
-    final articlesClient = new ArticlesClient();
+    final articlesClient = ArticlesClient();
     final recentArticlesAll = await articlesClient.getRecentArticles();
 
     final prefs = await SharedPreferences.getInstance();
@@ -56,31 +56,31 @@ class LatestNewsState extends State<LatestNews> {
         _articlesFiltered = recentArticlesFiltered;
       });
     } on Exception catch (e) {
-      Scaffold.of(context).showSnackBar(new SnackBar(
-            content: new Text("Internal Error: ${e.toString()}"),
+      Scaffold.of(context).showSnackBar(SnackBar(
+            content: Text("Internal Error: ${e.toString()}"),
           ));
     }
   }
 
   @override
   Widget build(BuildContext context) {
-    return new RefreshIndicator(
+    return RefreshIndicator(
         key: _refreshIndicatorKey,
         onRefresh: _fetchArticles,
-        child: new Container(
-          child: new Column(
+        child: Container(
+          child: Column(
             children: <Widget>[
-              new Align(
+              Align(
                   alignment: Alignment.topCenter,
-                  child: new Container(
+                  child: Container(
                     padding: const EdgeInsets.only(left: 8.0),
-                    child: new Stack(
+                    child: Stack(
                       alignment: const Alignment(1.0, 1.0),
                       children: <Widget>[
-                        new TextField(
+                        TextField(
                           controller: _searchInputController,
                           enabled: _searchInputVisible,
-                          decoration: new InputDecoration(
+                          decoration: InputDecoration(
                               border: const UnderlineInputBorder(),
                               hintText: 'Search...'),
                           onChanged: (String criteria) {
@@ -92,7 +92,7 @@ class LatestNewsState extends State<LatestNews> {
                             });
                           },
                         ),
-                        new FlatButton(
+                        FlatButton(
                             onPressed: () {
                               _searchInputController.clear();
                               setState(() {
@@ -100,23 +100,23 @@ class LatestNewsState extends State<LatestNews> {
                                 _articlesFiltered = _articles;
                               });
                             },
-                            child: new Icon(Icons.clear))
+                            child: Icon(Icons.clear))
                       ],
                     ),
                   )),
-              new Container(
-                child: new Expanded(
-                    child: new ListView.builder(
-                  padding: new EdgeInsets.all(8.0),
+              Container(
+                child: Expanded(
+                    child: ListView.builder(
+                  padding: EdgeInsets.all(8.0),
                   itemCount: _articlesFiltered?.length ?? 0,
                   itemBuilder: (BuildContext context, int index) {
-                    return new ArticleWidget(
+                    return ArticleWidget(
                       article: _articlesFiltered[index],
 //                    onCardClick: () {
 //  //                      Navigator.of(context).push(
-//  //                          new FadeRoute(
-//  //                            builder: (BuildContext context) => new BookNotesPage(_items[index]),
-//  //                            settings: new RouteSettings(name: '/notes', isInitialRoute: false),
+//  //                          FadeRoute(
+//  //                            builder: (BuildContext context) => BookNotesPage(_items[index]),
+//  //                            settings: RouteSettings(name: '/notes', isInitialRoute: false),
 //  //                          ));
 //                    },
                       onStarClick: () {

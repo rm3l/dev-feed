@@ -12,15 +12,15 @@ class ArticleArchives extends StatefulWidget {
   const ArticleArchives();
 
   @override
-  State<StatefulWidget> createState() => new ArticleArchivesState();
+  State<StatefulWidget> createState() => ArticleArchivesState();
 }
 
 class ArticleArchivesState extends State<ArticleArchives> {
   final GlobalKey<RefreshIndicatorState> _refreshIndicatorKey =
-      new GlobalKey<RefreshIndicatorState>();
+      GlobalKey<RefreshIndicatorState>();
 
   List<Article> _articles;
-  DateTime _currentDate = new DateTime.now();
+  DateTime _currentDate = DateTime.now();
 
   @override
   void initState() {
@@ -32,7 +32,7 @@ class ArticleArchivesState extends State<ArticleArchives> {
 
   Future<Null> _fetchArticles(DateTime date) async {
     _refreshIndicatorKey.currentState.show();
-    final articlesClient = new ArticlesClient();
+    final articlesClient = ArticlesClient();
     try {
       final dateSlug = "${date.year.toString()}-"
           "${date.month.toString().padLeft(2,'0')}-"
@@ -49,23 +49,23 @@ class ArticleArchivesState extends State<ArticleArchives> {
         _articles = filteredArticles;
       });
     } on Exception catch (e) {
-      Scaffold.of(context).showSnackBar(new SnackBar(
-            content: new Text("Internal Error: ${e.toString()}"),
+      Scaffold.of(context).showSnackBar(SnackBar(
+            content: Text("Internal Error: ${e.toString()}"),
           ));
     }
   }
 
   @override
   Widget build(BuildContext context) {
-    return new RefreshIndicator(
+    return RefreshIndicator(
       key: _refreshIndicatorKey,
       onRefresh: _onRefresh,
-      child: new Container(
-        child: new Column(
+      child: Container(
+        child: Column(
           children: <Widget>[
-            new Align(
+            Align(
               alignment: Alignment.topCenter,
-              child: new Calendar(
+              child: Calendar(
                 isExpandable: true,
                 onDateSelected: (selectedDateTime) {
                   _currentDate = selectedDateTime;
@@ -73,19 +73,19 @@ class ArticleArchivesState extends State<ArticleArchives> {
                 },
               ),
             ),
-            new Container(
-                child: new Expanded(
-                    child: new ListView.builder(
-              padding: new EdgeInsets.all(8.0),
+            Container(
+                child: Expanded(
+                    child: ListView.builder(
+              padding: EdgeInsets.all(8.0),
               itemCount: _articles?.length ?? 0,
               itemBuilder: (BuildContext context, int index) {
-                return new ArticleWidget(
+                return ArticleWidget(
                   article: _articles[index],
 //                    onCardClick: () {
 //  //                      Navigator.of(context).push(
-//  //                          new FadeRoute(
-//  //                            builder: (BuildContext context) => new BookNotesPage(_items[index]),
-//  //                            settings: new RouteSettings(name: '/notes', isInitialRoute: false),
+//  //                          FadeRoute(
+//  //                            builder: (BuildContext context) => BookNotesPage(_items[index]),
+//  //                            settings: RouteSettings(name: '/notes', isInitialRoute: false),
 //  //                          ));
 //                    },
                   onStarClick: () {

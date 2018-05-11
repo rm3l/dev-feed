@@ -3,7 +3,7 @@ import 'dart:async';
 import 'package:awesome_dev/api/api.dart';
 
 class TagsClient {
-  static final TagsClient _singleton = new TagsClient._internal();
+  static final TagsClient _singleton = TagsClient._internal();
 
   //Leveraging Dart Factory constructors to build singletons
   factory TagsClient() {
@@ -17,7 +17,7 @@ class TagsClient {
     final dataMap = map["data"];
     var recentTagsList = dataMap[queryKey];
     if (recentTagsList == null) {
-      throw new StateError('No content');
+      throw StateError('No content');
     }
     List<String> result = [];
     for (var recentTag in recentTagsList) {

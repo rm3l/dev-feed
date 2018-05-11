@@ -11,17 +11,17 @@ class Tags extends StatefulWidget {
   const Tags();
 
   @override
-  State<StatefulWidget> createState() => new TagsState();
+  State<StatefulWidget> createState() => TagsState();
 }
 
 class TagsState extends State<Tags> {
   final GlobalKey<RefreshIndicatorState> _refreshIndicatorKey =
-      new GlobalKey<RefreshIndicatorState>();
+      GlobalKey<RefreshIndicatorState>();
 
   List<String> _tags;
   List<String> _tagsFiltered;
 
-  final _searchInputController = new TextEditingController();
+  final _searchInputController = TextEditingController();
 
   String _search;
   bool _searchInputVisible = false;
@@ -34,21 +34,21 @@ class TagsState extends State<Tags> {
 
   Future<List<String>> _loadTags() async {
     _refreshIndicatorKey.currentState.show();
-    final tagsClient = new tagsApi.TagsClient();
+    final tagsClient = tagsApi.TagsClient();
     final tags = await tagsClient.getTags();
     return tags;
   }
 
   List<String> _searchInTags(List<String> allTags, String search) {
     if (allTags == null) {
-      return new List<String>(0);
+      return List<String>(0);
     }
     var tagsFiltered = allTags;
     if (search != null && search.isNotEmpty) {
       final searchLowerCase = search.toLowerCase();
       tagsFiltered = allTags
-        .where((tag) => tag.toLowerCase().contains(searchLowerCase))
-        .toList();
+          .where((tag) => tag.toLowerCase().contains(searchLowerCase))
+          .toList();
     }
     return tagsFiltered;
   }
@@ -63,31 +63,31 @@ class TagsState extends State<Tags> {
         _tagsFiltered = tagsFiltered;
       });
     } on Exception catch (e) {
-      Scaffold.of(context).showSnackBar(new SnackBar(
-              content: new Text("Internal Error: ${e.toString()}"),
-            ));
+      Scaffold.of(context).showSnackBar(SnackBar(
+            content: Text("Internal Error: ${e.toString()}"),
+          ));
     }
   }
 
   @override
   Widget build(BuildContext context) {
-    return new RefreshIndicator(
+    return RefreshIndicator(
         key: _refreshIndicatorKey,
         onRefresh: _fetchTags,
-        child: new Container(
-          child: new Column(
+        child: Container(
+          child: Column(
             children: <Widget>[
-              new Align(
+              Align(
                   alignment: Alignment.topCenter,
-                  child: new Container(
+                  child: Container(
                     padding: const EdgeInsets.only(left: 8.0),
-                    child: new Stack(
+                    child: Stack(
                       alignment: const Alignment(1.0, 1.0),
                       children: <Widget>[
-                        new TextField(
+                        TextField(
                           controller: _searchInputController,
                           enabled: _searchInputVisible,
-                          decoration: new InputDecoration(
+                          decoration: InputDecoration(
                               border: const UnderlineInputBorder(),
                               hintText: 'Search...'),
                           onChanged: (String criteria) {
@@ -98,7 +98,7 @@ class TagsState extends State<Tags> {
                             });
                           },
                         ),
-                        new FlatButton(
+                        FlatButton(
                             onPressed: () {
                               _searchInputController.clear();
                               setState(() {
@@ -106,28 +106,29 @@ class TagsState extends State<Tags> {
                                 _tagsFiltered = _tags;
                               });
                             },
-                            child: new Icon(Icons.clear))
+                            child: Icon(Icons.clear))
                       ],
                     ),
                   )),
-              new Container(
-                child: new Expanded(
-                    child: new ListView.builder(
-                  padding: new EdgeInsets.all(8.0),
+              Container(
+                child: Expanded(
+                    child: ListView.builder(
+                  padding: EdgeInsets.all(8.0),
                   itemCount: _tagsFiltered?.length ?? 0,
                   itemBuilder: (BuildContext context, int index) {
-                    return new GestureDetector(
+                    return GestureDetector(
                         onTap: () => Application.router.navigateTo(
                             context, "/tags/${_tagsFiltered[index]}",
                             transition: TransitionType.fadeIn),
-                        child: new Column(
+                        child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: <Widget>[
-                            new Padding(
-                                padding: new EdgeInsets.all(10.0),
-                                child: new Text(_tagsFiltered[index])),
-                            new Divider(
-                                height: 10.0, color: Theme.of(context).primaryColor),
+                            Padding(
+                                padding: EdgeInsets.all(10.0),
+                                child: Text(_tagsFiltered[index])),
+                            Divider(
+                                height: 10.0,
+                                color: Theme.of(context).primaryColor),
                           ],
                         ));
                   },

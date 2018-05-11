@@ -3,7 +3,7 @@ import 'dart:convert' show utf8, json;
 import 'dart:io';
 
 final _apiEndpoint = Uri.parse('http://tools.rm3l.org:9000/graphql');
-final _httpClient = new HttpClient();
+final _httpClient = HttpClient();
 
 /*
 Example of query
@@ -42,11 +42,11 @@ Future<Map<String, dynamic>> issueGraphQLQuery(String query,
   request.write(requestBody);
   HttpClientResponse response = await request.close();
   if (response.headers.contentType.toString() != ContentType.JSON.toString()) {
-    throw new UnsupportedError('Server returned an unsupported content type: '
+    throw UnsupportedError('Server returned an unsupported content type: '
         '${response.headers.contentType} from ${request.uri}');
   }
   if (response.statusCode != HttpStatus.OK) {
-    throw new StateError(
+    throw StateError(
         'Server responded with error: ${response.statusCode} ${response.reasonPhrase}');
   }
   return json.decode(await response.transform(utf8.decoder).join());

@@ -24,7 +24,7 @@ class _LinkTextSpan extends TextSpan {
       : super(
             style: style,
             text: text ?? url,
-            recognizer: new TapGestureRecognizer()
+            recognizer: TapGestureRecognizer()
               ..onTap = () {
                 launch(url, forceSafariVC: false);
               });
@@ -44,12 +44,12 @@ Future<Null> showGalleryAboutDialog(BuildContext context) async {
 //    applicationIcon: const FlutterLogo(), //TODO Use Asset here
     applicationLegalese: '© 2018 Armel S.',
     children: <Widget>[
-      new Padding(
+      Padding(
         padding: const EdgeInsets.only(top: 24.0),
-        child: new RichText(
-          text: new TextSpan(
+        child: RichText(
+          text: TextSpan(
             children: <TextSpan>[
-              new TextSpan(
+              TextSpan(
                   style: aboutTextStyle,
                   text:
                       'Awesome Dev allows you to keep up with the top engineering '
@@ -58,11 +58,11 @@ Future<Null> showGalleryAboutDialog(BuildContext context) async {
                       '\nAvailable on '
                       '${defaultTargetPlatform == TargetPlatform.iOS ? 'multiple platforms' : 'both iOS and Android'}.')
 //                      '\n\nThanks to Flutter ('),
-//              new _LinkTextSpan(
+//              _LinkTextSpan(
 //                style: linkStyle,
 //                url: 'https://flutter.io',
 //              ),
-//              new TextSpan(
+//              TextSpan(
 //                  style: aboutTextStyle,
 //                  text: '), this mobile app is available on '
 //                      '${defaultTargetPlatform == TargetPlatform.iOS ? 'multiple platforms' : 'iOS and Android'} '
