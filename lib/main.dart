@@ -36,7 +36,7 @@ class AwesomeDevApp extends StatelessWidget {
     return MaterialApp(
       title: 'Awesome Dev',
       theme: ThemeData(
-        primaryColor: Colors.green,
+        primaryColor: Colors.teal,
         backgroundColor: Colors.white,
       ),
       home: AwesomeDev(),
