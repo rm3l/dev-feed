@@ -233,7 +233,7 @@ class AwesomeDevDao {
                                                                 description = it[ArticlesParsed.description],
                                                                 body = it[ArticlesParsed.body],
                                                                 author = it[ArticlesParsed.author],
-                                                                image = it[ArticlesParsed.image],
+                                                                image = if (it[ArticlesParsed.image].isNullOrBlank()) null else it[ArticlesParsed.image],
                                                                 published = it[ArticlesParsed.published]
                                                                 //TODO Fix videos and keywords
 //                                                        videos = objectMapper.readValue(it[ArticlesParsed.videos]?:"", ArrayList::class.java)
@@ -282,7 +282,7 @@ class AwesomeDevDao {
                                                     description = it[ArticlesParsed.description],
                                                     body = it[ArticlesParsed.body],
                                                     author = it[ArticlesParsed.author],
-                                                    image = it[ArticlesParsed.image],
+                                                    image = if (it[ArticlesParsed.image].isNullOrBlank()) null else it[ArticlesParsed.image],
                                                     published = it[ArticlesParsed.published]
                                                     //TODO Fix videos and keywords
 //                                                        videos = objectMapper.readValue(it[ArticlesParsed.videos]?:"", ArrayList::class.java)
@@ -340,7 +340,7 @@ class AwesomeDevDao {
                                                     description = it[ArticlesParsed.description],
                                                     body = it[ArticlesParsed.body],
                                                     author = it[ArticlesParsed.author],
-                                                    image = it[ArticlesParsed.image],
+                                                    image = if (it[ArticlesParsed.image].isNullOrBlank()) null else it[ArticlesParsed.image],
                                                     published = it[ArticlesParsed.published]
                                                     //TODO Fix videos and keywords
 //                                                        videos = objectMapper.readValue(it[ArticlesParsed.videos]?:"", ArrayList::class.java)
@@ -406,7 +406,7 @@ class AwesomeDevDao {
                                                                 description = it[ArticlesParsed.description],
                                                                 body = it[ArticlesParsed.body],
                                                                 author = it[ArticlesParsed.author],
-                                                                image = it[ArticlesParsed.image],
+                                                                image = if (it[ArticlesParsed.image].isNullOrBlank()) null else it[ArticlesParsed.image],
                                                                 published = it[ArticlesParsed.published]
                                                                 //TODO Fix videos and keywords
 //                                                        videos = objectMapper.readValue(it[ArticlesParsed.videos]?:"", ArrayList::class.java)

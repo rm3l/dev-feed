@@ -267,12 +267,14 @@ private class ArticleExtractor(private val dao: AwesomeDevDao, private val artic
                                         "subscription-key" to ARTICLE_EXTRACTION_API_SUBSCRIPTION_KEY
                                 )).jsonObject
 
+                val parsedImage = articleExtractionJsonObject.optString("image")
+
                 article.parsed = ArticleParsed(
                         url = article.url,
                         title = articleExtractionJsonObject.optString("title"),
                         published = articleExtractionJsonObject.optString("published"),
                         author = articleExtractionJsonObject.optString("author"),
-                        image = articleExtractionJsonObject.optString("image"),
+                        image = if (parsedImage.isNullOrBlank()) null else parsedImage,
                         description = articleExtractionJsonObject.optString("description"),
                         body = articleExtractionJsonObject.optString("body"),
                         videos = articleExtractionJsonObject.optJSONArray("videos")?.map { it.toString() }?.toSet(),
