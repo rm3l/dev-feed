@@ -31,6 +31,8 @@ class Article {
 
   final ArticleLinkScreenshot screenshot;
 
+  final ArticleParsed parsed;
+
   bool starred = false;
 
   Article(this.title, this.url,
@@ -39,7 +41,8 @@ class Article {
       this.description,
       this.domain,
       this.tags,
-      this.screenshot});
+      this.screenshot,
+      this.parsed});
 
   Article.fromJson(Map<String, dynamic> json)
       : id = json['id'],
@@ -49,7 +52,8 @@ class Article {
         description = json['description'],
         domain = json['domain'],
         tags = convertTags(json['tags']),
-        screenshot = ArticleLinkScreenshot.fromJson(json['screenshot']);
+        screenshot = ArticleLinkScreenshot.fromJson(json['screenshot']),
+        parsed = ArticleParsed.fromJson(json['parsed']);
 
   static List<String> convertTags(List<dynamic> tags) {
     final result = <String>[];
@@ -114,6 +118,73 @@ class ArticleLinkScreenshot {
 
   @override
   int get hashCode => data.hashCode;
+}
+
+/*
+    url: ID!
+    title: String
+    author: String
+    published: String
+    image: String
+    videos: [String]
+    keywords: [String]
+    description: String
+    body: String
+ */
+class ArticleParsed {
+  final String url;
+  final String title;
+  final String author;
+  final String published;
+  final String image;
+  final String description;
+  final String body;
+  final List<String> videos;
+  final List<String> keywords;
+
+  ArticleParsed(this.url,
+      {this.title,
+      this.author,
+      this.published,
+      this.image,
+      this.description,
+      this.body,
+      this.videos,
+      this.keywords});
+
+  static List<String> convertToListString(List<dynamic> elements) {
+    final result = <String>[];
+    if (elements == null) {
+      return result;
+    }
+    for (var element in elements) {
+      if (element == null) {
+        result.add(element.toString());
+      }
+    }
+    return result;
+  }
+
+  ArticleParsed.fromJson(Map<String, dynamic> json)
+      : url = json['url'],
+        title = json['title'],
+        author = json['author'],
+        published = json['published'],
+        image = json['image'],
+        description = json['description'],
+        body = json['body'],
+        videos = convertToListString(json['videos']),
+        keywords = convertToListString(json['keywords']);
+
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is ArticleParsed &&
+          runtimeType == other.runtimeType &&
+          url == other.url;
+
+  @override
+  int get hashCode => url.hashCode;
 }
 
 class ArticlesClient {
@@ -200,6 +271,11 @@ class ArticlesClient {
         "       mimeType \n "
         "       data \n "
         "   } \n "
+        "   parsed { \n "
+        "       image \n "
+        "       description \n "
+        "       body \n "
+        "   } \n "
         " } \n "
         "}";
     return _getArticles(query, "recentArticles");
@@ -225,6 +301,11 @@ class ArticlesClient {
         "       mimeType \n "
         "       data \n "
         "   } \n "
+        "   parsed { \n "
+        "       image \n "
+        "       description \n "
+        "       body \n "
+        "   } \n "
         " } \n "
         "}";
     return _getArticles(query, "articles");
@@ -246,6 +327,11 @@ class ArticlesClient {
         "       mimeType \n "
         "       data \n "
         "   } \n "
+        "   parsed { \n "
+        "       image \n "
+        "       description \n "
+        "       body \n "
+        "   } \n "
         " } \n "
         "}";
     return _getArticles(query, "allButRecentArticles");
@@ -266,6 +352,11 @@ class ArticlesClient {
         "       width \n "
         "       mimeType \n "
         "       data \n "
+        "   } \n "
+        "   parsed { \n "
+        "       image \n "
+        "       description \n "
+        "       body \n "
         "   } \n "
         " } \n "
         "}";

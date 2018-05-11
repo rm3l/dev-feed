@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_custom_tabs/flutter_custom_tabs.dart';
 import 'package:meta/meta.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:transparent_image/transparent_image.dart';
 
 class ArticleWidget extends StatefulWidget {
   ArticleWidget({
@@ -26,8 +27,8 @@ class ArticleWidgetState extends State<ArticleWidget> {
     try {
       await launch(
         widget.article.url,
-        option: CustomTabsOption(
-          toolbarColor: Theme.of(context).primaryColor,
+        option: const CustomTabsOption(
+//          toolbarColor: Theme.of(context).primaryColor,
           enableDefaultShare: true,
           enableUrlBarHiding: true,
           showPageTitle: true,
@@ -74,6 +75,30 @@ class ArticleWidgetState extends State<ArticleWidget> {
       }
     }
 
+    final placeHolderImage = new MemoryImage(kTransparentImage);
+    Widget articleOverviewImageWidget;
+    final articleOverviewImageWidgetWidth = 110.0;
+    final articleOverviewImageWidgetHeight = 60.0;
+    if (widget.article.parsed != null &&
+        widget.article.parsed.image != null &&
+        widget.article.parsed.image.isNotEmpty) {
+      articleOverviewImageWidget = new FadeInImage(
+          placeholder: placeHolderImage,
+          image: new NetworkImage(widget.article.parsed.image),
+          width: articleOverviewImageWidgetWidth,
+          height: articleOverviewImageWidgetHeight);
+    } else if (widget.article.screenshot != null &&
+        widget.article.screenshot.dataBytes != null &&
+        widget.article.screenshot.dataBytes.isNotEmpty) {
+      articleOverviewImageWidget = new FadeInImage(
+          placeholder: placeHolderImage,
+          image: new MemoryImage(widget.article.screenshot.dataBytes),
+          width: articleOverviewImageWidgetWidth,
+          height: articleOverviewImageWidgetHeight);
+    } else {
+      articleOverviewImageWidget = null;
+    }
+
     return GestureDetector(
         onTap: widget.onCardClick != null ? widget.onCardClick : _launchURL,
         child: Container(
@@ -107,13 +132,15 @@ class ArticleWidgetState extends State<ArticleWidget> {
                     ),
                     Stack(
                       children: <Widget>[
-                        widget.article.screenshot != null &&
-                                widget.article.screenshot.dataBytes != null
+                        articleOverviewImageWidget != null
                             ? Hero(
-                                child: Image.memory(
-                                  widget.article.screenshot.dataBytes,
-                                  width: 110.0,
-                                ),
+//                                child: Stack(
+//                                  children: <Widget>[
+//                                    CircularProgressIndicator(),
+//                                    articleOverviewImageWidget
+//                                  ],
+//                                ),
+                                child: articleOverviewImageWidget,
                                 tag: widget.article.id,
                               )
                             : Container(),
