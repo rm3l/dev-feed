@@ -66,7 +66,8 @@ class ArticleWidgetState extends State<ArticleWidget> {
     final tagsWidgets = <Widget>[];
     if (widget.article.tags != null) {
       for (var tag in widget.article.tags) {
-        tagsWidgets.add(Expanded(
+        tagsWidgets.add(Container(
+            margin: const EdgeInsets.only(right: 3.0),
             child: GestureDetector(
               onTap: () => Application.router.navigateTo(context, "/tags/$tag",
                   transition: TransitionType.fadeIn),
@@ -163,9 +164,14 @@ class ArticleWidgetState extends State<ArticleWidget> {
                 Padding(padding: const EdgeInsets.all(3.0)),
 
                 //Tags
-                Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                    children: tagsWidgets),
+                new Container(
+                  height: 33.0,
+                  child: ListView(
+                    scrollDirection: Axis.horizontal,
+                    physics: const BouncingScrollPhysics(),
+                    children: tagsWidgets,
+                  ),
+                ),
 
                 Padding(padding: const EdgeInsets.all(3.0)),
 
