@@ -75,24 +75,24 @@ class ArticleWidgetState extends State<ArticleWidget> {
       }
     }
 
-    final placeHolderImage = new MemoryImage(kTransparentImage);
+    final placeHolderImage = MemoryImage(kTransparentImage);
     Widget articleOverviewImageWidget;
     final articleOverviewImageWidgetWidth = 110.0;
     final articleOverviewImageWidgetHeight = 60.0;
     if (widget.article.parsed != null &&
         widget.article.parsed.image != null &&
         widget.article.parsed.image.isNotEmpty) {
-      articleOverviewImageWidget = new FadeInImage(
+      articleOverviewImageWidget = FadeInImage(
           placeholder: placeHolderImage,
-          image: new NetworkImage(widget.article.parsed.image),
+          image: NetworkImage(widget.article.parsed.image),
           width: articleOverviewImageWidgetWidth,
           height: articleOverviewImageWidgetHeight);
     } else if (widget.article.screenshot != null &&
         widget.article.screenshot.dataBytes != null &&
         widget.article.screenshot.dataBytes.isNotEmpty) {
-      articleOverviewImageWidget = new FadeInImage(
+      articleOverviewImageWidget = FadeInImage(
           placeholder: placeHolderImage,
-          image: new MemoryImage(widget.article.screenshot.dataBytes),
+          image: MemoryImage(widget.article.screenshot.dataBytes),
           width: articleOverviewImageWidgetWidth,
           height: articleOverviewImageWidgetHeight);
     } else {
