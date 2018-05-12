@@ -27,8 +27,8 @@ class ArticleWidgetState extends State<ArticleWidget> {
     try {
       await launch(
         widget.article.url,
-        option: const CustomTabsOption(
-//          toolbarColor: Theme.of(context).primaryColor,
+        option: CustomTabsOption(
+          toolbarColor: Theme.of(context).primaryColor,
           enableDefaultShare: true,
           enableUrlBarHiding: true,
           showPageTitle: true,
