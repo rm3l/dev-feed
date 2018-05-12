@@ -68,10 +68,13 @@ class ArticleWidgetState extends State<ArticleWidget> {
       for (var tag in widget.article.tags) {
         tagsWidgets.add(Expanded(
             child: GestureDetector(
-          onTap: () => Application.router.navigateTo(context, "/tags/$tag",
-              transition: TransitionType.fadeIn),
-          child: Text(tag),
-        )));
+              onTap: () => Application.router.navigateTo(context, "/tags/$tag",
+                  transition: TransitionType.fadeIn),
+              child: Chip(
+                label: Text(tag),
+                backgroundColor: Theme.of(context).buttonColor,
+              ),
+            )));
       }
     }
 

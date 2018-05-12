@@ -125,7 +125,7 @@ class TagsState extends State<Tags> {
                           children: <Widget>[
                             Padding(
                                 padding: EdgeInsets.all(10.0),
-                                child: Text(_tagsFiltered[index])),
+                                child: Chip(label: Text(_tagsFiltered[index]))),
                             Divider(
                                 height: 10.0,
                                 color: Theme.of(context).primaryColor),
