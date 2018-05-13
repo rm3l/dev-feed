@@ -19,19 +19,13 @@ class ArticleArchivesState extends State<ArticleArchives> {
   final GlobalKey<RefreshIndicatorState> _refreshIndicatorKey =
       GlobalKey<RefreshIndicatorState>();
 
+  bool _initialDisplay = true;
   List<Article> _articles;
   DateTime _currentDate = DateTime.now();
-
-  @override
-  void initState() {
-    super.initState();
-    _onRefresh();
-  }
 
   Future<Null> _onRefresh() async => _fetchArticles(_currentDate);
 
   Future<Null> _fetchArticles(DateTime date) async {
-    _refreshIndicatorKey.currentState.show();
     final articlesClient = ArticlesClient();
     try {
       final dateSlug = "${date.year.toString()}-"
@@ -46,6 +40,8 @@ class ArticleArchivesState extends State<ArticleArchives> {
             favorites.contains(article.toSharedPreferencesString());
       }
       setState(() {
+        _initialDisplay = false;
+        _currentDate = date;
         _articles = filteredArticles;
       });
     } on Exception catch (e) {
@@ -57,6 +53,11 @@ class ArticleArchivesState extends State<ArticleArchives> {
 
   @override
   Widget build(BuildContext context) {
+    if (_initialDisplay) {
+      final widget = Center(child: CircularProgressIndicator());
+      _onRefresh();
+      return widget;
+    }
     return RefreshIndicator(
       key: _refreshIndicatorKey,
       onRefresh: _onRefresh,
@@ -68,7 +69,6 @@ class ArticleArchivesState extends State<ArticleArchives> {
               child: Calendar(
                 isExpandable: true,
                 onDateSelected: (selectedDateTime) {
-                  _currentDate = selectedDateTime;
                   _fetchArticles(selectedDateTime);
                 },
               ),

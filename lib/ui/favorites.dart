@@ -19,6 +19,7 @@ class FavoriteNewsState extends State<FavoriteNews> {
   final GlobalKey<RefreshIndicatorState> _refreshIndicatorKey =
       GlobalKey<RefreshIndicatorState>();
 
+  bool _initialDisplay = true;
   List<Article> _articles;
   List<Article> _articlesFiltered;
 
@@ -27,37 +28,26 @@ class FavoriteNewsState extends State<FavoriteNews> {
   String _search;
   bool _searchInputVisible = false;
 
-  @override
-  void initState() {
-    super.initState();
-    _fetchArticles();
-  }
-
-  Future<List<Article>> _loadArticles() async {
-    _refreshIndicatorKey.currentState.show();
-    final articlesClient = ArticlesClient();
-    final prefs = await SharedPreferences.getInstance();
-    final favorites = prefs.getStringList("favs") ?? <String>[];
-    final articlesToLookup = <Article>[];
-    for (var fav in favorites) {
-      final Map<String, dynamic> map = json.decode(fav);
-      articlesToLookup
-          .add(Article(map['title'].toString(), map['url'].toString()));
-    }
-    final favoriteArticles =
-        await articlesClient.getFavoriteArticles(articlesToLookup);
-    for (var article in favoriteArticles) {
-      article.starred = true;
-    }
-    return favoriteArticles;
-  }
-
   Future<Null> _fetchArticles() async {
     try {
-      final favoriteArticles = await _loadArticles();
+      final articlesClient = ArticlesClient();
+      final prefs = await SharedPreferences.getInstance();
+      final favorites = prefs.getStringList("favs") ?? <String>[];
+      final articlesToLookup = <Article>[];
+      for (var fav in favorites) {
+        final Map<String, dynamic> map = json.decode(fav);
+        articlesToLookup
+            .add(Article(map['title'].toString(), map['url'].toString()));
+      }
+      final favoriteArticles =
+          await articlesClient.getFavoriteArticles(articlesToLookup);
+      for (var article in favoriteArticles) {
+        article.starred = true;
+      }
       final favoriteArticlesFiltered =
           ArticlesClient.searchInArticles(favoriteArticles, _search);
       setState(() {
+        _initialDisplay = false;
         _articles = favoriteArticles;
         _searchInputVisible = _articles.isNotEmpty;
         _articlesFiltered = favoriteArticlesFiltered;
@@ -71,6 +61,11 @@ class FavoriteNewsState extends State<FavoriteNews> {
 
   @override
   Widget build(BuildContext context) {
+    if (_initialDisplay) {
+      final widget = Center(child: CircularProgressIndicator());
+      _fetchArticles();
+      return widget;
+    }
     return RefreshIndicator(
         key: _refreshIndicatorKey,
         onRefresh: _fetchArticles,

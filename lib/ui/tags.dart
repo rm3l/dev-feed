@@ -18,6 +18,7 @@ class TagsState extends State<Tags> {
   final GlobalKey<RefreshIndicatorState> _refreshIndicatorKey =
       GlobalKey<RefreshIndicatorState>();
 
+  bool _initialDisplay = true;
   List<String> _tags;
   List<String> _tagsFiltered;
 
@@ -25,19 +26,6 @@ class TagsState extends State<Tags> {
 
   String _search;
   bool _searchInputVisible = false;
-
-  @override
-  void initState() {
-    super.initState();
-    _fetchTags();
-  }
-
-  Future<List<String>> _loadTags() async {
-    _refreshIndicatorKey.currentState.show();
-    final tagsClient = tagsApi.TagsClient();
-    final tags = await tagsClient.getTags();
-    return tags;
-  }
 
   List<String> _searchInTags(List<String> allTags, String search) {
     if (allTags == null) {
@@ -55,9 +43,11 @@ class TagsState extends State<Tags> {
 
   Future<Null> _fetchTags() async {
     try {
-      final allTags = await _loadTags();
+      final tagsClient = tagsApi.TagsClient();
+      final allTags = await tagsClient.getTags();
       final tagsFiltered = _searchInTags(allTags, _search);
       setState(() {
+        _initialDisplay = false;
         _tags = allTags;
         _searchInputVisible = _tags.isNotEmpty;
         _tagsFiltered = tagsFiltered;
@@ -71,6 +61,11 @@ class TagsState extends State<Tags> {
 
   @override
   Widget build(BuildContext context) {
+    if (_initialDisplay) {
+      final widget = Center(child: CircularProgressIndicator());
+      _fetchTags();
+      return widget;
+    }
     return RefreshIndicator(
         key: _refreshIndicatorKey,
         onRefresh: _fetchTags,
