@@ -26,6 +26,7 @@ class TagsState extends State<Tags> {
 
   String _search;
   bool _searchInputVisible = false;
+  Exception _errorOnLoad;
 
   List<String> _searchInTags(List<String> allTags, String search) {
     if (allTags == null) {
@@ -51,11 +52,16 @@ class TagsState extends State<Tags> {
         _tags = allTags;
         _searchInputVisible = _tags.isNotEmpty;
         _tagsFiltered = tagsFiltered;
+        _errorOnLoad = null;
       });
     } on Exception catch (e) {
-      Scaffold.of(context).showSnackBar(SnackBar(
-            content: Text("Internal Error: ${e.toString()}"),
-          ));
+      setState(() {
+        _initialDisplay = false;
+        _tags = null;
+        _searchInputVisible = false;
+        _tagsFiltered = null;
+        _errorOnLoad = e;
+      });
     }
   }
 
@@ -109,8 +115,17 @@ class TagsState extends State<Tags> {
                 child: Expanded(
                     child: ListView.builder(
                   padding: EdgeInsets.all(8.0),
-                  itemCount: _tagsFiltered?.length ?? 0,
+                  itemCount:
+                      _errorOnLoad != null ? 1 : _tagsFiltered?.length ?? 0,
                   itemBuilder: (BuildContext context, int index) {
+                    if (_errorOnLoad != null) {
+                      return Center(
+                        child: Text(
+                          "Internal error: ${_errorOnLoad.toString()}",
+                          style: TextStyle(color: Colors.red, fontSize: 20.0),
+                        ),
+                      );
+                    }
                     return GestureDetector(
                         onTap: () => Application.router.navigateTo(
                             context, "/tags/${_tagsFiltered[index]}",

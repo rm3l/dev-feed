@@ -27,6 +27,7 @@ class FavoriteNewsState extends State<FavoriteNews> {
 
   String _search;
   bool _searchInputVisible = false;
+  Exception _errorOnLoad;
 
   Future<Null> _fetchArticles() async {
     try {
@@ -51,11 +52,16 @@ class FavoriteNewsState extends State<FavoriteNews> {
         _articles = favoriteArticles;
         _searchInputVisible = _articles.isNotEmpty;
         _articlesFiltered = favoriteArticlesFiltered;
+        _errorOnLoad = null;
       });
     } on Exception catch (e) {
-      Scaffold.of(context).showSnackBar(SnackBar(
-            content: Text("Internal Error: ${e.toString()}"),
-          ));
+      setState(() {
+        _initialDisplay = false;
+        _errorOnLoad = e;
+        _articles = null;
+        _searchInputVisible = false;
+        _articlesFiltered = null;
+      });
     }
   }
 
@@ -110,8 +116,17 @@ class FavoriteNewsState extends State<FavoriteNews> {
                 child: Expanded(
                     child: ListView.builder(
                   padding: EdgeInsets.all(8.0),
-                  itemCount: _articlesFiltered?.length ?? 0,
+                  itemCount:
+                      _errorOnLoad != null ? 1 : _articlesFiltered?.length ?? 0,
                   itemBuilder: (BuildContext context, int index) {
+                    if (_errorOnLoad != null) {
+                      return Center(
+                        child: Text(
+                          "Internal error: ${_errorOnLoad.toString()}",
+                          style: TextStyle(color: Colors.red, fontSize: 20.0),
+                        ),
+                      );
+                    }
                     return ArticleWidget(
                       article: _articlesFiltered[index],
 //                    onCardClick: () {

@@ -22,6 +22,7 @@ class ArticleArchivesState extends State<ArticleArchives> {
   bool _initialDisplay = true;
   List<Article> _articles;
   DateTime _currentDate = DateTime.now();
+  Exception _errorOnLoad;
 
   Future<Null> _onRefresh() async => _fetchArticles(_currentDate);
 
@@ -43,11 +44,15 @@ class ArticleArchivesState extends State<ArticleArchives> {
         _initialDisplay = false;
         _currentDate = date;
         _articles = filteredArticles;
+        _errorOnLoad = null;
       });
     } on Exception catch (e) {
-      Scaffold.of(context).showSnackBar(SnackBar(
-            content: Text("Internal Error: ${e.toString()}"),
-          ));
+      setState(() {
+        _initialDisplay = false;
+        _currentDate = date;
+        _articles = null;
+        _errorOnLoad = e;
+      });
     }
   }
 
@@ -69,7 +74,8 @@ class ArticleArchivesState extends State<ArticleArchives> {
               child: Calendar(
                 isExpandable: true,
                 onDateSelected: (selectedDateTime) {
-                  _fetchArticles(selectedDateTime);
+                  _currentDate = selectedDateTime;
+                  _refreshIndicatorKey.currentState.show();
                 },
               ),
             ),
@@ -77,8 +83,16 @@ class ArticleArchivesState extends State<ArticleArchives> {
                 child: Expanded(
                     child: ListView.builder(
               padding: EdgeInsets.all(8.0),
-              itemCount: _articles?.length ?? 0,
+              itemCount: _errorOnLoad != null ? 1 : _articles?.length ?? 0,
               itemBuilder: (BuildContext context, int index) {
+                if (_errorOnLoad != null) {
+                  return Center(
+                    child: Text(
+                      "Internal error: ${_errorOnLoad.toString()}",
+                      style: TextStyle(color: Colors.red, fontSize: 20.0),
+                    ),
+                  );
+                }
                 return ArticleWidget(
                   article: _articles[index],
 //                    onCardClick: () {
