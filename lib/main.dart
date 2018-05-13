@@ -89,6 +89,12 @@ class _AwesomeDevState extends State<AwesomeDev> with TickerProviderStateMixin {
         vsync: this,
       ),
       NavigationIconView(
+        icon: const Icon(Icons.search),
+        title: 'Search',
+        color: Colors.deepOrangeAccent,
+        vsync: this,
+      ),
+      NavigationIconView(
         icon: const Icon(Icons.archive),
         title: 'Archives',
         color: Colors.deepOrange,
@@ -128,9 +134,17 @@ class _AwesomeDevState extends State<AwesomeDev> with TickerProviderStateMixin {
       return const FavoriteNews();
     }
     if (_currentIndex == 2) {
-      return const ArticleArchives();
+      //TODO
+      return const Center(
+          child: Text(
+        "TODO Search tab",
+        style: const TextStyle(fontSize: 24.0),
+      ));
     }
     if (_currentIndex == 3) {
+      return const ArticleArchives();
+    }
+    if (_currentIndex == 4) {
       return const Tags();
     }
 
