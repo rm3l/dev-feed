@@ -68,13 +68,19 @@ class ArticleWidgetState extends State<ArticleWidget> {
       for (var tag in widget.article.tags) {
         tagsWidgets.add(Container(
             margin: const EdgeInsets.only(right: 3.0),
-            child: GestureDetector(
-              onTap: () => Application.router.navigateTo(context, "/tags/$tag",
-                  transition: TransitionType.fadeIn),
-              child: Chip(
-                label: Text(tag),
-                backgroundColor: Theme.of(context).buttonColor,
+            child: ActionChip(
+              avatar: CircleAvatar(
+                backgroundColor: Colors.blueGrey,
+                child: Text(tag.substring(1, 2)),
               ),
+              label: Text(
+                tag,
+                textAlign: TextAlign.left,
+              ),
+              backgroundColor: Theme.of(context).buttonColor,
+              onPressed: () => Application.router.navigateTo(
+                  context, "/tags/$tag",
+                  transition: TransitionType.fadeIn),
             )));
       }
     }

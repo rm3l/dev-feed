@@ -126,21 +126,32 @@ class TagsState extends State<Tags> {
                         ),
                       );
                     }
-                    return GestureDetector(
-                        onTap: () => Application.router.navigateTo(
-                            context, "/tags/${_tagsFiltered[index]}",
-                            transition: TransitionType.fadeIn),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: <Widget>[
-                            Padding(
-                                padding: EdgeInsets.all(10.0),
-                                child: Chip(label: Text(_tagsFiltered[index]))),
-                            Divider(
-                                height: 10.0,
-                                color: Theme.of(context).primaryColor),
-                          ],
-                        ));
+
+                    final tag = _tagsFiltered[index];
+                    return Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: <Widget>[
+                        Padding(
+                            padding: EdgeInsets.all(10.0),
+                            child: ActionChip(
+                              avatar: CircleAvatar(
+                                backgroundColor: Colors.blueGrey,
+                                child: Text(tag.substring(1, 2)),
+                              ),
+                              label: Text(
+                                tag,
+                                textAlign: TextAlign.left,
+                              ),
+                              backgroundColor: Theme.of(context).buttonColor,
+                              onPressed: () => Application.router.navigateTo(
+                                  context, "/tags/$tag",
+                                  transition: TransitionType.fadeIn),
+                            )),
+                        Divider(
+                            height: 10.0,
+                            color: Theme.of(context).primaryColor),
+                      ],
+                    );
                   },
                 )),
               ),
