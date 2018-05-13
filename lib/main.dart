@@ -6,6 +6,7 @@ import 'package:awesome_dev/ui/about.dart';
 import 'package:awesome_dev/ui/archives.dart';
 import 'package:awesome_dev/ui/favorites.dart';
 import 'package:awesome_dev/ui/latest_news.dart';
+import 'package:awesome_dev/ui/search.dart';
 import 'package:awesome_dev/ui/tags.dart';
 import 'package:fluro/fluro.dart';
 import 'package:flutter/material.dart';
@@ -134,12 +135,7 @@ class _AwesomeDevState extends State<AwesomeDev> with TickerProviderStateMixin {
       return const FavoriteNews();
     }
     if (_currentIndex == 2) {
-      //TODO
-      return const Center(
-          child: Text(
-        "TODO Search tab",
-        style: const TextStyle(fontSize: 24.0),
-      ));
+      return const Search();
     }
     if (_currentIndex == 3) {
       return const ArticleArchives();
