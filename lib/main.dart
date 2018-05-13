@@ -21,6 +21,10 @@ void main() {
     return true;
   }());
 
+  final router = Router();
+  Routes.configureRoutes(router);
+  Application.router = router;
+
   runApp(AwesomeDevApp());
 }
 
@@ -40,6 +44,8 @@ class AwesomeDevApp extends StatelessWidget {
         backgroundColor: Colors.white,
       ),
       home: AwesomeDev(),
+      onGenerateRoute: (routeSettings) =>
+          Application.router.generator(routeSettings),
     );
   }
 }
@@ -63,12 +69,6 @@ class _AwesomeDevState extends State<AwesomeDev> with TickerProviderStateMixin {
     } else if (value == 'send-feedback') {
       //TODO
     }
-  }
-
-  _AwesomeDevState() {
-    final router = Router();
-    Routes.configureRoutes(router);
-    Application.router = router;
   }
 
   @override

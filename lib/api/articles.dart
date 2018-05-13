@@ -97,7 +97,7 @@ class ArticleLinkScreenshot {
 
   final Uint8List dataBytes;
 
-  ArticleLinkScreenshot(
+  const ArticleLinkScreenshot(
       {this.data, this.width, this.height, this.mimeType, this.dataBytes});
 
   ArticleLinkScreenshot.fromJson(Map<String, dynamic> json)
@@ -142,7 +142,7 @@ class ArticleParsed {
   final List<String> videos;
   final List<String> keywords;
 
-  ArticleParsed(this.url,
+  const ArticleParsed(this.url,
       {this.title,
       this.author,
       this.published,
@@ -185,6 +185,26 @@ class ArticleParsed {
 
   @override
   int get hashCode => url.hashCode;
+}
+
+/*
+from: String
+    to: String
+    search: String
+    tags: [String]
+    titles: [String]
+    urls: [String]
+ */
+class ArticleFilter {
+  final int from;
+  final int to;
+  final String search;
+  final List<String> tags;
+  final List<String> titles;
+  final List<String> urls;
+
+  const ArticleFilter(
+      {this.from, this.to, this.search, this.tags, this.titles, this.urls});
 }
 
 class ArticlesClient {
@@ -363,9 +383,35 @@ class ArticlesClient {
     return _getArticles(query, "articles");
   }
 
-  Future<List<Article>> getAllArticles() async {
+  Future<List<Article>> getAllArticles({ArticleFilter filter}) async {
+    final filterElements = <String>[];
+    if (filter != null) {
+      if (filter.from != null) {
+        filterElements.add("from: \"${filter.from.toString()}\"");
+      }
+      if (filter.to != null) {
+        filterElements.add("to: \"${filter.to.toString()}\"");
+      }
+      if (filter.search != null) {
+        filterElements.add("search: \"${filter.search}\"");
+      }
+      if (filter.tags != null) {
+        filterElements
+            .add("tags: [${filter.tags.map((tag) => "\"$tag\"").join(",")}]");
+      }
+      if (filter.titles != null) {
+        filterElements.add(
+            "titles: [${filter.titles.map((title) => "\"$title\"").join(",")}]");
+      }
+      if (filter.titles != null) {
+        filterElements
+            .add("urls: [${filter.urls.map((url) => "\"$url\"").join(",")}]");
+      }
+    }
     final String query = "query { \n "
-        " articles { \n "
+        " articles "
+        "${filterElements.isNotEmpty ? "(filter: { ${filterElements.join(", ")} }) " : ""}"
+        "{ \n "
         "   id \n "
         "   timestamp \n "
         "   title \n "
@@ -378,6 +424,11 @@ class ArticlesClient {
         "       width \n "
         "       mimeType \n "
         "       data \n "
+        "   } \n "
+        "   parsed { \n "
+        "       image \n "
+        "       description \n "
+        "       body \n "
         "   } \n "
         " } \n "
         "}";
