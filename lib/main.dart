@@ -10,8 +10,10 @@ import 'package:awesome_dev/ui/search.dart';
 import 'package:awesome_dev/ui/tags.dart';
 import 'package:fluro/fluro.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_stetho/flutter_stetho.dart';
 import 'package:logging/logging.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 void main() {
   assert(() {
@@ -58,19 +60,14 @@ class AwesomeDev extends StatefulWidget {
   State<StatefulWidget> createState() => _AwesomeDevState();
 }
 
+const contactEmailAddress = "apps+awesome_dev@rm3l.org";
+
 class _AwesomeDevState extends State<AwesomeDev> with TickerProviderStateMixin {
-//  SearchBar searchBar;
+  final _scaffoldKey = GlobalKey<ScaffoldState>();
+
+  //  SearchBar searchBar;
   int _currentIndex = 0;
   List<NavigationIconView> _navigationViews;
-
-  void onAppBarMenuItemSelected(String value) {
-    print("Selected value from popup menu: [$value]");
-    if (value == "about") {
-      showGalleryAboutDialog(context);
-    } else if (value == 'send-feedback') {
-      //TODO
-    }
-  }
 
   @override
   void initState() {
@@ -184,7 +181,40 @@ class _AwesomeDevState extends State<AwesomeDev> with TickerProviderStateMixin {
         title: const Text('Awesome Dev'),
         actions: <Widget>[
           PopupMenuButton<String>(
-            onSelected: onAppBarMenuItemSelected,
+            onSelected: (value) {
+              print("Selected value from popup menu: [$value]");
+              if (value == "about") {
+                showGalleryAboutDialog(context);
+              } else if (value == 'send-feedback') {
+                //TODO For now, open up the default email address,
+                //but ultimately create a new 'maoni'-like plugin.
+//
+                final ios = Theme.of(context).platform == TargetPlatform.iOS;
+                final contactUrl =
+                    "mailto:$contactEmailAddress}?subject=About+AwesomeDev+app+on+"
+                    "${ios ? "iOS" : "Android"}";
+                canLaunch(contactUrl).then((onValue) {
+                  launch(contactUrl).catchError((error) {
+                    print("Error: ${error.toString()}");
+                  });
+                }, onError: (error) {
+                  print("Error: ${error.toString()}");
+//                  _scaffoldKey.currentState.showSnackBar(SnackBar(
+//                    content: Text("Could not open up email app. "
+//                        "Please reach out to us at $contactEmailAddress!"),
+//                    action: SnackBarAction(
+//                      label: 'Copy email',
+//                      onPressed: () {
+//                        Clipboard
+//                            .setData(ClipboardData(text: contactEmailAddress));
+//                        _scaffoldKey.currentState
+//                            .showSnackBar(SnackBar(content: Text("Copied!")));
+//                      },
+//                    ),
+//                  ));
+                });
+              }
+            },
             itemBuilder: (BuildContext context) => <PopupMenuItem<String>>[
 //                  const PopupMenuItem<String>(
 //                      value: 'settings', child: const Text('Settings')),
