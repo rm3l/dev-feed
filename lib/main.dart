@@ -15,6 +15,10 @@ import 'package:flutter_stetho/flutter_stetho.dart';
 import 'package:logging/logging.dart';
 import 'package:url_launcher/url_launcher.dart';
 
+const contactEmailAddress = "apps+awesome_dev@rm3l.org";
+
+enum AppBarMenuItem { ABOUT, SEND_FEEDBACK }
+
 void main() {
   assert(() {
     //assert will execute only in Debug Mode
@@ -60,10 +64,9 @@ class AwesomeDev extends StatefulWidget {
   State<StatefulWidget> createState() => _AwesomeDevState();
 }
 
-const contactEmailAddress = "apps+awesome_dev@rm3l.org";
-
 class _AwesomeDevState extends State<AwesomeDev> with TickerProviderStateMixin {
-  final _scaffoldKey = GlobalKey<ScaffoldState>();
+  // The AppBar's action needs this key to find its own Scaffold.
+  final GlobalKey<ScaffoldState> _scaffoldKey = new GlobalKey<ScaffoldState>();
 
   //  SearchBar searchBar;
   int _currentIndex = 0;
@@ -177,51 +180,60 @@ class _AwesomeDevState extends State<AwesomeDev> with TickerProviderStateMixin {
     );
 
     return Scaffold(
+      key: _scaffoldKey,
       appBar: AppBar(
         title: const Text('Awesome Dev'),
         actions: <Widget>[
-          PopupMenuButton<String>(
-            onSelected: (value) {
-              print("Selected value from popup menu: [$value]");
-              if (value == "about") {
-                showGalleryAboutDialog(context);
-              } else if (value == 'send-feedback') {
-                //TODO For now, open up the default email address,
-                //but ultimately create a new 'maoni'-like plugin.
-//
-                final ios = Theme.of(context).platform == TargetPlatform.iOS;
-                final contactUrl =
-                    "mailto:$contactEmailAddress}?subject=About+AwesomeDev+app+on+"
-                    "${ios ? "iOS" : "Android"}";
-                canLaunch(contactUrl).then((onValue) {
-                  launch(contactUrl).catchError((error) {
-                    print("Error: ${error.toString()}");
-                  });
-                }, onError: (error) {
-                  print("Error: ${error.toString()}");
-//                  _scaffoldKey.currentState.showSnackBar(SnackBar(
-//                    content: Text("Could not open up email app. "
-//                        "Please reach out to us at $contactEmailAddress!"),
-//                    action: SnackBarAction(
-//                      label: 'Copy email',
-//                      onPressed: () {
-//                        Clipboard
-//                            .setData(ClipboardData(text: contactEmailAddress));
-//                        _scaffoldKey.currentState
-//                            .showSnackBar(SnackBar(content: Text("Copied!")));
-//                      },
-//                    ),
-//                  ));
-                });
+          PopupMenuButton<AppBarMenuItem>(
+            onSelected: (AppBarMenuItem value) {
+              switch (value) {
+                case AppBarMenuItem.ABOUT:
+                  showGalleryAboutDialog(_scaffoldKey.currentContext);
+                  break;
+                case AppBarMenuItem.SEND_FEEDBACK:
+                  {
+                    //TODO For now, open up the default email address,
+                    //but ultimately create a new 'maoni'-like plugin.
+
+                    final ios =
+                        Theme.of(_scaffoldKey.currentContext).platform ==
+                            TargetPlatform.iOS;
+                    final contactUrl =
+                        "mailto:$contactEmailAddress}?subject=About+AwesomeDev+app+on+"
+                        "${ios ? "iOS" : "Android"}";
+                    canLaunch(contactUrl).then((onValue) {
+                      launch(contactUrl).catchError((error) {
+                        print("Error: ${error.toString()}");
+                      });
+                    }, onError: (error) {
+                      _scaffoldKey.currentState.showSnackBar(SnackBar(
+                        content: const Text("Could not open up email app. "
+                            "Please reach out to us at $contactEmailAddress!"),
+                        duration: Duration(seconds: 7),
+                        backgroundColor: Colors.deepPurple,
+                        action: SnackBarAction(
+                          label: 'Copy email',
+                          onPressed: () {
+                            Clipboard.setData(
+                                ClipboardData(text: contactEmailAddress));
+                            _scaffoldKey.currentState.showSnackBar(
+                                SnackBar(content: const Text("Copied!")));
+                          },
+                        ),
+                      ));
+                    });
+                  }
+                  break;
+                default:
+                  throw UnsupportedError("Unsupported menu item: $value");
               }
             },
-            itemBuilder: (BuildContext context) => <PopupMenuItem<String>>[
-//                  const PopupMenuItem<String>(
-//                      value: 'settings', child: const Text('Settings')),
-                  const PopupMenuItem<String>(
-                      value: 'about', child: const Text('About')),
-                  const PopupMenuItem<String>(
-                      value: 'send-feedback',
+            itemBuilder: (BuildContext context) =>
+                <PopupMenuItem<AppBarMenuItem>>[
+                  const PopupMenuItem<AppBarMenuItem>(
+                      value: AppBarMenuItem.ABOUT, child: const Text('About')),
+                  const PopupMenuItem<AppBarMenuItem>(
+                      value: AppBarMenuItem.SEND_FEEDBACK,
                       child: const Text('Send Feedback')),
                 ],
           ),
