@@ -114,7 +114,8 @@ class FavoriteNewsState extends State<FavoriteNews> {
                   )),
               Container(
                 child: Expanded(
-                    child: ListView.builder(
+                    child: Scrollbar(
+                        child: ListView.builder(
                   padding: EdgeInsets.all(8.0),
                   itemCount:
                       _errorOnLoad != null ? 1 : _articlesFiltered?.length ?? 0,
@@ -145,7 +146,7 @@ class FavoriteNewsState extends State<FavoriteNews> {
                       },
                     );
                   },
-                )),
+                ))),
               ),
             ],
           ),

@@ -113,7 +113,8 @@ class TagsState extends State<Tags> {
                   )),
               Container(
                 child: Expanded(
-                    child: ListView.builder(
+                    child: Scrollbar(
+                        child: ListView.builder(
                   padding: EdgeInsets.all(8.0),
                   itemCount:
                       _errorOnLoad != null ? 1 : _tagsFiltered?.length ?? 0,
@@ -153,7 +154,7 @@ class TagsState extends State<Tags> {
                       ],
                     );
                   },
-                )),
+                ))),
               ),
             ],
           ),

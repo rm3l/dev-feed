@@ -93,7 +93,8 @@ class _SearchState extends State<Search> {
                   )),
               Container(
                 child: Expanded(
-                    child: ListView.builder(
+                    child: Scrollbar(
+                        child: ListView.builder(
                   padding: EdgeInsets.all(8.0),
                   itemCount: _errorOnLoad != null ? 1 : _articles?.length ?? 0,
                   itemBuilder: (BuildContext context, int index) {
@@ -122,7 +123,7 @@ class _SearchState extends State<Search> {
                       },
                     );
                   },
-                )),
+                ))),
               ),
             ],
           ),
