@@ -54,7 +54,7 @@ Future<Null> showGalleryAboutDialog(BuildContext context) async {
                   text:
                       'Awesome Dev allows you to keep up with the top engineering '
                       'content from companies all over the world!'
-                      '\nContent carefully handpicked by AI and a network of globally distributed nerds!'
+//                      '\nContent carefully handpicked by AI and a network of globally distributed nerds!'
                       '\nAvailable on '
                       '${defaultTargetPlatform == TargetPlatform.iOS ? 'multiple platforms' : 'both iOS and Android'}.')
 //                      '\n\nThanks to Flutter ('),
