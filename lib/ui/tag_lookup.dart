@@ -140,19 +140,11 @@ class _TagLookupHomeState extends State<_TagLookupHome> {
                     }
                     return ArticleWidget(
                       article: _articlesFiltered[index],
-//                    onCardClick: () {
-//  //                      Navigator.of(context).push(
-//  //                          FadeRoute(
-//  //                            builder: (BuildContext context) => BookNotesPage(_items[index]),
-//  //                            settings: RouteSettings(name: '/notes', isInitialRoute: false),
-//  //                          ));
-//                    },
                       onStarClick: () {
                         setState(() {
                           _articlesFiltered[index].starred =
                               !_articlesFiltered[index].starred;
                         });
-                        //                      Repository.get().updateBook(_items[index]);
                       },
                     );
                   },

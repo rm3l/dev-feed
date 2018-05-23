@@ -59,7 +59,14 @@ class ArticleArchivesState extends State<ArticleArchives> {
   @override
   Widget build(BuildContext context) {
     if (_initialDisplay) {
-      final widget = Center(child: CircularProgressIndicator());
+      final widget = Stack(
+        children: <Widget>[
+          Center(
+            child: CircularProgressIndicator(),
+          ),
+          Center(child: Text("Please hold on - loading articles..."))
+        ],
+      );
       _onRefresh();
       return widget;
     }
@@ -84,7 +91,11 @@ class ArticleArchivesState extends State<ArticleArchives> {
                     child: Scrollbar(
                         child: ListView.builder(
               padding: EdgeInsets.all(8.0),
-              itemCount: _errorOnLoad != null ? 1 : _articles?.length ?? 0,
+              itemCount: _errorOnLoad != null
+                  ? 1
+                  : (_articles == null || _articles.isEmpty)
+                      ? 1
+                      : _articles.length,
               itemBuilder: (BuildContext context, int index) {
                 if (_errorOnLoad != null) {
                   return Center(
@@ -94,15 +105,16 @@ class ArticleArchivesState extends State<ArticleArchives> {
                     ),
                   );
                 }
+                if (_articles == null || _articles.isEmpty) {
+                  return Center(
+                    child: Text(
+                      "No article found at this time",
+                      style: TextStyle(fontSize: 20.0),
+                    ),
+                  );
+                }
                 return ArticleWidget(
                   article: _articles[index],
-//                    onCardClick: () {
-//  //                      Navigator.of(context).push(
-//  //                          FadeRoute(
-//  //                            builder: (BuildContext context) => BookNotesPage(_items[index]),
-//  //                            settings: RouteSettings(name: '/notes', isInitialRoute: false),
-//  //                          ));
-//                    },
                   onStarClick: () {
                     setState(() {
                       _articles[index].starred = !_articles[index].starred;

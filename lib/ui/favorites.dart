@@ -68,10 +68,42 @@ class FavoriteNewsState extends State<FavoriteNews> {
   @override
   Widget build(BuildContext context) {
     if (_initialDisplay) {
-      final widget = Center(child: CircularProgressIndicator());
+      final widget = Stack(
+        children: <Widget>[
+          Center(
+            child: CircularProgressIndicator(),
+          ),
+          Center(
+              child: const Text(
+                  "Please hold on - loading your favorite articles..."))
+        ],
+      );
       _fetchArticles();
       return widget;
     }
+
+    if (_errorOnLoad == null &&
+        (_articlesFiltered == null || _articlesFiltered.isEmpty)) {
+      //No error, but no article fetched
+      return RefreshIndicator(
+          key: _refreshIndicatorKey,
+          onRefresh: _fetchArticles,
+          child: ListView(
+            children: <Widget>[
+              Container(
+                  height: MediaQuery.of(context).size.height -
+                      kToolbarHeight -
+                      kBottomNavigationBarHeight,
+                  child: Center(
+                    child: const Text(
+                      "No favorite article found at this time",
+                      style: TextStyle(fontSize: 20.0),
+                    ),
+                  )),
+            ],
+          ));
+    }
+
     return RefreshIndicator(
         key: _refreshIndicatorKey,
         onRefresh: _fetchArticles,
@@ -130,19 +162,11 @@ class FavoriteNewsState extends State<FavoriteNews> {
                     }
                     return ArticleWidget(
                       article: _articlesFiltered[index],
-//                    onCardClick: () {
-//  //                      Navigator.of(context).push(
-//  //                          FadeRoute(
-//  //                            builder: (BuildContext context) => BookNotesPage(_items[index]),
-//  //                            settings: RouteSettings(name: '/notes', isInitialRoute: false),
-//  //                          ));
-//                    },
                       onStarClick: () {
                         setState(() {
                           _articlesFiltered[index].starred =
                               !_articlesFiltered[index].starred;
                         });
-                        //                      Repository.get().updateBook(_items[index]);
                       },
                     );
                   },

@@ -68,9 +68,37 @@ class TagsState extends State<Tags> {
   @override
   Widget build(BuildContext context) {
     if (_initialDisplay) {
-      final widget = Center(child: CircularProgressIndicator());
+      final widget = Stack(
+        children: <Widget>[
+          Center(
+            child: CircularProgressIndicator(),
+          ),
+          Center(child: Text("Please hold on - loading articles tags..."))
+        ],
+      );
       _fetchTags();
       return widget;
+    }
+    if (_errorOnLoad == null &&
+        (_tagsFiltered == null || _tagsFiltered.isEmpty)) {
+      //No error, but no article fetched
+      return RefreshIndicator(
+          key: _refreshIndicatorKey,
+          onRefresh: _fetchTags,
+          child: ListView(
+            children: <Widget>[
+              Container(
+                  height: MediaQuery.of(context).size.height -
+                      kToolbarHeight -
+                      kBottomNavigationBarHeight,
+                  child: Center(
+                    child: const Text(
+                      "No tag found at this time",
+                      style: TextStyle(fontSize: 20.0),
+                    ),
+                  )),
+            ],
+          ));
     }
     return RefreshIndicator(
         key: _refreshIndicatorKey,

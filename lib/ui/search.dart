@@ -16,6 +16,7 @@ class _SearchState extends State<Search> {
   final GlobalKey<RefreshIndicatorState> _refreshIndicatorKey =
       GlobalKey<RefreshIndicatorState>();
 
+  bool _initialDisplay = true;
   List<Article> _articles;
 
   final _searchInputController = TextEditingController();
@@ -27,6 +28,7 @@ class _SearchState extends State<Search> {
     try {
       if (_search == null || _search.isEmpty) {
         setState(() {
+          _initialDisplay = false;
           _articles = null;
           _errorOnLoad = null;
         });
@@ -41,12 +43,14 @@ class _SearchState extends State<Search> {
               favorites.contains(article.toSharedPreferencesString());
         }
         setState(() {
+          _initialDisplay = false;
           _articles = recentArticles;
           _errorOnLoad = null;
         });
       }
     } on Exception catch (e) {
       setState(() {
+        _initialDisplay = false;
         _errorOnLoad = e;
         _articles = null;
       });
@@ -83,6 +87,7 @@ class _SearchState extends State<Search> {
                             onPressed: () {
                               _searchInputController.clear();
                               setState(() {
+                                _initialDisplay = true;
                                 _search = null;
                                 _articles = null;
                               });
@@ -91,40 +96,50 @@ class _SearchState extends State<Search> {
                       ],
                     ),
                   )),
-              Container(
-                child: Expanded(
-                    child: Scrollbar(
-                        child: ListView.builder(
-                  padding: EdgeInsets.all(8.0),
-                  itemCount: _errorOnLoad != null ? 1 : _articles?.length ?? 0,
-                  itemBuilder: (BuildContext context, int index) {
-                    if (_errorOnLoad != null) {
-                      return Center(
-                        child: Text(
-                          "Internal error: ${_errorOnLoad.toString()}",
-                          style: TextStyle(color: Colors.red, fontSize: 20.0),
-                        ),
-                      );
-                    }
-                    return ArticleWidget(
-                      article: _articles[index],
-//                    onCardClick: () {
-//  //                      Navigator.of(context).push(
-//  //                          FadeRoute(
-//  //                            builder: (BuildContext context) => BookNotesPage(_items[index]),
-//  //                            settings: RouteSettings(name: '/notes', isInitialRoute: false),
-//  //                          ));
-//                    },
-                      onStarClick: () {
-                        setState(() {
-                          _articles[index].starred = !_articles[index].starred;
-                        });
-                        //                      Repository.get().updateBook(_items[index]);
-                      },
-                    );
-                  },
-                ))),
-              ),
+              _initialDisplay
+                  ? Container()
+                  : Container(
+                      child: Expanded(
+                          child: Scrollbar(
+                              child: ListView.builder(
+                        padding: EdgeInsets.all(8.0),
+                        itemCount: _errorOnLoad != null
+                            ? 1
+                            : (_articles == null || _articles.isEmpty)
+                                ? 1
+                                : _articles.length,
+                        itemBuilder: (BuildContext context, int index) {
+                          if (_errorOnLoad != null) {
+                            return Center(
+                              child: Text(
+                                "Internal error: ${_errorOnLoad.toString()}",
+                                style: TextStyle(
+                                    color: Colors.red, fontSize: 20.0),
+                              ),
+                            );
+                          }
+                          if (_articles == null || _articles.isEmpty) {
+                            return Center(
+                              child: Text(
+                                "No article found",
+                                style: TextStyle(fontSize: 20.0),
+                              ),
+                            );
+                          }
+                          return ArticleWidget(
+                            article: _articles[index],
+                            onStarClick: () {
+                              setState(() {
+                                _initialDisplay = false;
+                                _articles[index].starred =
+                                    !_articles[index].starred;
+                              });
+                              //                      Repository.get().updateBook(_items[index]);
+                            },
+                          );
+                        },
+                      ))),
+                    ),
             ],
           ),
         ));
