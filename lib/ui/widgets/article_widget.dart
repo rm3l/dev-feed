@@ -1,3 +1,4 @@
+import 'package:intl/intl.dart';
 import 'package:awesome_dev/api/articles.dart';
 import 'package:awesome_dev/config/application.dart';
 import 'package:fluro/fluro.dart';
@@ -133,6 +134,17 @@ class ArticleWidgetState extends State<ArticleWidget> {
                             Align(
                               alignment: Alignment.topLeft,
                               child: Text(widget.article.domain,
+                                  style: const TextStyle(color: Colors.black54),
+                                  textAlign: TextAlign.left),
+                            ),
+                            Padding(padding: const EdgeInsets.all(3.0)),
+                            Align(
+                              alignment: Alignment.topLeft,
+                              child: Text(
+                                  new DateFormat.yMMMd().format(
+                                      new DateTime.fromMillisecondsSinceEpoch(
+                                          widget.article.timestamp,
+                                          isUtc: true)),
                                   style: const TextStyle(color: Colors.black38),
                                   textAlign: TextAlign.left),
                             )
