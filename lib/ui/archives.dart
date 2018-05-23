@@ -3,7 +3,8 @@ import 'dart:async';
 import 'package:awesome_dev/api/articles.dart';
 import 'package:awesome_dev/ui/widgets/article_widget.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_calendar/flutter_calendar.dart';
+import 'package:awesome_dev/ext/flutter_calendar.dart'
+    as awesome_dev_flutter_calendar;
 import 'package:shared_preferences/shared_preferences.dart';
 
 enum IndicatorType { overscroll, refresh }
@@ -70,6 +71,7 @@ class ArticleArchivesState extends State<ArticleArchives> {
       _onRefresh();
       return widget;
     }
+
     return RefreshIndicator(
       key: _refreshIndicatorKey,
       onRefresh: _onRefresh,
@@ -78,7 +80,7 @@ class ArticleArchivesState extends State<ArticleArchives> {
           children: <Widget>[
             Align(
               alignment: Alignment.topCenter,
-              child: Calendar(
+              child: awesome_dev_flutter_calendar.Calendar(
                 isExpandable: true,
                 onDateSelected: (selectedDateTime) {
                   _currentDate = selectedDateTime;
@@ -119,7 +121,6 @@ class ArticleArchivesState extends State<ArticleArchives> {
                     setState(() {
                       _articles[index].starred = !_articles[index].starred;
                     });
-                    //                      Repository.get().updateBook(_items[index]);
                   },
                 );
               },
