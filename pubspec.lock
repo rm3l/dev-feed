@@ -8,6 +8,15 @@ packages:
       url: "https://pub.dartlang.org"
     source: hosted
     version: "0.31.2-alpha.2"
+  app_review:
+    dependency: "direct main"
+    description:
+      path: "."
+      ref: HEAD
+      resolved-ref: "5c21630e8d63d57893c27f912c92bc4d1ede5cdd"
+      url: "git://github.com/rm3l/app_review"
+    source: git
+    version: "0.0.3"
   archive:
     dependency: transitive
     description:
@@ -36,13 +45,6 @@ packages:
       url: "https://pub.dartlang.org"
     source: hosted
     version: "1.0.3"
-  browser:
-    dependency: transitive
-    description:
-      name: browser
-      url: "https://pub.dartlang.org"
-    source: hosted
-    version: "0.10.0+3"
   charcode:
     dependency: transitive
     description:
@@ -111,13 +113,6 @@ packages:
     description: flutter
     source: sdk
     version: "0.0.0"
-  flutter_billing:
-    dependency: "direct main"
-    description:
-      name: flutter_billing
-      url: "https://pub.dartlang.org"
-    source: hosted
-    version: "0.2.2"
   flutter_calendar:
     dependency: "direct main"
     description:
@@ -133,19 +128,12 @@ packages:
     source: hosted
     version: "0.1.0"
   flutter_launcher_icons:
-    dependency: "direct main"
+    dependency: "direct dev"
     description:
       name: flutter_launcher_icons
       url: "https://pub.dartlang.org"
     source: hosted
-    version: "0.2.1"
-  flutter_redux:
-    dependency: "direct main"
-    description:
-      name: flutter_redux
-      url: "https://pub.dartlang.org"
-    source: hosted
-    version: "0.5.0"
+    version: "0.3.3"
   flutter_stetho:
     dependency: "direct dev"
     description:
@@ -206,7 +194,7 @@ packages:
       name: image
       url: "https://pub.dartlang.org"
     source: hosted
-    version: "1.1.33"
+    version: "2.0.0"
   intl:
     dependency: transitive
     description:
@@ -361,13 +349,6 @@ packages:
       url: "https://pub.dartlang.org"
     source: hosted
     version: "1.0.0"
-  redux:
-    dependency: transitive
-    description:
-      name: redux
-      url: "https://pub.dartlang.org"
-    source: hosted
-    version: "3.0.0"
   shared_preferences:
     dependency: "direct main"
     description:
@@ -450,13 +431,6 @@ packages:
       url: "https://pub.dartlang.org"
     source: hosted
     version: "1.0.2"
-  synchronized:
-    dependency: transitive
-    description:
-      name: synchronized
-      url: "https://pub.dartlang.org"
-    source: hosted
-    version: "1.4.0"
   term_glyph:
     dependency: transitive
     description:
@@ -479,7 +453,7 @@ packages:
     source: hosted
     version: "0.1.0"
   tuple:
-    dependency: "direct main"
+    dependency: transitive
     description:
       name: tuple
       url: "https://pub.dartlang.org"
@@ -550,4 +524,4 @@ packages:
     version: "2.1.13"
 sdks:
   dart: ">=2.0.0-dev.52.0 <=2.0.0-dev.54.0.flutter-46ab040e58"
-  flutter: ">=0.1.4 <2.0.0"
+  flutter: ">=0.4.4 <0.5.0"

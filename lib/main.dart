@@ -15,9 +15,11 @@ import 'package:flutter_stetho/flutter_stetho.dart';
 import 'package:logging/logging.dart';
 import 'package:url_launcher/url_launcher.dart';
 
+import 'package:app_review/app_review.dart';
+
 const contactEmailAddress = "apps+awesome_dev@rm3l.org";
 
-enum AppBarMenuItem { ABOUT, SEND_FEEDBACK }
+enum AppBarMenuItem { ABOUT, SEND_FEEDBACK, RATING }
 
 void main() {
   assert(() {
@@ -72,9 +74,19 @@ class _AwesomeDevState extends State<AwesomeDev> with TickerProviderStateMixin {
   int _currentIndex = 0;
   List<NavigationIconView> _navigationViews;
 
+  String appID = "";
+  String output = "";
+
   @override
   void initState() {
     super.initState();
+
+    AppReview.getAppID.then((onValue) {
+      setState(() {
+        appID = onValue;
+      });
+      print("App ID: $appID");
+    });
 
     _navigationViews = <NavigationIconView>[
       NavigationIconView(
@@ -190,6 +202,15 @@ class _AwesomeDevState extends State<AwesomeDev> with TickerProviderStateMixin {
                 case AppBarMenuItem.ABOUT:
                   showGalleryAboutDialog(_scaffoldKey.currentContext);
                   break;
+                case AppBarMenuItem.RATING:
+                  {
+                    AppReview.requestReview.catchError((onError) {
+                      Scaffold.of(context).showSnackBar(SnackBar(
+                            content: Text("Error: ${onError.toString()}"),
+                          ));
+                    });
+                  }
+                  break;
                 case AppBarMenuItem.SEND_FEEDBACK:
                   {
                     //TODO For now, open up the default email address,
@@ -235,6 +256,9 @@ class _AwesomeDevState extends State<AwesomeDev> with TickerProviderStateMixin {
                   const PopupMenuItem<AppBarMenuItem>(
                       value: AppBarMenuItem.SEND_FEEDBACK,
                       child: const Text('Send Feedback')),
+                  const PopupMenuItem<AppBarMenuItem>(
+                      value: AppBarMenuItem.RATING,
+                      child: const Text('Rate this app!')),
                 ],
           ),
         ],
