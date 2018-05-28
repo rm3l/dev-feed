@@ -49,9 +49,9 @@ class AwesomeDevApp extends StatelessWidget {
     return MaterialApp(
       title: 'Awesome Dev',
       theme: ThemeData(
-        primaryColor: Colors.teal,
-        backgroundColor: Colors.white,
-      ),
+          primaryColor: Colors.teal,
+          backgroundColor: Colors.white,
+          fontFamily: 'Inconsolata'),
       home: AwesomeDev(),
       onGenerateRoute: (routeSettings) =>
           Application.router.generator(routeSettings),
