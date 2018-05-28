@@ -35,12 +35,15 @@ dev_dependencies:
     sdk: flutter
 
   flutter_stetho: 0.1.1
+  flutter_launcher_icons: "^0.3.3"
 
 # https://pub.dartlang.org/packages/flutter_launcher_icons
-#flutter_icons:
-#  image_path: "icon/icon.png"
-#  android: true
-#  ios: "Example-Icon"
+#
+# Run "flutter pub pub run flutter_launcher_icons:main" to generate
+flutter_icons:
+  image_path: "assets/icons/awesome_dev.png"
+  android: true
+  ios: true
 
 # For information on the generic Dart part of this file, see the
 # following page: https://www.dartlang.org/tools/pub/pubspec
@@ -81,11 +84,11 @@ flutter:
   #       - asset: fonts/TrajanPro_Bold.ttf
   #         weight: 700
   fonts:
-      - family: Poppins
+      - family: Inconsolata
         fonts:
-          - asset: assets/fonts/Poppins-Regular.ttf
-          - asset: assets/fonts/Poppins-SemiBold.ttf
-            weight: 600
+          - asset: assets/fonts/Inconsolata-Regular.ttf
+          - asset: assets/fonts/Inconsolata-Bold.ttf
+            weight: 400
   #
   # For details regarding fonts from package dependencies, 
   # see https://flutter.io/custom-fonts/#from-packages
