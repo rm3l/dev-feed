@@ -41,7 +41,8 @@ Future<Null> showGalleryAboutDialog(BuildContext context) async {
   showAboutDialog(
     context: context,
     applicationVersion: packageInfo.version,
-//    applicationIcon: const FlutterLogo(), //TODO Use Asset here
+    applicationIcon: Image.asset("assets/icons/awesome_dev.png",
+        fit: BoxFit.scaleDown, width: 90.0),
     applicationLegalese: '© 2018 Armel S.',
     children: <Widget>[
       Padding(
