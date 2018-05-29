@@ -129,12 +129,13 @@ class ArticleWidgetState extends State<ArticleWidget> {
                                     textAlign: TextAlign.left,
                                     style: const TextStyle(
                                         fontWeight: FontWeight.bold,
-                                        fontSize: 15.0))),
+                                        fontSize: 17.0))),
                             Padding(padding: const EdgeInsets.all(3.0)),
                             Align(
                               alignment: Alignment.topLeft,
                               child: Text(widget.article.domain,
-                                  style: const TextStyle(color: Colors.black54),
+                                  style: const TextStyle(
+                                      color: Colors.black54, fontSize: 15.0),
                                   textAlign: TextAlign.left),
                             ),
                             Padding(padding: const EdgeInsets.all(3.0)),
@@ -145,7 +146,8 @@ class ArticleWidgetState extends State<ArticleWidget> {
                                       new DateTime.fromMillisecondsSinceEpoch(
                                           widget.article.timestamp,
                                           isUtc: true)),
-                                  style: const TextStyle(color: Colors.black38),
+                                  style: const TextStyle(
+                                      color: Colors.black38, fontSize: 15.0),
                                   textAlign: TextAlign.left),
                             )
                           ],

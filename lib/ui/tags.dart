@@ -167,10 +167,9 @@ class TagsState extends State<Tags> {
                                 backgroundColor: Colors.blueGrey,
                                 child: Text(tag.substring(1, 2)),
                               ),
-                              label: Text(
-                                tag,
-                                textAlign: TextAlign.left,
-                              ),
+                              label: Text(tag,
+                                  textAlign: TextAlign.left,
+                                  style: TextStyle(fontSize: 16.0)),
                               backgroundColor: Theme.of(context).buttonColor,
                               onPressed: () => Application.router.navigateTo(
                                   context, "/tags/$tag",
