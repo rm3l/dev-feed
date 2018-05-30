@@ -83,6 +83,7 @@ class FavoriteNewsState extends State<FavoriteNews> {
     }
 
     if (_errorOnLoad == null &&
+        _search == null &&
         (_articlesFiltered == null || _articlesFiltered.isEmpty)) {
       //No error, but no article fetched
       return RefreshIndicator(

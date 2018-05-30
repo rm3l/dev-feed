@@ -80,6 +80,7 @@ class TagsState extends State<Tags> {
       return widget;
     }
     if (_errorOnLoad == null &&
+        _search == null &&
         (_tagsFiltered == null || _tagsFiltered.isEmpty)) {
       //No error, but no article fetched
       return RefreshIndicator(
