@@ -15,14 +15,16 @@ class TagsClient {
   Future<List<String>> _getTags(String graphqlQuery, String queryKey) async {
     var map = await issueGraphQLQuery(graphqlQuery);
     final dataMap = map["data"];
-    var recentTagsList = dataMap[queryKey];
-    if (recentTagsList == null) {
+    var tagsList = dataMap[queryKey];
+    if (tagsList == null) {
       throw StateError('No content');
     }
     List<String> result = [];
-    for (var recentTag in recentTagsList) {
-      result.add(recentTag.toString());
+    for (var tag in tagsList) {
+      result.add(tag.toString());
     }
+    result
+        .sort((tag1, tag2) => tag1.toLowerCase().compareTo(tag2.toLowerCase()));
     return result;
   }
 
