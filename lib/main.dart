@@ -203,17 +203,18 @@ class _AwesomeDevState extends State<AwesomeDev> with TickerProviderStateMixin {
       const PopupMenuItem<AppBarMenuItem>(
           value: AppBarMenuItem.RATING, child: const Text('Rate this app!'))
     ]);
-    if (!inAppProductPurchased) {
-      menuEntries.add(const PopupMenuItem<AppBarMenuItem>(
-          value: AppBarMenuItem.GO_PREMIUM, child: const Text('Go Premium!')));
-    }
-    Application.billing.isPurchased(IN_APP_PRODUCT_ID).then((purchased) {
-      if (inAppProductPurchased != purchased) {
-        setState(() {
-          inAppProductPurchased = purchased;
-        });
-      }
-    });
+    //TODO Handle in-app billing in a future release
+//    if (!inAppProductPurchased) {
+//      menuEntries.add(const PopupMenuItem<AppBarMenuItem>(
+//          value: AppBarMenuItem.GO_PREMIUM, child: const Text('Go Premium!')));
+//    }
+//    Application.billing.isPurchased(IN_APP_PRODUCT_ID).then((purchased) {
+//      if (inAppProductPurchased != purchased) {
+//        setState(() {
+//          inAppProductPurchased = purchased;
+//        });
+//      }
+//    });
 
     return Scaffold(
       key: _scaffoldKey,
