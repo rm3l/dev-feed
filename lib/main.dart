@@ -19,7 +19,7 @@ import 'package:app_review/app_review.dart';
 
 const contactEmailAddress = "apps+awesome_dev@rm3l.org";
 
-enum AppBarMenuItem { ABOUT, SEND_FEEDBACK, RATING }
+enum AppBarMenuItem { ABOUT, SEND_FEEDBACK, RATING, GO_PREMIUM }
 
 void main() {
   assert(() {
@@ -76,6 +76,8 @@ class _AwesomeDevState extends State<AwesomeDev> with TickerProviderStateMixin {
 
   String appID = "";
   String output = "";
+
+  bool inAppProductPurchased = false;
 
   @override
   void initState() {
@@ -191,6 +193,28 @@ class _AwesomeDevState extends State<AwesomeDev> with TickerProviderStateMixin {
       },
     );
 
+    final List<PopupMenuEntry<AppBarMenuItem>> menuEntries = [];
+    menuEntries.addAll(<PopupMenuItem<AppBarMenuItem>>[
+      const PopupMenuItem<AppBarMenuItem>(
+          value: AppBarMenuItem.ABOUT, child: const Text('About')),
+      const PopupMenuItem<AppBarMenuItem>(
+          value: AppBarMenuItem.SEND_FEEDBACK,
+          child: const Text('Send Feedback')),
+      const PopupMenuItem<AppBarMenuItem>(
+          value: AppBarMenuItem.RATING, child: const Text('Rate this app!'))
+    ]);
+    if (!inAppProductPurchased) {
+      menuEntries.add(const PopupMenuItem<AppBarMenuItem>(
+          value: AppBarMenuItem.GO_PREMIUM, child: const Text('Go Premium!')));
+    }
+    Application.billing.isPurchased(IN_APP_PRODUCT_ID).then((purchased) {
+      if (inAppProductPurchased != purchased) {
+        setState(() {
+          inAppProductPurchased = purchased;
+        });
+      }
+    });
+
     return Scaffold(
       key: _scaffoldKey,
       appBar: AppBar(
@@ -208,6 +232,24 @@ class _AwesomeDevState extends State<AwesomeDev> with TickerProviderStateMixin {
                       Scaffold.of(context).showSnackBar(SnackBar(
                             content: Text("Error: ${onError.toString()}"),
                           ));
+                    });
+                  }
+                  break;
+                case AppBarMenuItem.GO_PREMIUM:
+                  {
+                    Application.billing
+                        .purchase(IN_APP_PRODUCT_ID)
+                        .then((purchased) {
+                      if (purchased) {
+                        setState(() {
+                          inAppProductPurchased = true;
+                        });
+                      } else {
+                        Scaffold.of(context).showSnackBar(SnackBar(
+                              content: Text(
+                                  "An error ocurred. Please try again later"),
+                            ));
+                      }
                     });
                   }
                   break;
@@ -249,17 +291,7 @@ class _AwesomeDevState extends State<AwesomeDev> with TickerProviderStateMixin {
                   throw UnsupportedError("Unsupported menu item: $value");
               }
             },
-            itemBuilder: (BuildContext context) =>
-                <PopupMenuItem<AppBarMenuItem>>[
-                  const PopupMenuItem<AppBarMenuItem>(
-                      value: AppBarMenuItem.ABOUT, child: const Text('About')),
-                  const PopupMenuItem<AppBarMenuItem>(
-                      value: AppBarMenuItem.SEND_FEEDBACK,
-                      child: const Text('Send Feedback')),
-                  const PopupMenuItem<AppBarMenuItem>(
-                      value: AppBarMenuItem.RATING,
-                      child: const Text('Rate this app!')),
-                ],
+            itemBuilder: (BuildContext context) => menuEntries,
           ),
         ],
       ),
