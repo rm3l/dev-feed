@@ -22,10 +22,10 @@ import javax.annotation.PostConstruct
 object Articles : Table(name = "articles") {
     val id = integer(name = "id").autoIncrement().primaryKey()
     val timestamp = long(name = "timestamp")
-    val title = varchar(name = "title", length = 255)
+    val title = text(name = "title")
     val description = text(name = "description").nullable()
-    val link = varchar(name = "link", length = 255)
-    val hostname = varchar(name = "hostname", length = 255).nullable()
+    val link = text(name = "link")
+    val hostname = text(name = "hostname").nullable()
     val screenshotData = text(name = "screenshot_data").nullable()
     val screenshotWidth = integer(name = "screenshot_width").nullable()
     val screenshotHeight = integer(name = "screenshot_height").nullable()
@@ -33,20 +33,20 @@ object Articles : Table(name = "articles") {
 }
 
 object Tags : Table(name = "tags") {
-    val name = varchar(name = "name", length = 255).primaryKey()
+    val name = text(name = "name").primaryKey()
 }
 
 object ArticlesTags : Table(name = "articles_tags") {
     val articleId = (integer("article_id") references Articles.id)
-    val tagName = (varchar("tag_name", length = 255) references Tags.name)
+    val tagName = (text("tag_name") references Tags.name)
 }
 
 object ArticlesParsed : Table(name = "articles_parsed") {
-    val url = (varchar(name = "link", length = 255).primaryKey() references Articles.link)
-    val title = varchar(name = "title", length = 255).nullable()
-    val author = varchar(name = "author", length = 255).nullable()
-    val published = varchar(name = "published", length = 255).nullable() //TODO Use DateTime
-    val image = varchar(name = "image", length = 255).nullable()
+    val url = (text(name = "link").primaryKey() references Articles.link)
+    val title = text(name = "title").nullable()
+    val author = text(name = "author").nullable()
+    val published = text(name = "published").nullable() //TODO Use DateTime
+    val image = text(name = "image").nullable()
     val videos = text(name = "videos").nullable()
     val keywords = text(name = "keywords").nullable()
     val description = text(name = "description").nullable()
