@@ -1,13 +1,16 @@
 package org.rm3l.awesomedev.crawlers
 
 import khttp.get
+import org.json.JSONObject
 import org.jsoup.Jsoup
 import org.rm3l.awesomedev.dal.AwesomeDevDao
 import org.rm3l.awesomedev.utils.asSupportedTimestamp
 import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.beans.factory.annotation.Value
+import org.springframework.boot.context.event.ApplicationReadyEvent
 import org.springframework.boot.web.client.RestTemplateBuilder
+import org.springframework.context.ApplicationListener
 import org.springframework.scheduling.annotation.Scheduled
 import org.springframework.stereotype.Component
 import org.springframework.web.client.RestTemplate
@@ -51,7 +54,7 @@ data class ArticleParsed(val url: String,
                          val body: String)
 
 @Component
-class DiscoverDevIoCrawler(val dao: AwesomeDevDao) {
+class DiscoverDevIoCrawler(val dao: AwesomeDevDao): ApplicationListener<ApplicationReadyEvent> {
 
     companion object {
         @JvmStatic
@@ -75,6 +78,10 @@ class DiscoverDevIoCrawler(val dao: AwesomeDevDao) {
         this.screenshotUpdaterExecutorService = Executors.newFixedThreadPool(screenshotUpdaterThreadPoolSize.toInt())
         this.executorService = Executors.newFixedThreadPool(threadPoolSize.toInt())
         this.articleExtractorExecutorService = Executors.newFixedThreadPool(screenshotUpdaterThreadPoolSize.toInt())
+    }
+
+    override fun onApplicationEvent(event: ApplicationReadyEvent) {
+        logger.info("ApplicationReady => scheduling crawling tasks...")
         CompletableFuture.runAsync {
             triggerRemoteWebsiteCrawling()
             triggerScreenshotUpdater()
@@ -164,8 +171,9 @@ private class DiscoverDevIoCrawlerArchiveFetcherFutureSupplier(private val date:
         private val logger = LoggerFactory.getLogger(DiscoverDevIoCrawlerArchiveFetcherFutureSupplier::class.java)
     }
 
-    override fun get(): List<Article> =
-            Jsoup.connect("$BACKEND_ARCHIVE_URL/$date")
+    override fun get(): List<Article> {
+	try {
+            return Jsoup.connect("$BACKEND_ARCHIVE_URL/$date")
                     .userAgent(USER_AGENT)
                     .get()
                     .run {
@@ -186,6 +194,13 @@ private class DiscoverDevIoCrawlerArchiveFetcherFutureSupplier(private val date:
                         }
                         articlesList
                     }
+        } catch (e: Exception) {
+           if (logger.isDebugEnabled) {
+             logger.debug("Error while fetching articles for $date: ${e.message}", e)
+           }
+	        return emptyList()
+        }
+    }
 }
 
 /**
@@ -210,25 +225,28 @@ private class DiscoverDevIoArticleScreenshotGrabber(private val dao: AwesomeDevD
         try {
             //Check if (title, url) pair already exist in the DB
             if (updater || !dao.existArticlesByTitleAndUrl(article.title, article.url)) {
-                val screenshotJsonObject =
-                        get(url).jsonObject.optJSONObject("screenshot")
-                //Weird, but for reasons best known to Google, / is replaced with _, and + is replaced with -
-                val base64ImageData = screenshotJsonObject.optString("data")
-                        .replace("_", "/")
-                        .replace("-", "+")
-                val mimeType = screenshotJsonObject.optString("mime_type")
-                val height = screenshotJsonObject.optInt("height")
-                val width = screenshotJsonObject.optInt("width")
-                if (!base64ImageData.isBlank()) {
-                    article.screenshot = Screenshot(data = base64ImageData,
-                            mimeType = mimeType,
-                            width = width,
-                            height = height)
+                val getRequest = get(url)
+                if (getRequest.statusCode in 200..399) {
+                    val screenshotJsonObject: JSONObject? =
+                            getRequest.jsonObject.optJSONObject("screenshot")
+                    //Weird, but for reasons best known to Google, / is replaced with _, and + is replaced with -
+                    val base64ImageData = screenshotJsonObject?.optString("data")
+                            ?.replace("_", "/")
+                            ?.replace("-", "+")
+                    val mimeType = screenshotJsonObject?.optString("mime_type")
+                    val height = screenshotJsonObject?.optInt("height")
+                    val width = screenshotJsonObject?.optInt("width")
+                    if (!base64ImageData.isNullOrBlank()) {
+                        article.screenshot = Screenshot(data = base64ImageData,
+                                mimeType = mimeType,
+                                width = width,
+                                height = height)
+                    }
                 }
             }
         } catch (e: Exception) {
-            if (logger.isDebugEnabled) {
-                logger.debug("Could not fetch screenshot data for ${article.url}: $url", e)
+            if (logger.isWarnEnabled) {
+                logger.warn("Could not fetch screenshot data for ${article.url}: $url", e)
             }
         }
         return article

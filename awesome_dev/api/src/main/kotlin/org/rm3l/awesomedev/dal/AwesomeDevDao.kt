@@ -24,7 +24,7 @@ object Articles : Table(name = "articles") {
     val timestamp = long(name = "timestamp")
     val title = text(name = "title")
     val description = text(name = "description").nullable()
-    val link = text(name = "link")
+    val link = varchar(name = "link", length=65535)
     val hostname = text(name = "hostname").nullable()
     val screenshotData = text(name = "screenshot_data").nullable()
     val screenshotWidth = integer(name = "screenshot_width").nullable()
@@ -33,16 +33,17 @@ object Articles : Table(name = "articles") {
 }
 
 object Tags : Table(name = "tags") {
-    val name = text(name = "name").primaryKey()
+    val name = varchar(name = "name", length=65535).primaryKey()
 }
 
 object ArticlesTags : Table(name = "articles_tags") {
     val articleId = (integer("article_id") references Articles.id)
-    val tagName = (text("tag_name") references Tags.name)
+    val tagName = (varchar("tag_name", length=65535) references Tags.name)
 }
 
 object ArticlesParsed : Table(name = "articles_parsed") {
-    val url = (text(name = "link").primaryKey() references Articles.link)
+    val id = integer(name = "id").autoIncrement().primaryKey()
+    val url = (varchar(name = "link", length=65535) references Articles.link)
     val title = text(name = "title").nullable()
     val author = text(name = "author").nullable()
     val published = text(name = "published").nullable() //TODO Use DateTime
