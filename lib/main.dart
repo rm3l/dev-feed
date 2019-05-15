@@ -12,7 +12,7 @@ import 'package:fluro/fluro.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_stetho/flutter_stetho.dart';
-import 'package:logging/logging.dart';
+//import 'package:logging/logging.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 import 'package:app_review/app_review.dart';
@@ -22,13 +22,13 @@ const contactEmailAddress = "apps+awesome_dev@rm3l.org";
 enum AppBarMenuItem { ABOUT, SEND_FEEDBACK, RATING, GO_PREMIUM }
 
 void main() {
-  assert(() {
-    //assert will execute only in Debug Mode
-    //Note in particular the () at the end of the call -
-    // assert can only operate on a boolean, so just passing in a function doesn't work.
-    HttpOverrides.global = StethoHttpOverrides();
-    return true;
-  }());
+//  assert(() {
+//    //assert will execute only in Debug Mode
+//    //Note in particular the () at the end of the call -
+//    // assert can only operate on a boolean, so just passing in a function doesn't work.
+//    HttpOverrides.global = StethoHttpOverrides();
+//    return true;
+//  }());
 
   final router = Router();
   Routes.configureRoutes(router);
@@ -40,11 +40,11 @@ void main() {
 class AwesomeDevApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    Logger.root // Optional
-      ..level = Level.ALL
-      ..onRecord.listen((rec) {
-        print('${rec.level.name}: ${rec.time}: ${rec.message}');
-      });
+//    Logger.root // Optional
+//      ..level = Level.ALL
+//      ..onRecord.listen((rec) {
+//        print('${rec.level.name}: ${rec.time}: ${rec.message}');
+//      });
 
     return MaterialApp(
       title: 'Awesome Dev',
@@ -231,8 +231,8 @@ class _AwesomeDevState extends State<AwesomeDev> with TickerProviderStateMixin {
                   {
                     AppReview.requestReview.catchError((onError) {
                       Scaffold.of(context).showSnackBar(SnackBar(
-                            content: Text("Error: ${onError.toString()}"),
-                          ));
+                        content: Text("Error: ${onError.toString()}"),
+                      ));
                     });
                   }
                   break;
@@ -247,9 +247,9 @@ class _AwesomeDevState extends State<AwesomeDev> with TickerProviderStateMixin {
                         });
                       } else {
                         Scaffold.of(context).showSnackBar(SnackBar(
-                              content: Text(
-                                  "An error ocurred. Please try again later"),
-                            ));
+                          content:
+                              Text("An error ocurred. Please try again later"),
+                        ));
                       }
                     });
                   }
