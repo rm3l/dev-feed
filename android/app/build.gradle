@@ -1,0 +1,138 @@
+def localProperties = new Properties()
+def localPropertiesFile = rootProject.file('local.properties')
+if (localPropertiesFile.exists()) {
+    localPropertiesFile.withReader('UTF-8') { reader ->
+        localProperties.load(reader)
+    }
+}
+
+def flutterRoot = localProperties.getProperty('flutter.sdk')
+if (flutterRoot == null) {
+    throw new GradleException("Flutter SDK not found. Define location with flutter.sdk in the local.properties file.")
+}
+
+apply plugin: 'com.android.application'
+apply from: "$flutterRoot/packages/flutter_tools/gradle/flutter.gradle"
+
+def android_sdk = 28
+def buildTools_version = '28.0.3'
+
+def homePath = System.properties['user.home'].toString()
+
+def getPlayStoreConfig = {
+    return file(homePath + "/.droid/PlayStore.keys.json")
+}
+
+def getReleaseSigningConfig = {
+    final propsFile = new File(homePath + "/.droid/awesome_dev.keystore.properties")
+    def storeFile = file('/dev/null')
+    def keyPassword = ""
+    if (propsFile.exists()) {
+        logger.debug("[Signing] Using properties file located at ${propsFile.absolutePath}")
+        final props = new Properties()
+        props.load(new FileInputStream(propsFile))
+        storeFile = new File(props['keystore'].toString())
+        keyPassword = props['keyPassword']
+    }
+    return ['AwesomeDevKey', storeFile, keyPassword, keyPassword]
+}
+def getDebugSigningConfig = {
+    return ['androiddebugkey', new File("${rootDir}/debug.keystore"), 'android', 'android']
+}
+
+def getVersionCodeAndName = {
+    flavorName ->
+        // Fetch the version according to git latest tag and "how far we are from last tag"
+        def longVersionName = "git -C ${rootDir} describe --tags --long HEAD".execute().text.trim()
+        def (fullVersionTag, versionBuild, gitSha) = longVersionName.tokenize('-')
+        def latestTagGitCommit = "git -C ${rootDir} rev-list rev-list -n 1 ${fullVersionTag}".execute().text.trim()
+        def (versionMajor, versionMinor, versionPatch) = fullVersionTag.tokenize('.')
+        def gitCommitHash = "git -C ${rootDir} rev-parse --short HEAD".execute().text.trim()
+
+        logger.debug("[Git] getVersionName($flavorName): \n" +
+                "rootDir = $rootDir , \n" +
+                "latestTagGitCommit = $latestTagGitCommit , \n" +
+                "longVersionName = $longVersionName , \n" +
+                "fullVersionTag = $fullVersionTag , \n" +
+                "versionBuild = $versionBuild , \n" +
+                "gitSha = $gitSha , \n" +
+                "versionMajor = $versionMajor , \n" +
+                "versionMinor = $versionMinor , \n" +
+                "versionPatch = $versionPatch , \n" +
+                "gitCommitHash = $gitCommitHash")
+
+        // Return the version name
+        final versionNameFullVersionLast = versionBuild ? "-$versionBuild" : ""
+        final versionName = "$fullVersionTag$versionNameFullVersionLast/$gitCommitHash-$flavorName"
+        final versionCode = (
+                versionMajor.toInteger() * 100000 +
+                        versionMinor.toInteger() * 10000 +
+                        versionPatch.toInteger() * 1000 +
+                        versionBuild.toInteger())
+
+        return [versionCode, versionName]
+}
+
+android {
+    compileSdkVersion android_sdk
+    buildToolsVersion buildTools_version
+
+    lintOptions {
+        disable 'InvalidPackage'
+    }
+
+    signingConfigs {
+        release {
+            (keyAlias, storeFile, storePassword, keyPassword) = getReleaseSigningConfig()
+        }
+        debug {
+            (keyAlias, storeFile, storePassword, keyPassword) = getDebugSigningConfig()
+        }
+    }
+
+    defaultConfig {
+        applicationId "org.rm3l.awesome_dev"
+        minSdkVersion 16
+        targetSdkVersion android_sdk
+        testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
+
+        // Fetch the version according to git latest tag and "how far are we from last tag"
+        (versionCode, versionName) = getVersionCodeAndName("android")
+
+        printf("\n-------- VERSION DATA for '$project.name' --------" +
+                "\n" +
+                "- CODE: " +
+                versionCode +
+                "\n" +
+                "- NAME: " +
+                versionName +
+                "\n----------------------------\n")
+    }
+
+    buildTypes {
+        release {
+//            minifyEnabled true
+//            proguardFiles 'proguard-rules.pro'
+            signingConfig signingConfigs.release
+//            zipAlignEnabled true
+        }
+        debug {
+            // Disable fabric build ID generation for debug builds
+//            ext.enableCrashlytics = false
+//            minifyEnabled true
+//            proguardFiles 'proguard-rules.pro'
+//            zipAlignEnabled true
+            signingConfig signingConfigs.debug
+        }
+    }
+}
+
+flutter {
+    source '../..'
+}
+
+dependencies {
+    testImplementation 'junit:junit:4.12'
+    androidTestImplementation 'com.android.support.test:runner:1.0.2'
+    androidTestImplementation 'com.android.support.test.espresso:espresso-core:3.0.2'
+}

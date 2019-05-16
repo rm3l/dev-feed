@@ -1,0 +1,91 @@
+name: awesome_dev
+description: A new Flutter project.
+
+dependencies:
+  flutter:
+    sdk: flutter
+
+  # The following adds the Cupertino Icons font to your application.
+  # Use with the CupertinoIcons class for iOS style icons.
+  cupertino_icons: "^0.1.2"
+  transparent_image: "^1.0.0"
+
+#  flutter_redux: "^0.5.3"
+
+  package_info: "^0.4.0"
+
+#  tuple: "^1.0.2""
+
+  flutter_custom_tabs: "^0.6.0"
+  shared_preferences: "^0.5.2"
+#  mocha: "^0.0.2"
+
+  flutter_calendar: "^0.0.8"
+
+  fluro: "^1.4.0"
+  pigment: "^1.0.3"
+
+  flutter_billing: "^0.3.0"
+  app_review: "^1.0.0"
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+
+  flutter_stetho: "0.2.2"
+  flutter_launcher_icons: "^0.7.0"
+
+# https://pub.dartlang.org/packages/flutter_launcher_icons
+#
+# Run "flutter pub pub run flutter_launcher_icons:main" to generate
+flutter_icons:
+  image_path: "assets/icons/awesome_dev.png"
+  android: true
+  ios: true
+
+# For information on the generic Dart part of this file, see the
+# following page: https://www.dartlang.org/tools/pub/pubspec
+
+# The following section is specific to Flutter.
+flutter:
+
+  # The following line ensures that the Material Icons font is
+  # included with your application, so that you can use the icons in
+  # the material Icons class.
+  uses-material-design: true
+
+  # To add assets to your application, add an assets section, like this:
+  assets:
+    - assets/icons/awesome_dev.png
+
+  # An image asset can refer to one or more resolution-specific "variants", see
+  # https://flutter.io/assets-and-images/#resolution-aware.
+
+  # For details regarding adding assets from package dependencies, see
+  # https://flutter.io/assets-and-images/#from-packages
+
+  # To add custom fonts to your application, add a fonts section here,
+  # in this "flutter" section. Each entry in this list should have a
+  # "family" key with the font family name, and a "fonts" key with a
+  # list giving the asset and other descriptors for the font. For
+  # example:
+  # fonts:
+  #   - family: Schyler
+  #     fonts:
+  #       - asset: fonts/Schyler-Regular.ttf
+  #       - asset: fonts/Schyler-Italic.ttf
+  #         style: italic
+  #   - family: Trajan Pro
+  #     fonts:
+  #       - asset: fonts/TrajanPro.ttf
+  #       - asset: fonts/TrajanPro_Bold.ttf
+  #         weight: 700
+  fonts:
+      - family: Inconsolata
+        fonts:
+          - asset: assets/fonts/Inconsolata-Regular.ttf
+          - asset: assets/fonts/Inconsolata-Bold.ttf
+            weight: 400
+  #
+  # For details regarding fonts from package dependencies, 
+  # see https://flutter.io/custom-fonts/#from-packages
