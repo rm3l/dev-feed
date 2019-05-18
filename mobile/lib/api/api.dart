@@ -23,8 +23,9 @@ import 'dart:async';
 import 'dart:convert' show utf8, json;
 import 'dart:io';
 
-final _apiEndpoint =
-    Uri.parse('http://tools.awesome-dev.rm3l.org:9000/graphql');
+import 'package:dev_feed/env.dart';
+
+final _apiEndpoint = Uri.parse('${Env.value.baseUrl}/graphql');
 final _httpClient = HttpClient();
 
 /*

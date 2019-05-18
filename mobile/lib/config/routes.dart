@@ -19,6 +19,7 @@
 //LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 //OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 //SOFTWARE.
+import 'package:dev_feed/env.dart';
 import 'package:fluro/fluro.dart';
 
 import 'package:dev_feed/main.dart';
@@ -26,7 +27,7 @@ import 'package:dev_feed/ui/tag_lookup.dart';
 
 class Routes {
   static final _rootHandler =
-      Handler(handlerFunc: (context, params) => DevFeedApp());
+      Handler(handlerFunc: (context, params) => DevFeedApp(Env.value));
   static final _notFoundHandler = Handler(handlerFunc: (context, params) {
     print("ROUTE WAS NOT FOUND !!! $params");
   });
