@@ -52,26 +52,6 @@ jobs:
             echo "CIRCLE_BUILD_NUM=$CIRCLE_BUILD_NUM" && 
             echo "CIRCLE_SHA1=$CIRCLE_SHA1"
       
-      - restore_cache:
-          key: jars-{{ checksum "android/build.gradle" }}-{{ checksum  "android/build.gradle" }}
-
-      - run:
-          name: Download Dependencies
-          command: cd android && ./gradlew androidDependencies --stacktrace
-
-      - save_cache:
-          paths:
-            - ~/.gradle
-          key: jars-{{ checksum "android/build.gradle" }}-{{ checksum  "android/maoni-sample/build.gradle" }}
-      
-      - run:
-          name: flutter doctor
-          command: flutter doctor
-
-      - run:
-          name: Run Tests
-          command: flutter test
-      
       - run:
           name: Build APK
           command: flutter -v build apk
@@ -99,17 +79,9 @@ jobs:
           command: echo "CIRCLE_PULL_REQUEST=$CIRCLE_PULL_REQUEST" && 
             echo "CIRCLE_BUILD_NUM=$CIRCLE_BUILD_NUM" && 
             echo "CIRCLE_SHA1=$CIRCLE_SHA1"
-      
-      - run:
-          name: flutter doctor
-          command: flutter doctor
 
       - run:
-          name: Run Tests
-          command: flutter test
-      
-      - run:
-          name: Build APK
+          name: Build IOS
           command: flutter -v build ios || echo "IOS Builds not supported yet"
       
       - store_artifacts:
