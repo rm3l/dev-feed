@@ -20,10 +20,25 @@
 #OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 #SOFTWARE.
 
-# TODO Build (in builder image) then add
+# Build
+FROM oracle/graalvm-ce:1.0.0-rc16
 
-FROM java:8
+WORKDIR /awesome_dev_backend
 
-ADD ./build/libs/api-0.1.0-SNAPSHOT.jar /app.jar
+COPY gradle /awesome_dev_backend/gradle
+COPY src /awesome_dev_backend/src
+COPY build.gradle /awesome_dev_backend/build.gradle
+COPY gradlew /awesome_dev_backend/gradlew
+COPY gradlew.bat /awesome_dev_backend/gradlew.bat
 
-CMD ["java", "-jar", "/app.jar"]
+RUN ./gradlew build --stacktrace
+
+RUN cp -r /awesome_dev_backend/build/libs/awesome_dev_backend-0.1.0-SNAPSHOT.jar /app.jar
+
+# /graphql and /graphiql endpoints
+EXPOSE 8080
+
+# /management Actuator endpoints
+EXPOSE 8181
+
+ENTRYPOINT ["java", "-jar", "/app.jar"]
