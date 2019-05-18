@@ -144,10 +144,10 @@ jobs:
           name: Run Tests
           command: flutter test
 
-      - store_test_results_android:
+      - store_test_results:
           path: android/build/test-results
 
-      - store_test_results_ios:
+      - store_test_results:
           path: ios/build/test-results
 
 workflows:
