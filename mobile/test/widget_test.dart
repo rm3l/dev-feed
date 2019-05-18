@@ -33,7 +33,6 @@ import 'package:dev_feed/main.dart';
 
 void main() {
   testWidgets('DevFeedApp smoke tests', (WidgetTester tester) async {
-
     //TODO
 
     // Build our app and trigger a frame.
