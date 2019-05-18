@@ -48,6 +48,9 @@ def getVersionCodeAndName = {
         if (!fullVersionTag?.trim()) {
             fullVersionTag = "0.0.0"
         }
+        if (!versionBuild?.trim()) {
+            versionBuild = "0"
+        }
         def latestTagGitCommit = "git -C ${rootDir} rev-list -n 1 ${fullVersionTag}".execute().text.trim()
         def (versionMajor, versionMinor, versionPatch) = fullVersionTag.tokenize('.')
         def gitCommitHash = "git -C ${rootDir} rev-parse --short HEAD".execute().text.trim()
