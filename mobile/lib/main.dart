@@ -23,6 +23,8 @@ import 'dart:io';
 
 import 'package:dev_feed/config/application.dart';
 import 'package:dev_feed/config/routes.dart';
+import 'package:dev_feed/env.dart';
+import 'package:dev_feed/environments/development.dart';
 import 'package:dev_feed/ui/about.dart';
 import 'package:dev_feed/ui/archives.dart';
 import 'package:dev_feed/ui/favorites.dart';
@@ -42,23 +44,13 @@ const contactEmailAddress = "apps+dev_feed@rm3l.org";
 
 enum AppBarMenuItem { ABOUT, SEND_FEEDBACK, RATING, GO_PREMIUM }
 
-void main() {
-//  assert(() {
-//    //assert will execute only in Debug Mode
-//    //Note in particular the () at the end of the call -
-//    // assert can only operate on a boolean, so just passing in a function doesn't work.
-//    HttpOverrides.global = StethoHttpOverrides();
-//    return true;
-//  }());
-
-  final router = Router();
-  Routes.configureRoutes(router);
-  Application.router = router;
-
-  runApp(DevFeedApp());
-}
+void main() => Development();
 
 class DevFeedApp extends StatelessWidget {
+  final Env env;
+
+  DevFeedApp(this.env);
+
   @override
   Widget build(BuildContext context) {
 //    Logger.root // Optional
