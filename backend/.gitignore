@@ -1,7 +1,6 @@
-awesome_dev/api/build/
-awesome_dev/api/.gradle/
-awesome_dev/api/out
-reverse_proxy/build
+build/
+.gradle/
+out
 
 # Ignore Gradle GUI config
 gradle-app.setting
