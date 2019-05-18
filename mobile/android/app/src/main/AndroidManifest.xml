@@ -40,7 +40,7 @@ SOFTWARE.
          FlutterApplication and put your custom class here. -->
     <application
         android:name="io.flutter.app.FlutterApplication"
-        android:label="Awesome Dev"
+        android:label="Dev Feed"
         android:icon="@mipmap/ic_launcher"
         allowBackup="true">
         <activity

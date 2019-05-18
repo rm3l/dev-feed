@@ -21,7 +21,7 @@
 //SOFTWARE.
 import 'dart:async';
 
-import 'package:awesome_dev/api/api.dart';
+import 'package:dev_feed/api/api.dart';
 
 class TagsClient {
   static final TagsClient _singleton = TagsClient._internal();

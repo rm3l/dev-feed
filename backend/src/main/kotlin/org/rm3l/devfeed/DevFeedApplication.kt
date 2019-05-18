@@ -19,27 +19,24 @@
 //LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 //OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 //SOFTWARE.
-package org.rm3l.awesomedev.graphql
+package org.rm3l.devfeed
 
-import com.coxautodev.graphql.tools.GraphQLQueryResolver
-import org.rm3l.awesomedev.crawlers.Article
-import org.rm3l.awesomedev.dal.AwesomeDevDao
-import org.springframework.stereotype.Component
+import org.springframework.boot.SpringApplication
+import org.springframework.boot.autoconfigure.SpringBootApplication
+import org.springframework.context.annotation.PropertySource
+import org.springframework.context.annotation.PropertySources
+import org.springframework.scheduling.annotation.EnableScheduling
 
-@Suppress("unused")
-@Component
-class Query(private val dao: AwesomeDevDao): GraphQLQueryResolver {
+@SpringBootApplication
+@PropertySources(value = [
+    //The order matters here. If a same property key is found in many files, the last one wins.
+    PropertySource(value = ["classpath:application.properties"]),
+    PropertySource(value = ["file:/etc/rm3l/awesome-dev.properties"], ignoreResourceNotFound = true)]
+)
+@EnableScheduling
+class DevFeedApplication
 
-    fun articleDates(limit: Int?, offset: Int?) = dao.getArticlesDates(limit, offset)
-
-    fun articles(limit: Int?, offset: Int?, filter: ArticleFilter?) = dao.getArticles(limit, offset, filter)
-
-    fun recentArticles(limit: Int?, offset: Int?) = dao.getRecentArticles(limit, offset)
-
-    fun allButRecentArticles(limit: Int?, offset: Int?, filter: ArticleFilter?) =
-            dao.allButRecentArticles(limit, offset, filter)
-
-    fun tags(limit: Int?, offset: Int?, search: List<String>?) = dao.getTags(limit, offset, search)
-
-    fun articlesWithNoScreenshots() = dao.getArticlesWithNoScreenshots()
+fun main(args: Array<String>) {
+    SpringApplication.run(DevFeedApplication::class.java, *args)
 }
+

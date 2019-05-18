@@ -21,8 +21,8 @@
 //SOFTWARE.
 import 'dart:async';
 
-import 'package:awesome_dev/api/tags.dart' as tagsApi;
-import 'package:awesome_dev/config/application.dart';
+import 'package:dev_feed/api/tags.dart' as tagsApi;
+import 'package:dev_feed/config/application.dart';
 import 'package:fluro/fluro.dart';
 import 'package:flutter/material.dart';
 

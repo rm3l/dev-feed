@@ -20,8 +20,8 @@
 //OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 //SOFTWARE.
 import 'package:intl/intl.dart';
-import 'package:awesome_dev/api/articles.dart';
-import 'package:awesome_dev/config/application.dart';
+import 'package:dev_feed/api/articles.dart';
+import 'package:dev_feed/config/application.dart';
 import 'package:fluro/fluro.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_custom_tabs/flutter_custom_tabs.dart';

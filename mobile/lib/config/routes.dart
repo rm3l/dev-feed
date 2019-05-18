@@ -21,12 +21,12 @@
 //SOFTWARE.
 import 'package:fluro/fluro.dart';
 
-import 'package:awesome_dev/main.dart';
-import 'package:awesome_dev/ui/tag_lookup.dart';
+import 'package:dev_feed/main.dart';
+import 'package:dev_feed/ui/tag_lookup.dart';
 
 class Routes {
   static final _rootHandler =
-      Handler(handlerFunc: (context, params) => AwesomeDevApp());
+      Handler(handlerFunc: (context, params) => DevFeedApp());
   static final _notFoundHandler = Handler(handlerFunc: (context, params) {
     print("ROUTE WAS NOT FOUND !!! $params");
   });

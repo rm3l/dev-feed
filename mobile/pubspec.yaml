@@ -20,8 +20,8 @@
 #OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 #SOFTWARE.
 
-name: awesome_dev
-description: A new Flutter project.
+name: dev_feed
+description: A Flutter-based mobile app displaying a list of daily curated content from top engineering blogs and articles.
 
 dependencies:
   flutter:
@@ -61,7 +61,7 @@ dev_dependencies:
 #
 # Run "flutter pub pub run flutter_launcher_icons:main" to generate
 flutter_icons:
-  image_path: "assets/icons/awesome_dev.png"
+  image_path: "assets/icons/dev_feed.png"
   android: true
   ios: true
 
@@ -78,7 +78,7 @@ flutter:
 
   # To add assets to your application, add an assets section, like this:
   assets:
-    - assets/icons/awesome_dev.png
+    - assets/icons/dev_feed.png
 
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.io/assets-and-images/#resolution-aware.

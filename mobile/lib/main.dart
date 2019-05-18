@@ -21,14 +21,14 @@
 //SOFTWARE.
 import 'dart:io';
 
-import 'package:awesome_dev/config/application.dart';
-import 'package:awesome_dev/config/routes.dart';
-import 'package:awesome_dev/ui/about.dart';
-import 'package:awesome_dev/ui/archives.dart';
-import 'package:awesome_dev/ui/favorites.dart';
-import 'package:awesome_dev/ui/latest_news.dart';
-import 'package:awesome_dev/ui/search.dart';
-import 'package:awesome_dev/ui/tags.dart';
+import 'package:dev_feed/config/application.dart';
+import 'package:dev_feed/config/routes.dart';
+import 'package:dev_feed/ui/about.dart';
+import 'package:dev_feed/ui/archives.dart';
+import 'package:dev_feed/ui/favorites.dart';
+import 'package:dev_feed/ui/latest_news.dart';
+import 'package:dev_feed/ui/search.dart';
+import 'package:dev_feed/ui/tags.dart';
 import 'package:fluro/fluro.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -38,7 +38,7 @@ import 'package:url_launcher/url_launcher.dart';
 
 import 'package:app_review/app_review.dart';
 
-const contactEmailAddress = "apps+awesome_dev@rm3l.org";
+const contactEmailAddress = "apps+dev_feed@rm3l.org";
 
 enum AppBarMenuItem { ABOUT, SEND_FEEDBACK, RATING, GO_PREMIUM }
 
@@ -55,10 +55,10 @@ void main() {
   Routes.configureRoutes(router);
   Application.router = router;
 
-  runApp(AwesomeDevApp());
+  runApp(DevFeedApp());
 }
 
-class AwesomeDevApp extends StatelessWidget {
+class DevFeedApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
 //    Logger.root // Optional
@@ -68,26 +68,26 @@ class AwesomeDevApp extends StatelessWidget {
 //      });
 
     return MaterialApp(
-      title: 'Awesome Dev',
+      title: 'Dev Feed',
       theme: ThemeData(
           primaryColor: Colors.teal,
           backgroundColor: Colors.white,
           fontFamily: 'Inconsolata'),
-      home: AwesomeDev(),
+      home: DevFeed(),
       onGenerateRoute: (routeSettings) =>
           Application.router.generator(routeSettings),
     );
   }
 }
 
-class AwesomeDev extends StatefulWidget {
+class DevFeed extends StatefulWidget {
   static const String routeName = '/material/bottom_navigation';
 
   @override
-  State<StatefulWidget> createState() => _AwesomeDevState();
+  State<StatefulWidget> createState() => _DevFeedState();
 }
 
-class _AwesomeDevState extends State<AwesomeDev> with TickerProviderStateMixin {
+class _DevFeedState extends State<DevFeed> with TickerProviderStateMixin {
   // The AppBar's action needs this key to find its own Scaffold.
   final GlobalKey<ScaffoldState> _scaffoldKey = new GlobalKey<ScaffoldState>();
 
@@ -240,7 +240,7 @@ class _AwesomeDevState extends State<AwesomeDev> with TickerProviderStateMixin {
     return Scaffold(
       key: _scaffoldKey,
       appBar: AppBar(
-        title: const Text('Awesome Dev'),
+        title: const Text('Dev Feed'),
         actions: <Widget>[
           PopupMenuButton<AppBarMenuItem>(
             onSelected: (AppBarMenuItem value) {
@@ -284,7 +284,7 @@ class _AwesomeDevState extends State<AwesomeDev> with TickerProviderStateMixin {
                         Theme.of(_scaffoldKey.currentContext).platform ==
                             TargetPlatform.iOS;
                     final contactUrl =
-                        "mailto:$contactEmailAddress}?subject=About+AwesomeDev+app+on+"
+                        "mailto:$contactEmailAddress}?subject=About+Dev+Feed+app+on+"
                         "${ios ? "iOS" : "Android"}";
                     canLaunch(contactUrl).then((onValue) {
                       launch(contactUrl).catchError((error) {

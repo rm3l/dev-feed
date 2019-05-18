@@ -19,24 +19,20 @@
 //LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 //OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 //SOFTWARE.
-package org.rm3l.awesomedev
+package org.rm3l.devfeed.graphql
 
-import org.springframework.boot.SpringApplication
-import org.springframework.boot.autoconfigure.SpringBootApplication
-import org.springframework.context.annotation.PropertySource
-import org.springframework.context.annotation.PropertySources
-import org.springframework.scheduling.annotation.EnableScheduling
-
-@SpringBootApplication
-@PropertySources(value = [
-    //The order matters here. If a same property key is found in many files, the last one wins.
-    PropertySource(value = ["classpath:application.properties"]),
-    PropertySource(value = ["file:/etc/rm3l/awesome-dev.properties"], ignoreResourceNotFound = true)]
+data class ArticleFilter(
+        val from: String? = null,
+        val to: String? = null,
+        val search: String? = null,
+        val tags: List<String>? = null,
+        val titles: List<String>? = null,
+        val urls: List<String>? = null
 )
-@EnableScheduling
-class AwesomeDevApplication
 
-fun main(args: Array<String>) {
-    SpringApplication.run(AwesomeDevApplication::class.java, *args)
-}
-
+data class ArticleInput(
+       val date: String,
+       val description: String,
+       val url: String,
+       val tags: List<String>? = null
+)

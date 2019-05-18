@@ -21,8 +21,8 @@
 //SOFTWARE.
 import 'dart:async';
 
-import 'package:awesome_dev/api/articles.dart';
-import 'package:awesome_dev/ui/widgets/article_widget.dart';
+import 'package:dev_feed/api/articles.dart';
+import 'package:dev_feed/ui/widgets/article_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 

@@ -19,22 +19,19 @@
 //LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 //OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 //SOFTWARE.
-package org.rm3l.awesomedev.crawlers
+package org.rm3l.devfeed.crawlers
 
 import khttp.get
 import org.json.JSONObject
 import org.jsoup.Jsoup
-import org.rm3l.awesomedev.dal.AwesomeDevDao
-import org.rm3l.awesomedev.utils.asSupportedTimestamp
+import org.rm3l.devfeed.dal.DevFeedDao
+import org.rm3l.devfeed.utils.asSupportedTimestamp
 import org.slf4j.LoggerFactory
-import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.boot.context.event.ApplicationReadyEvent
-import org.springframework.boot.web.client.RestTemplateBuilder
 import org.springframework.context.ApplicationListener
 import org.springframework.scheduling.annotation.Scheduled
 import org.springframework.stereotype.Component
-import org.springframework.web.client.RestTemplate
 import java.net.URL
 import java.util.concurrent.CompletableFuture
 import java.util.concurrent.ExecutionException
@@ -75,7 +72,7 @@ data class ArticleParsed(val url: String,
                          val body: String)
 
 @Component
-class DiscoverDevIoCrawler(val dao: AwesomeDevDao): ApplicationListener<ApplicationReadyEvent> {
+class DiscoverDevIoCrawler(val dao: DevFeedDao): ApplicationListener<ApplicationReadyEvent> {
 
     companion object {
         @JvmStatic
@@ -227,7 +224,7 @@ private class DiscoverDevIoCrawlerArchiveFetcherFutureSupplier(private val date:
 /**
  * Remote Website screenshot grabber. Based upon this article: https://shkspr.mobi/blog/2015/11/google-secret-screenshot-api/
  */
-private class DiscoverDevIoArticleScreenshotGrabber(private val dao: AwesomeDevDao,
+private class DiscoverDevIoArticleScreenshotGrabber(private val dao: DevFeedDao,
                                                     private val article: Article,
                                                     private val updater: Boolean = false):
         Supplier<Article> {
@@ -275,7 +272,7 @@ private class DiscoverDevIoArticleScreenshotGrabber(private val dao: AwesomeDevD
 
 }
 
-private class ArticleExtractor(private val dao: AwesomeDevDao, private val article: Article): Supplier<Article> {
+private class ArticleExtractor(private val dao: DevFeedDao, private val article: Article): Supplier<Article> {
 
     companion object {
 
@@ -330,7 +327,7 @@ private class ArticleExtractor(private val dao: AwesomeDevDao, private val artic
 
 }
 
-private class DiscoverDevIoArchiveCrawler(private val dao: AwesomeDevDao,
+private class DiscoverDevIoArchiveCrawler(private val dao: DevFeedDao,
                                           private val article: Article,
                                           private val updater: Boolean = false):
         Supplier<Unit> {

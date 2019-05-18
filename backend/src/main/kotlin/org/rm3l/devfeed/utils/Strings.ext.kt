@@ -19,37 +19,15 @@
 //LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 //OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 //SOFTWARE.
-package org.rm3l.awesomedev.graphql
+package org.rm3l.devfeed.utils
 
-import com.coxautodev.graphql.tools.GraphQLMutationResolver
-import org.rm3l.awesomedev.crawlers.Article
-import org.rm3l.awesomedev.dal.AwesomeDevDao
-import org.springframework.stereotype.Component
+import java.time.LocalDateTime
+import java.time.ZoneOffset
+import java.time.format.DateTimeFormatter
 
-@Component
-class Mutation(private val dao: AwesomeDevDao): GraphQLMutationResolver {
-
-    fun addArticle(input: ArticleInput): Article {
-        TODO("Not implemented yet")
-    }
-
-    fun deleteArticle(id: Long): Boolean {
-        TODO("Not implemented yet")
-    }
-
-    fun updateArticle(id: Long, input: ArticleInput): Article {
-        TODO("Not implemented yet")
-    }
-
-    fun addTag(input: String): String {
-        TODO("Not implemented yet")
-    }
-
-    fun tagArticle(articleId: Long, tags: List<String>): Article {
-        TODO("Not implemented yet")
-    }
-
-    fun untagArticle(articleId: Long, tagsToRemove: List<String>): Article {
-        TODO("Not implemented yet")
-    }
-}
+fun String?.asSupportedTimestamp() =
+        this?.let {
+            1000L * LocalDateTime
+                    .parse("${it}T12:00:00", DateTimeFormatter.ISO_DATE_TIME)
+                    .toEpochSecond(ZoneOffset.UTC)
+        }

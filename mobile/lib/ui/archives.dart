@@ -21,11 +21,11 @@
 //SOFTWARE.
 import 'dart:async';
 
-import 'package:awesome_dev/api/articles.dart';
-import 'package:awesome_dev/ui/widgets/article_widget.dart';
+import 'package:dev_feed/api/articles.dart';
+import 'package:dev_feed/ui/widgets/article_widget.dart';
 import 'package:flutter/material.dart';
-import 'package:awesome_dev/ext/flutter_calendar.dart'
-    as awesome_dev_flutter_calendar;
+import 'package:dev_feed/ext/flutter_calendar.dart'
+    as dev_feed_flutter_calendar;
 import 'package:shared_preferences/shared_preferences.dart';
 
 enum IndicatorType { overscroll, refresh }
@@ -52,8 +52,8 @@ class ArticleArchivesState extends State<ArticleArchives> {
     final articlesClient = ArticlesClient();
     try {
       final dateSlug = "${date.year.toString()}-"
-          "${date.month.toString().padLeft(2,'0')}-"
-          "${date.day.toString().padLeft(2,'0')}";
+          "${date.month.toString().padLeft(2, '0')}-"
+          "${date.day.toString().padLeft(2, '0')}";
       final filteredArticles =
           await articlesClient.getArticlesForDate(dateSlug);
       final prefs = await SharedPreferences.getInstance();
@@ -101,7 +101,7 @@ class ArticleArchivesState extends State<ArticleArchives> {
           children: <Widget>[
             Align(
               alignment: Alignment.topCenter,
-              child: awesome_dev_flutter_calendar.Calendar(
+              child: dev_feed_flutter_calendar.Calendar(
                 isExpandable: true,
                 onDateSelected: (selectedDateTime) {
                   _currentDate = selectedDateTime;

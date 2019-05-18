@@ -23,7 +23,7 @@ import 'dart:async';
 import 'dart:convert';
 import 'dart:typed_data';
 
-import 'package:awesome_dev/api/api.dart';
+import 'package:dev_feed/api/api.dart';
 
 /*
     id: ID!

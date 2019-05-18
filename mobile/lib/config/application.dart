@@ -22,7 +22,7 @@
 import 'package:fluro/fluro.dart';
 import 'package:flutter_billing/flutter_billing.dart';
 
-const IN_APP_PRODUCT_ID = "awesome_dev_premium";
+const IN_APP_PRODUCT_ID = "dev_feed_premium";
 
 class Application {
   static Router router;

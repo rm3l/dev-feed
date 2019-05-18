@@ -62,7 +62,7 @@ Future<Null> showGalleryAboutDialog(BuildContext context) async {
   showAboutDialog(
     context: context,
     applicationVersion: packageInfo.version,
-    applicationIcon: Image.asset("assets/icons/awesome_dev.png",
+    applicationIcon: Image.asset("assets/icons/dev_feed.png",
         fit: BoxFit.scaleDown, width: 90.0),
     applicationLegalese: '© 2018 Armel S.',
     children: <Widget>[
@@ -74,7 +74,7 @@ Future<Null> showGalleryAboutDialog(BuildContext context) async {
               TextSpan(
                   style: aboutTextStyle,
                   text:
-                      'Awesome Dev allows you to keep up with the top engineering '
+                      'Dev Feed allows you to keep up with the top engineering '
                       'content from companies all over the world!'
 //                      '\nContent carefully handpicked by AI and a network of globally distributed nerds!'
                       '\nAvailable on '

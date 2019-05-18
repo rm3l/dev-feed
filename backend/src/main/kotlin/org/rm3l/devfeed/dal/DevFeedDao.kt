@@ -19,7 +19,7 @@
 //LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 //OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 //SOFTWARE.
-package org.rm3l.awesomedev.dal
+package org.rm3l.devfeed.dal
 
 import com.fasterxml.jackson.databind.ObjectMapper
 import org.jetbrains.exposed.sql.*
@@ -27,11 +27,11 @@ import org.jetbrains.exposed.sql.SchemaUtils.createMissingTablesAndColumns
 import org.jetbrains.exposed.sql.SqlExpressionBuilder.between
 import org.jetbrains.exposed.sql.SqlExpressionBuilder.like
 import org.jetbrains.exposed.sql.transactions.transaction
-import org.rm3l.awesomedev.crawlers.Article
-import org.rm3l.awesomedev.crawlers.ArticleParsed
-import org.rm3l.awesomedev.crawlers.Screenshot
-import org.rm3l.awesomedev.graphql.ArticleFilter
-import org.rm3l.awesomedev.utils.asSupportedTimestamp
+import org.rm3l.devfeed.crawlers.Article
+import org.rm3l.devfeed.crawlers.ArticleParsed
+import org.rm3l.devfeed.crawlers.Screenshot
+import org.rm3l.devfeed.graphql.ArticleFilter
+import org.rm3l.devfeed.utils.asSupportedTimestamp
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.http.converter.json.Jackson2ObjectMapperBuilder
@@ -78,7 +78,7 @@ object ArticlesParsed : Table(name = "articles_parsed") {
 const val DEFAULT_OFFSET = 0
 
 @Component
-class AwesomeDevDao {
+class DevFeedDao {
 
     @Value("\${datasource.url}")
     private lateinit var datasourceUrl: String
@@ -239,7 +239,8 @@ class AwesomeDevDao {
                                     val article = Article(id = articleResultRow[Articles.id].toLong(),
                                             title = articleResultRow[Articles.title],
                                             url = articleResultRow[Articles.link],
-                                            domain = articleResultRow[Articles.hostname] ?: URL(articleResultRow[Articles.link]).host,
+                                            domain = articleResultRow[Articles.hostname]
+                                                    ?: URL(articleResultRow[Articles.link]).host,
                                             timestamp = articleResultRow[Articles.timestamp],
                                             screenshot = Screenshot(
                                                     data = articleResultRow[Articles.screenshotData],
@@ -247,7 +248,7 @@ class AwesomeDevDao {
                                                     width = articleResultRow[Articles.screenshotWidth],
                                                     height = articleResultRow[Articles.screenshotHeight]
                                             ),
-                                            parsed = ArticlesParsed.select { ArticlesParsed.url.eq(articleResultRow[Articles.link])}
+                                            parsed = ArticlesParsed.select { ArticlesParsed.url.eq(articleResultRow[Articles.link]) }
                                                     .map {
                                                         ArticleParsed(
                                                                 url = articleResultRow[Articles.link],
@@ -286,17 +287,18 @@ class AwesomeDevDao {
                     .select { Articles.screenshotData.isNull().or(Articles.screenshotData eq "") }
                     .map { articleResultRow ->
                         Article(id = articleResultRow[Articles.id].toLong(),
-                            title = articleResultRow[Articles.title],
-                            url = articleResultRow[Articles.link],
-                            domain = articleResultRow[Articles.hostname] ?: URL(articleResultRow[Articles.link]).host,
-                            timestamp = articleResultRow[Articles.timestamp],
-                            screenshot = Screenshot(
-                                    data = articleResultRow[Articles.screenshotData],
-                                    mimeType = articleResultRow[Articles.screenshotMimeType],
-                                    width = articleResultRow[Articles.screenshotWidth],
-                                    height = articleResultRow[Articles.screenshotHeight]
-                            ),
-                                parsed = ArticlesParsed.select { ArticlesParsed.url.eq(articleResultRow[Articles.link])}
+                                title = articleResultRow[Articles.title],
+                                url = articleResultRow[Articles.link],
+                                domain = articleResultRow[Articles.hostname]
+                                        ?: URL(articleResultRow[Articles.link]).host,
+                                timestamp = articleResultRow[Articles.timestamp],
+                                screenshot = Screenshot(
+                                        data = articleResultRow[Articles.screenshotData],
+                                        mimeType = articleResultRow[Articles.screenshotMimeType],
+                                        width = articleResultRow[Articles.screenshotWidth],
+                                        height = articleResultRow[Articles.screenshotHeight]
+                                ),
+                                parsed = ArticlesParsed.select { ArticlesParsed.url.eq(articleResultRow[Articles.link]) }
                                         .map {
                                             ArticleParsed(
                                                     url = articleResultRow[Articles.link],
@@ -309,7 +311,8 @@ class AwesomeDevDao {
                                                     //TODO Fix videos and keywords
 //                                                        videos = objectMapper.readValue(it[ArticlesParsed.videos]?:"", ArrayList::class.java)
                                             )
-                                        }.firstOrNull()) }
+                                        }.firstOrNull())
+                    }
                     .toSet())
         }
         return result.toList()
@@ -346,7 +349,8 @@ class AwesomeDevDao {
                         val article = Article(id = articleResultRow[Articles.id].toLong(),
                                 title = articleResultRow[Articles.title],
                                 url = articleResultRow[Articles.link],
-                                domain = articleResultRow[Articles.hostname] ?: URL(articleResultRow[Articles.link]).host,
+                                domain = articleResultRow[Articles.hostname]
+                                        ?: URL(articleResultRow[Articles.link]).host,
                                 timestamp = articleResultRow[Articles.timestamp],
                                 screenshot = Screenshot(
                                         data = articleResultRow[Articles.screenshotData],
@@ -354,7 +358,7 @@ class AwesomeDevDao {
                                         width = articleResultRow[Articles.screenshotWidth],
                                         height = articleResultRow[Articles.screenshotHeight]
                                 ),
-                                parsed = ArticlesParsed.select { ArticlesParsed.url.eq(articleResultRow[Articles.link])}
+                                parsed = ArticlesParsed.select { ArticlesParsed.url.eq(articleResultRow[Articles.link]) }
                                         .map {
                                             ArticleParsed(
                                                     url = articleResultRow[Articles.link],
@@ -390,7 +394,7 @@ class AwesomeDevDao {
         transaction {
             val query = Articles.slice(Articles.timestamp).selectAll().orderBy(Articles.timestamp, isAsc = false)
                     .withDistinct()
-            limit?.let { query.limit(it, offset?:DEFAULT_OFFSET) }
+            limit?.let { query.limit(it, offset?: DEFAULT_OFFSET) }
             result.addAll(query.map { it[Articles.timestamp] }.toSet())
         }
         return result.toSet()
@@ -405,14 +409,15 @@ class AwesomeDevDao {
                     .firstOrNull()
                     ?.let {
                         val query = Articles.select { Articles.timestamp.eq(it) }
-                        limit?.let { query.limit(it, offset?:DEFAULT_OFFSET) }
+                        limit?.let { query.limit(it, offset?: DEFAULT_OFFSET) }
                         query.orderBy(Articles.timestamp, isAsc = false)
                         result.addAll(query
                                 .map {articleResultRow ->
                                     val article = Article(id = articleResultRow[Articles.id].toLong(),
                                             title = articleResultRow[Articles.title],
                                             url = articleResultRow[Articles.link],
-                                            domain = articleResultRow[Articles.hostname] ?: URL(articleResultRow[Articles.link]).host,
+                                            domain = articleResultRow[Articles.hostname]
+                                                    ?: URL(articleResultRow[Articles.link]).host,
                                             timestamp = articleResultRow[Articles.timestamp],
                                             screenshot = Screenshot(
                                                     data = articleResultRow[Articles.screenshotData],
@@ -420,7 +425,7 @@ class AwesomeDevDao {
                                                     width = articleResultRow[Articles.screenshotWidth],
                                                     height = articleResultRow[Articles.screenshotHeight]
                                             ),
-                                            parsed = ArticlesParsed.select { ArticlesParsed.url.eq(articleResultRow[Articles.link])}
+                                            parsed = ArticlesParsed.select { ArticlesParsed.url.eq(articleResultRow[Articles.link]) }
                                                     .map {
                                                         ArticleParsed(
                                                                 url = articleResultRow[Articles.link],
@@ -456,13 +461,13 @@ class AwesomeDevDao {
             val tagNameSlice = Tags.slice(Tags.name)
             val query = if (search != null && search.isNotEmpty()) {
                 tagNameSlice.select {
-                    OrOpMultiple (search.map { Tags.name.like("%$it%") }.toList())
+                    OrOpMultiple(search.map { Tags.name.like("%$it%") }.toList())
                 }
             } else {
                 tagNameSlice.selectAll()
             }
             query.withDistinct()
-            limit?.let { query.limit(it, offset?:DEFAULT_OFFSET) }
+            limit?.let { query.limit(it, offset?: DEFAULT_OFFSET) }
             result.addAll(query.map { it[Tags.name] }.toSet())
         }
         return result.toSet()

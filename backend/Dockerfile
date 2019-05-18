@@ -23,17 +23,17 @@
 # Build
 FROM oracle/graalvm-ce:1.0.0-rc16
 
-WORKDIR /awesome_dev_backend
+WORKDIR /dev-feed-backend
 
-COPY gradle /awesome_dev_backend/gradle
-COPY src /awesome_dev_backend/src
-COPY build.gradle /awesome_dev_backend/build.gradle
-COPY gradlew /awesome_dev_backend/gradlew
-COPY gradlew.bat /awesome_dev_backend/gradlew.bat
+COPY gradle /dev-feed-backend/gradle
+COPY src /dev-feed-backend/src
+COPY build.gradle /dev-feed-backend/build.gradle
+COPY gradlew /dev-feed-backend/gradlew
+COPY gradlew.bat /dev-feed-backend/gradlew.bat
 
 RUN ./gradlew build --stacktrace
 
-RUN cp -r /awesome_dev_backend/build/libs/awesome_dev_backend-0.1.0-SNAPSHOT.jar /app.jar
+RUN cp -r /dev-feed-backend/build/libs/dev-feed-backend-0.1.0-SNAPSHOT.jar /app.jar
 
 # /graphql and /graphiql endpoints
 EXPOSE 8080

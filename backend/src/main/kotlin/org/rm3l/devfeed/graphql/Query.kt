@@ -19,20 +19,26 @@
 //LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 //OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 //SOFTWARE.
-package org.rm3l.awesomedev.graphql
+package org.rm3l.devfeed.graphql
 
-data class ArticleFilter(
-        val from: String? = null,
-        val to: String? = null,
-        val search: String? = null,
-        val tags: List<String>? = null,
-        val titles: List<String>? = null,
-        val urls: List<String>? = null
-)
+import com.coxautodev.graphql.tools.GraphQLQueryResolver
+import org.rm3l.devfeed.dal.DevFeedDao
+import org.springframework.stereotype.Component
 
-data class ArticleInput(
-       val date: String,
-       val description: String,
-       val url: String,
-       val tags: List<String>? = null
-)
+@Suppress("unused")
+@Component
+class Query(private val dao: DevFeedDao): GraphQLQueryResolver {
+
+    fun articleDates(limit: Int?, offset: Int?) = dao.getArticlesDates(limit, offset)
+
+    fun articles(limit: Int?, offset: Int?, filter: ArticleFilter?) = dao.getArticles(limit, offset, filter)
+
+    fun recentArticles(limit: Int?, offset: Int?) = dao.getRecentArticles(limit, offset)
+
+    fun allButRecentArticles(limit: Int?, offset: Int?, filter: ArticleFilter?) =
+            dao.allButRecentArticles(limit, offset, filter)
+
+    fun tags(limit: Int?, offset: Int?, search: List<String>?) = dao.getTags(limit, offset, search)
+
+    fun articlesWithNoScreenshots() = dao.getArticlesWithNoScreenshots()
+}
