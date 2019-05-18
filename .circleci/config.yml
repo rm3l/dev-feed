@@ -57,11 +57,11 @@ jobs:
           command: flutter -v build apk
       
       - store_artifacts:
-          path: android/build/app/outputs/apk
+          path: build/app/outputs/apk
           destination: outputs
 
       - store_artifacts:
-          path: android/build/reports
+          path: build/reports
           destination: reports
 
   build_ios:
@@ -85,11 +85,11 @@ jobs:
           command: flutter -v build ios || echo "IOS Builds not supported yet"
       
       - store_artifacts:
-          path: ios/build/app/outputs
+          path: build/app/outputs/ios
           destination: outputs
 
       - store_artifacts:
-          path: ios/build/reports
+          path: build/reports
           destination: reports
 
   test_mobile:
@@ -117,10 +117,10 @@ jobs:
           command: flutter test
 
       - store_test_results:
-          path: android/build/test-results
+          path: build/test-results
 
       - store_test_results:
-          path: ios/build/test-results
+          path: build/test-results
 
 workflows:
   version: 2
