@@ -84,5 +84,81 @@ jobs:
           path: android/build/reports
           destination: reports
 
-      - store_test_results:
+  build_ios:
+    working_directory: ~/awesome-dev-src/mobile
+
+    docker:
+      - image: cirrusci/flutter
+
+    steps:
+      - checkout:
+          path: ~/awesome-dev-src
+
+      - run:
+          name: Output relevant env. variables
+          command: echo "CIRCLE_PULL_REQUEST=$CIRCLE_PULL_REQUEST" && 
+            echo "CIRCLE_BUILD_NUM=$CIRCLE_BUILD_NUM" && 
+            echo "CIRCLE_SHA1=$CIRCLE_SHA1"
+      
+      - run:
+          name: flutter doctor
+          command: flutter doctor
+
+      - run:
+          name: Run Tests
+          command: flutter test
+      
+      - run:
+          name: Build APK
+          command: flutter -v build ios || echo "IOS Builds not supported yet"
+      
+      - store_artifacts:
+          path: ios/build/app/outputs
+          destination: outputs
+
+      - store_artifacts:
+          path: ios/build/reports
+          destination: reports
+
+  test_mobile:
+    working_directory: ~/awesome-dev-src/mobile
+
+    docker:
+      - image: cirrusci/flutter
+
+    steps:
+      - checkout:
+          path: ~/awesome-dev-src
+
+      - run:
+          name: Output relevant env. variables
+          command: echo "CIRCLE_PULL_REQUEST=$CIRCLE_PULL_REQUEST" && 
+            echo "CIRCLE_BUILD_NUM=$CIRCLE_BUILD_NUM" && 
+            echo "CIRCLE_SHA1=$CIRCLE_SHA1"
+      
+      - run:
+          name: flutter doctor
+          command: flutter doctor
+
+      - run:
+          name: Run Tests
+          command: flutter test
+
+      - store_test_results_android:
           path: android/build/test-results
+
+      - store_test_results_ios:
+          path: ios/build/test-results
+
+workflows:
+  version: 2
+
+  build_and_test_backend:
+    jobs:
+      - build_backend
+
+  build_and_test_mobile_apps:
+    jobs:
+      - build_android
+      - build_ios
+      - test_mobile
