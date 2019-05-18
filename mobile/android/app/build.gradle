@@ -24,7 +24,7 @@ def getPlayStoreConfig = {
 }
 
 def getReleaseSigningConfig = {
-    if (Boolean.getBoolean(System.env.CI)) {
+    if ("true".equalsIgnoreCase(System.getenv('CI'))) {
         return getDebugSigningConfig()
     }
     final propsFile = new File(homePath + "/.droid/awesome_dev.keystore.properties")
