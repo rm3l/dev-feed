@@ -19,37 +19,13 @@
 //LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 //OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 //SOFTWARE.
-package org.rm3l.devfeed.graphql
+package org.rm3l.devfeed.crawlers
 
-import com.coxautodev.graphql.tools.GraphQLMutationResolver
 import org.rm3l.devfeed.contract.Article
-import org.rm3l.devfeed.dal.DevFeedDao
-import org.springframework.stereotype.Component
+import java.lang.Exception
 
-@Component
-class Mutation(private val dao: DevFeedDao): GraphQLMutationResolver {
+interface DevFeedCrawler {
 
-    fun addArticle(input: ArticleInput): Article {
-        TODO("Not implemented yet")
-    }
-
-    fun deleteArticle(id: Long): Boolean {
-        TODO("Not implemented yet")
-    }
-
-    fun updateArticle(id: Long, input: ArticleInput): Article {
-        TODO("Not implemented yet")
-    }
-
-    fun addTag(input: String): String {
-        TODO("Not implemented yet")
-    }
-
-    fun tagArticle(articleId: Long, tags: List<String>): Article {
-        TODO("Not implemented yet")
-    }
-
-    fun untagArticle(articleId: Long, tagsToRemove: List<String>): Article {
-        TODO("Not implemented yet")
-    }
+    @Throws(Exception::class)
+    fun fetchArticles(): Collection<Article>
 }

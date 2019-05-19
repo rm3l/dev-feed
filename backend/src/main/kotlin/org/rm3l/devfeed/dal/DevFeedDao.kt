@@ -27,9 +27,9 @@ import org.jetbrains.exposed.sql.SchemaUtils.createMissingTablesAndColumns
 import org.jetbrains.exposed.sql.SqlExpressionBuilder.between
 import org.jetbrains.exposed.sql.SqlExpressionBuilder.like
 import org.jetbrains.exposed.sql.transactions.transaction
-import org.rm3l.devfeed.crawlers.Article
-import org.rm3l.devfeed.crawlers.ArticleParsed
-import org.rm3l.devfeed.crawlers.Screenshot
+import org.rm3l.devfeed.contract.Article
+import org.rm3l.devfeed.contract.ArticleParsed
+import org.rm3l.devfeed.contract.Screenshot
 import org.rm3l.devfeed.graphql.ArticleFilter
 import org.rm3l.devfeed.utils.asSupportedTimestamp
 import org.springframework.beans.factory.annotation.Autowired
@@ -37,7 +37,6 @@ import org.springframework.beans.factory.annotation.Value
 import org.springframework.http.converter.json.Jackson2ObjectMapperBuilder
 import org.springframework.stereotype.Component
 import java.net.URL
-import java.util.ArrayList
 import javax.annotation.PostConstruct
 
 object Articles : Table(name = "articles") {

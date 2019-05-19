@@ -19,37 +19,41 @@
 //LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 //OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 //SOFTWARE.
-package org.rm3l.devfeed.graphql
+package org.rm3l.devfeed.crawlers
 
-import com.coxautodev.graphql.tools.GraphQLMutationResolver
 import org.rm3l.devfeed.contract.Article
 import org.rm3l.devfeed.dal.DevFeedDao
-import org.springframework.stereotype.Component
+import org.slf4j.LoggerFactory
+import java.util.function.Supplier
 
-@Component
-class Mutation(private val dao: DevFeedDao): GraphQLMutationResolver {
+class ArticleUpdater(private val dao: DevFeedDao,
+                     private val article: Article,
+                     private val updater: Boolean = false):
+        Supplier<Unit> {
 
-    fun addArticle(input: ArticleInput): Article {
-        TODO("Not implemented yet")
+    companion object {
+        @JvmStatic
+        private val logger = LoggerFactory.getLogger(ArticleUpdater::class.java)
     }
 
-    fun deleteArticle(id: Long): Boolean {
-        TODO("Not implemented yet")
-    }
+    override fun get() {
+        if (logger.isDebugEnabled) {
+            logger.debug(">>> Handling article crawled: $article")
+        }
 
-    fun updateArticle(id: Long, input: ArticleInput): Article {
-        TODO("Not implemented yet")
-    }
-
-    fun addTag(input: String): String {
-        TODO("Not implemented yet")
-    }
-
-    fun tagArticle(articleId: Long, tags: List<String>): Article {
-        TODO("Not implemented yet")
-    }
-
-    fun untagArticle(articleId: Long, tagsToRemove: List<String>): Article {
-        TODO("Not implemented yet")
+        if (updater) {
+            dao.updateArticleScreenshotData(article)
+        } else {
+            //Check if (title, url) pair already exist in the DB
+            val existArticlesByTitleAndUrl =
+                    dao.existArticlesByTitleAndUrl(article.title, article.url)
+            if (logger.isDebugEnabled) {
+                logger.debug("$existArticlesByTitleAndUrl = " +
+                        "existArticlesByTitleAndUrl(${article.title}, ${article.url})")
+            }
+            if (!existArticlesByTitleAndUrl) {
+                dao.insertArticle(article)
+            }
+        }
     }
 }
