@@ -24,7 +24,7 @@ import 'dart:io';
 import 'package:dev_feed/config/application.dart';
 import 'package:dev_feed/config/routes.dart';
 import 'package:dev_feed/env.dart';
-import 'package:dev_feed/environments/development.dart';
+import 'package:dev_feed/environments/heroku.dart';
 import 'package:dev_feed/ui/about.dart';
 import 'package:dev_feed/ui/archives.dart';
 import 'package:dev_feed/ui/favorites.dart';
@@ -44,7 +44,7 @@ const contactEmailAddress = "apps+dev_feed@rm3l.org";
 
 enum AppBarMenuItem { ABOUT, SEND_FEEDBACK, RATING, GO_PREMIUM }
 
-void main() => Development();
+void main() => Heroku();
 
 class DevFeedApp extends StatelessWidget {
   final Env env;
