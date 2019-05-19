@@ -24,8 +24,7 @@ import 'dart:async';
 import 'package:dev_feed/api/articles.dart';
 import 'package:dev_feed/ui/widgets/article_widget.dart';
 import 'package:flutter/material.dart';
-import 'package:dev_feed/ext/flutter_calendar.dart'
-    as dev_feed_flutter_calendar;
+import 'package:flutter_calendar/flutter_calendar.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 enum IndicatorType { overscroll, refresh }
@@ -101,7 +100,7 @@ class ArticleArchivesState extends State<ArticleArchives> {
           children: <Widget>[
             Align(
               alignment: Alignment.topCenter,
-              child: dev_feed_flutter_calendar.Calendar(
+              child: Calendar(
                 isExpandable: true,
                 onDateSelected: (selectedDateTime) {
                   _currentDate = selectedDateTime;
