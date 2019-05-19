@@ -1,4 +1,4 @@
-package com.example.awesomedev;
+package org.rm3l.devfeed;
 
 import android.os.Bundle;
 
