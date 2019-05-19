@@ -56,19 +56,19 @@ Future<Map<String, dynamic>> issueGraphQLQuery(String query,
 
   final String requestBody = json.encode(jsonBody);
   HttpClientRequest request = await _httpClient.postUrl(_apiEndpoint)
-    ..headers.add(HttpHeaders.ACCEPT, ContentType.JSON)
-    ..headers.add(HttpHeaders.USER_AGENT, 'org.rm3l.discoverdev.io')
-    ..headers.contentType = ContentType.JSON
+    ..headers.add(HttpHeaders.acceptHeader, ContentType.json)
+    ..headers.add(HttpHeaders.userAgentHeader, 'org.rm3l.dev_feed')
+    ..headers.contentType = ContentType.json
     ..headers.contentLength = requestBody.length
     ..headers.chunkedTransferEncoding = false;
 
   request.write(requestBody);
   HttpClientResponse response = await request.close();
-  if (response.headers.contentType.toString() != ContentType.JSON.toString()) {
+  if (response.headers.contentType.toString() != ContentType.json.toString()) {
     throw UnsupportedError('Server returned an unsupported content type: '
         '${response.headers.contentType} from ${request.uri}');
   }
-  if (response.statusCode != HttpStatus.OK) {
+  if (response.statusCode != HttpStatus.ok) {
     throw StateError(
         'Server responded with error: ${response.statusCode} ${response.reasonPhrase}');
   }
