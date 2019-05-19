@@ -20,14 +20,7 @@
 //OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 //SOFTWARE.
 import 'package:fluro/fluro.dart';
-import 'package:flutter_billing/flutter_billing.dart';
-
-const IN_APP_PRODUCT_ID = "dev_feed_premium";
 
 class Application {
   static Router router;
-
-  static final Billing billing = new Billing(onError: (exception) {
-    print("Error: ${exception.toString()}");
-  });
 }

@@ -47,7 +47,6 @@ dependencies:
   fluro: "^1.4.0"
   pigment: "^1.0.3"
 
-  flutter_billing: "^0.3.0"
   app_review: "^1.0.0"
 
 dev_dependencies:

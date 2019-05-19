@@ -42,7 +42,7 @@ import 'package:app_review/app_review.dart';
 
 const contactEmailAddress = "apps+dev_feed@rm3l.org";
 
-enum AppBarMenuItem { ABOUT, SEND_FEEDBACK, RATING, GO_PREMIUM }
+enum AppBarMenuItem { ABOUT, SEND_FEEDBACK, RATING }
 
 void main() => Heroku();
 
@@ -89,8 +89,6 @@ class _DevFeedState extends State<DevFeed> with TickerProviderStateMixin {
 
   String appID = "";
   String output = "";
-
-  bool inAppProductPurchased = false;
 
   @override
   void initState() {
@@ -216,18 +214,6 @@ class _DevFeedState extends State<DevFeed> with TickerProviderStateMixin {
       const PopupMenuItem<AppBarMenuItem>(
           value: AppBarMenuItem.RATING, child: const Text('Rate this app!'))
     ]);
-    //TODO Handle in-app billing in a future release
-//    if (!inAppProductPurchased) {
-//      menuEntries.add(const PopupMenuItem<AppBarMenuItem>(
-//          value: AppBarMenuItem.GO_PREMIUM, child: const Text('Go Premium!')));
-//    }
-//    Application.billing.isPurchased(IN_APP_PRODUCT_ID).then((purchased) {
-//      if (inAppProductPurchased != purchased) {
-//        setState(() {
-//          inAppProductPurchased = purchased;
-//        });
-//      }
-//    });
 
     return Scaffold(
       key: _scaffoldKey,
@@ -246,24 +232,6 @@ class _DevFeedState extends State<DevFeed> with TickerProviderStateMixin {
                       Scaffold.of(context).showSnackBar(SnackBar(
                         content: Text("Error: ${onError.toString()}"),
                       ));
-                    });
-                  }
-                  break;
-                case AppBarMenuItem.GO_PREMIUM:
-                  {
-                    Application.billing
-                        .purchase(IN_APP_PRODUCT_ID)
-                        .then((purchased) {
-                      if (purchased) {
-                        setState(() {
-                          inAppProductPurchased = true;
-                        });
-                      } else {
-                        Scaffold.of(context).showSnackBar(SnackBar(
-                          content:
-                              Text("An error ocurred. Please try again later"),
-                        ));
-                      }
                     });
                   }
                   break;
