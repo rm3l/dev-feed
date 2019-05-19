@@ -39,6 +39,6 @@ RUN cp -r /dev-feed-backend/build/libs/dev-feed-backend-0.1.0-SNAPSHOT.jar /app.
 EXPOSE 8080
 
 # /management Actuator endpoints
-EXPOSE 8181
+EXPOSE 8081
 
 ENTRYPOINT ["java", "-jar", "/app.jar"]
