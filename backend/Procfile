@@ -1,1 +1,1 @@
-web: java -Dserver.port=$PORT -Dmanagement.port=$PORT -Dmanagement.security.enabled=true $JAVA_OPTS -jar build/libs/backend-0.1.0-SNAPSHOT.jar
+web: java -Dserver.port=$PORT -Dmanagement.port=$PORT -Dmanagement.security.enabled=true $JAVA_OPTS -jar build/libs/dev-feed-backend-0.1.0-SNAPSHOT.jar
