@@ -1,5 +1,16 @@
 # Dev Feed
 
+[![License](https://img.shields.io/badge/license-MIT-green.svg?style=flat)](https://github.com/rm3l/dev-feed/blob/master/LICENSE) 
+
+[![CircleCI](https://circleci.com/gh/rm3l/dev-feed.svg?style=svg)](https://circleci.com/gh/rm3l/dev-feed)
+
+[![Heroku](http://heroku-badge.herokuapp.com/?app=dev-feed-api&root=graphiql&style=flat&svg=1)](https://dev-feed-api.herokuapp.com/graphiql)
+
+[![Docker Automated build](https://img.shields.io/docker/automated/rm3l/dev-feed.svg)](https://hub.docker.com/r/rm3l/dev-feed) 
+[![Docker Build Status](https://img.shields.io/docker/build/rm3l/dev-feed.svg)](https://hub.docker.com/r/rm3l/dev-feed) 
+[![Docker Stars](https://img.shields.io/docker/stars/rm3l/dev-feed.svg)](https://hub.docker.com/r/rm3l/dev-feed) 
+[![Docker Pulls](https://img.shields.io/docker/pulls/rm3l/dev-feed.svg)](https://hub.docker.com/r/rm3l/dev-feed)
+
 TODO Add more description here.
 
 ## Contribution Guidelines
