@@ -34,7 +34,7 @@ import java.util.concurrent.ExecutionException
 import java.util.concurrent.ExecutorService
 import java.util.function.Supplier
 
-const val BACKEND_BASE_URL = "http://www.discoverdev.io"
+const val BACKEND_BASE_URL = "https://www.discoverdev.io"
 const val BACKEND_ARCHIVE_URL = "$BACKEND_BASE_URL/archive"
 const val USER_AGENT = "org.rm3l.devfeed"
 
@@ -63,6 +63,7 @@ class DiscoverDevIoCrawler: DevFeedCrawler {
                                 .map { it.attr("href")}
                                 .map { it.replaceFirst("/archive/", "", ignoreCase = true) }
                                 .map {
+                                    logger.debug("Crawling page: $it ...")
                                     CompletableFuture.supplyAsync(
                                             DiscoverDevIoCrawlerArchiveFetcherFutureSupplier(it),
                                             crawlersExecutorService) }
@@ -72,10 +73,8 @@ class DiscoverDevIoCrawler: DevFeedCrawler {
             logger.info("<<< Done crawling website: $BACKEND_ARCHIVE_URL")
             return articles
         } catch (e: ExecutionException) {
-            if (logger.isDebugEnabled) {
-                logger.debug("Crawling execution could not complete successfully - " +
-                        "will try again later", e)
-            }
+            logger.warn("Crawling execution could not complete successfully - " +
+                    "will try again later", e)
             throw e
         }
     }
@@ -113,9 +112,7 @@ private class DiscoverDevIoCrawlerArchiveFetcherFutureSupplier(private val date:
                         articlesList
                     }
         } catch (e: Exception) {
-           if (logger.isDebugEnabled) {
-             logger.debug("Error while fetching articles for $date: ${e.message}", e)
-           }
+            logger.warn("Error while fetching articles for $date: ${e.message}", e)
 	        return emptyList()
         }
     }
