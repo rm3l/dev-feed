@@ -53,7 +53,7 @@ class DevFeedFetcherService(private val dao: DevFeedDao,
                         .map { crawler -> CompletableFuture.supplyAsync {
                             logger.debug("Crawling from $crawler...")
                             val articles = crawler.fetchArticles()
-                            logger.debug("... Done crawling from $crawler !")
+                            logger.debug("... Done crawling from $crawler : ${articles.size} articles!")
                             articles
                         } }
                         .flatMap { it.join() }
@@ -72,10 +72,8 @@ class DevFeedFetcherService(private val dao: DevFeedDao,
                 CompletableFuture.allOf(*futures).get() //Wait for all of them to finish
             }
         } catch (e: Exception) {
-            if (logger.isDebugEnabled) {
-                logger.debug("Crawling remote websites could not complete successfully - " +
-                        "will try again later", e)
-            }
+            logger.warn("Crawling remote websites could not complete successfully - " +
+                    "will try again later", e)
         }
     }
 
@@ -104,10 +102,8 @@ class DevFeedFetcherService(private val dao: DevFeedDao,
                     "${dao.getArticlesWithNoScreenshots().size} articles with no screenshots " +
                     "=> will check again in a near future.")
         } catch (e: ExecutionException) {
-            if (logger.isDebugEnabled) {
-                logger.debug("Updating missing screenshots could not complete successfully - " +
-                        "will try again later", e)
-            }
+            logger.warn("Updating missing screenshots could not complete successfully - " +
+                    "will try again later", e)
         }
     }
 }

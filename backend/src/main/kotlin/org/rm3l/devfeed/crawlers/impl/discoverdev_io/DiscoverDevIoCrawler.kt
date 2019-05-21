@@ -63,7 +63,7 @@ class DiscoverDevIoCrawler: DevFeedCrawler {
                                 .map { it.attr("href")}
                                 .map { it.replaceFirst("/archive/", "", ignoreCase = true) }
                                 .map {
-                                    logger.debug("Crawling page: $it ...")
+                                    logger.trace("Crawling page: $it ...")
                                     CompletableFuture.supplyAsync(
                                             DiscoverDevIoCrawlerArchiveFetcherFutureSupplier(it),
                                             crawlersExecutorService) }
@@ -107,7 +107,7 @@ private class DiscoverDevIoCrawlerArchiveFetcherFutureSupplier(private val date:
                                                     .toSet())
                                 }.toList()
                         if (logger.isDebugEnabled) {
-                            logger.debug("Fetched ${articlesList.size} articles for $date")
+                            logger.trace("Fetched ${articlesList.size} articles for $date")
                         }
                         articlesList
                     }
