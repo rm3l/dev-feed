@@ -53,7 +53,7 @@ dev_dependencies:
   flutter_test:
     sdk: flutter
 
-  flutter_stetho: "0.2.2"
+  flutter_stetho: "0.5.0"
   flutter_launcher_icons: "^0.7.0"
 
 # https://pub.dartlang.org/packages/flutter_launcher_icons
