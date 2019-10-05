@@ -21,7 +21,7 @@
 #SOFTWARE.
 
 # Build
-FROM oracle/graalvm-ce:1.0.0-rc16
+FROM adoptopenjdk:11-jdk-openj9 AS builder
 
 WORKDIR /dev-feed-backend
 
@@ -31,9 +31,13 @@ COPY build.gradle /dev-feed-backend/build.gradle
 COPY gradlew /dev-feed-backend/gradlew
 COPY gradlew.bat /dev-feed-backend/gradlew.bat
 
+ENV GRADLE_OPTS="-Dorg.gradle.daemon=false"
+
 RUN ./gradlew build --stacktrace
 
-RUN cp -r /dev-feed-backend/build/libs/dev-feed-backend-0.1.0-SNAPSHOT.jar /app.jar
+FROM adoptopenjdk:11-jre-openj9
+
+COPY --from=builder /dev-feed-backend/build/libs/dev-feed-backend-0.2.0-SNAPSHOT.jar /app.jar
 
 # /graphql and /graphiql endpoints
 EXPOSE 8080
