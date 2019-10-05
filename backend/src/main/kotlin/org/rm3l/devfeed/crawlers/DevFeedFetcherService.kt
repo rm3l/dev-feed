@@ -42,7 +42,7 @@ class DevFeedFetcherService(private val dao: DevFeedDao,
             }.exceptionally { t ->
                 logger.info(t.message, t)
                 null
-            }.join()
+            }
         } catch (e: Exception) {
             logger.warn("init() could not complete successfully - " +
                     "will try again later", e)
