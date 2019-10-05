@@ -4,16 +4,19 @@ import org.rm3l.devfeed.dal.DevFeedDao
 import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.beans.factory.annotation.Qualifier
+import org.springframework.boot.actuate.health.Health
+import org.springframework.boot.actuate.health.HealthIndicator
 import org.springframework.scheduling.annotation.Scheduled
 import org.springframework.stereotype.Service
 import java.util.concurrent.CompletableFuture
 import java.util.concurrent.ExecutionException
 import java.util.concurrent.ExecutorService
+import java.util.concurrent.atomic.AtomicBoolean
 import javax.annotation.PostConstruct
 
 @Service
 class DevFeedFetcherService(private val dao: DevFeedDao,
-                            private val crawlers: Collection<DevFeedCrawler>? = null) {
+                            private val crawlers: Collection<DevFeedCrawler>? = null): HealthIndicator {
 
     companion object {
         @JvmStatic
@@ -32,6 +35,8 @@ class DevFeedFetcherService(private val dao: DevFeedDao,
     @Qualifier("articleExtractorExecutorService")
     private lateinit var articleExtractorExecutorService: ExecutorService
 
+    private val initDone = AtomicBoolean(false)
+
     @PostConstruct
     fun init() {
         logger.info("ApplicationReady => scheduling crawling tasks...")
@@ -39,6 +44,7 @@ class DevFeedFetcherService(private val dao: DevFeedDao,
             CompletableFuture.runAsync {
                 triggerRemoteWebsiteCrawling()
                 triggerScreenshotUpdater()
+                initDone.set(true)
             }.exceptionally { t ->
                 logger.info(t.message, t)
                 null
@@ -50,7 +56,7 @@ class DevFeedFetcherService(private val dao: DevFeedDao,
     }
 
     @Scheduled(cron = "\${crawlers.task.cron-expression}")
-    fun triggerRemoteWebsiteCrawling() {
+    @Synchronized fun triggerRemoteWebsiteCrawling() {
         try {
             if (!crawlers.isNullOrEmpty()) {
                 val futures = crawlers
@@ -74,6 +80,7 @@ class DevFeedFetcherService(private val dao: DevFeedDao,
                                 ArticleUpdater(dao, it), crawlersExecutorService) }
                         .toTypedArray()
                 CompletableFuture.allOf(*futures).get() //Wait for all of them to finish
+                initDone.set(true)
             }
         } catch (e: Exception) {
             logger.warn("Crawling remote websites could not complete successfully - " +
@@ -82,7 +89,7 @@ class DevFeedFetcherService(private val dao: DevFeedDao,
     }
 
     @Scheduled(cron = "\${crawlers.screenshot-updater.task.cron-expression}")
-    fun triggerScreenshotUpdater() {
+    @Synchronized fun triggerScreenshotUpdater() {
         try {
             val articleIdsWithNoScreenshots = dao.getArticlesWithNoScreenshots()
             logger.info(">>> Inspecting (and trying to update) " +
@@ -101,6 +108,7 @@ class DevFeedFetcherService(private val dao: DevFeedDao,
                                 crawlersExecutorService)
                     }.toTypedArray()
             CompletableFuture.allOf(*futures).get() //Wait for all of them to finish
+            initDone.set(true)
             logger.info("<<< Done inspecting and updating ${articleIdsWithNoScreenshots.size} " +
                     "articles with no screenshots. Now, there remains " +
                     "${dao.getArticlesWithNoScreenshots().size} articles with no screenshots " +
@@ -110,4 +118,11 @@ class DevFeedFetcherService(private val dao: DevFeedDao,
                     "will try again later", e)
         }
     }
+
+    override fun health(): Health =
+            if (initDone.get()) {
+                Health.up().build()
+            } else {
+                Health.outOfService().build()
+            }
 }
