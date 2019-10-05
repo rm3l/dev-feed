@@ -2,14 +2,14 @@ version: 2.1
 
 jobs:
   build_backend:
-    working_directory: ~/awesome-dev-src/backend
+    working_directory: ~/dev-feed-src/backend
 
     docker:
-      - image: openjdk:8-jdk
+      - image: adoptopenjdk:11-jdk-openj9
 
     steps:
       - checkout:
-          path: ~/awesome-dev-src
+          path: ~/dev-feed-src
       
       - run:
           name: Output relevant env. variables
@@ -37,14 +37,14 @@ jobs:
 
 
   build_android:
-    working_directory: ~/awesome-dev-src/mobile
+    working_directory: ~/dev-feed-src/mobile
 
     docker:
-      - image: cirrusci/flutter
+      - image: cirrusci/flutter:stable
 
     steps:
       - checkout:
-          path: ~/awesome-dev-src
+          path: ~/dev-feed-src
 
       - run:
           name: Output relevant env. variables
@@ -54,7 +54,7 @@ jobs:
       
       - run:
           name: Build APK
-          command: flutter -v build apk
+          command: flutter build apk
       
       - store_artifacts:
           path: build/app/outputs/apk
@@ -65,14 +65,14 @@ jobs:
           destination: reports
 
   build_ios:
-    working_directory: ~/awesome-dev-src/mobile
+    working_directory: ~/dev-feed-src/mobile
 
     docker:
-      - image: cirrusci/flutter
+      - image: cirrusci/flutter:stable
 
     steps:
       - checkout:
-          path: ~/awesome-dev-src
+          path: ~/dev-feed-src
 
       - run:
           name: Output relevant env. variables
@@ -82,7 +82,7 @@ jobs:
 
       - run:
           name: Build IOS
-          command: flutter -v build ios || echo "IOS Builds not supported yet"
+          command: flutter build ios || echo "IOS Builds not supported yet"
       
       - store_artifacts:
           path: build/app/outputs/ios
@@ -93,14 +93,14 @@ jobs:
           destination: reports
 
   test_mobile:
-    working_directory: ~/awesome-dev-src/mobile
+    working_directory: ~/dev-feed-src/mobile
 
     docker:
-      - image: cirrusci/flutter
+      - image: cirrusci/flutter:stable
 
     steps:
       - checkout:
-          path: ~/awesome-dev-src
+          path: ~/dev-feed-src
 
       - run:
           name: Output relevant env. variables
