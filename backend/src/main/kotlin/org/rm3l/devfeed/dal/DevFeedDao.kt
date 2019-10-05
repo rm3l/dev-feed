@@ -175,7 +175,7 @@ class DevFeedDao {
                 articleTag
             }?.forEach { tagIdInserted ->
                 ArticlesTags.insert {
-                    it[articleId] = articleIdentifier!!
+                    it[articleId] = articleIdentifier
                     it[tagName] = tagIdInserted
                 }
             }
@@ -199,7 +199,7 @@ class DevFeedDao {
         transaction {
             Articles.slice(Articles.timestamp)
                     .selectAll()
-                    .orderBy(Articles.timestamp, isAsc = false)
+                    .orderBy(Articles.timestamp, order = SortOrder.DESC)
                     .withDistinct().limit(1)
                     .map { it[Articles.timestamp] }
                     .firstOrNull()
@@ -231,7 +231,7 @@ class DevFeedDao {
                         }
                         query = Articles.select(whereClause)
 //                      limit?.let { query.limit(it, offset?:DEFAULT_OFFSET) }
-                        query.orderBy(Articles.timestamp, isAsc = false)
+                        query.orderBy(Articles.timestamp, order = SortOrder.DESC)
 
                         val list = query
                                 .map {articleResultRow ->
@@ -341,7 +341,7 @@ class DevFeedDao {
             }
             query = if (whereClause != null) { Articles.select(whereClause) } else { Articles.selectAll() }
 //            limit?.let { query.limit(it, offset?:DEFAULT_OFFSET) }
-            query.orderBy(Articles.timestamp, isAsc = false)
+            query.orderBy(Articles.timestamp, order = SortOrder.DESC)
 
             val list = query
                     .map { articleResultRow ->
@@ -391,7 +391,8 @@ class DevFeedDao {
     fun getArticlesDates(limit: Int? = null, offset: Int? = null): Set<Long> {
         val result = mutableSetOf<Long>()
         transaction {
-            val query = Articles.slice(Articles.timestamp).selectAll().orderBy(Articles.timestamp, isAsc = false)
+            val query = Articles.slice(Articles.timestamp).selectAll()
+                    .orderBy(Articles.timestamp, order = SortOrder.DESC)
                     .withDistinct()
             limit?.let { query.limit(it, offset?: DEFAULT_OFFSET) }
             result.addAll(query.map { it[Articles.timestamp] }.toSet())
@@ -402,14 +403,16 @@ class DevFeedDao {
     fun getRecentArticles(limit: Int? = null, offset: Int? = null): Collection<Article> {
         val result = mutableListOf<Article>()
         transaction {
-            Articles.slice(Articles.timestamp).selectAll().orderBy(Articles.timestamp, isAsc = false).limit(1)
+            Articles.slice(Articles.timestamp).selectAll()
+                    .orderBy(Articles.timestamp, order = SortOrder.DESC)
+                    .limit(1)
                     .withDistinct()
                     .map { it[Articles.timestamp] }
                     .firstOrNull()
                     ?.let {
                         val query = Articles.select { Articles.timestamp.eq(it) }
                         limit?.let { query.limit(it, offset?: DEFAULT_OFFSET) }
-                        query.orderBy(Articles.timestamp, isAsc = false)
+                        query.orderBy(Articles.timestamp, order = SortOrder.DESC)
                         result.addAll(query
                                 .map {articleResultRow ->
                                     val article = Article(id = articleResultRow[Articles.id].toLong(),
