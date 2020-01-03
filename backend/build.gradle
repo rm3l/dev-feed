@@ -73,7 +73,7 @@ dependencies {
 
     compile ("org.jsoup:jsoup:1.12.1")
 
-    compile ("org.jetbrains.exposed:exposed:0.13.7")
+    compile ("org.jetbrains.exposed:exposed:0.17.7")
 
     //JDBC Drivers
     compile 'org.xerial:sqlite-jdbc:3.30.1'
