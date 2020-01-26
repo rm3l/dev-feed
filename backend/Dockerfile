@@ -21,7 +21,7 @@
 #SOFTWARE.
 
 # Build
-FROM adoptopenjdk:11-jdk-openj9 AS builder
+FROM adoptopenjdk:13-jdk-openj9 AS builder
 
 WORKDIR /dev-feed-backend
 
@@ -35,7 +35,7 @@ ENV GRADLE_OPTS="-Dorg.gradle.daemon=false"
 
 RUN ./gradlew build --stacktrace
 
-FROM adoptopenjdk:11-jre-openj9
+FROM adoptopenjdk:13-jdk-openj9
 
 COPY --from=builder /dev-feed-backend/build/libs/dev-feed-backend-0.2.0-SNAPSHOT.jar /app.jar
 
