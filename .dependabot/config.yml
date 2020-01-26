@@ -7,3 +7,12 @@ update_configs:
       - "rm3l"
     default_labels:
       - "dependencies"
+
+  - package_manager: "docker"
+    directory: "/backend"
+    update_schedule: "daily"
+    default_reviewers:
+      - "rm3l"
+    default_labels:
+      - "dependencies"
+
