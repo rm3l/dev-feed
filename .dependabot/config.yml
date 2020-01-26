@@ -1,0 +1,9 @@
+version: 1
+update_configs:
+  - package_manager: "java:gradle"
+    directory: "/backend"
+    update_schedule: "daily"
+    default_reviewers:
+      - "rm3l"
+    default_labels:
+      - "dependencies"
