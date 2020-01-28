@@ -2,7 +2,7 @@ version: 1
 update_configs:
   - package_manager: "java:gradle"
     directory: "/backend"
-    update_schedule: "daily"
+    update_schedule: "weekly"
     default_reviewers:
       - "rm3l"
     default_labels:
@@ -10,7 +10,7 @@ update_configs:
 
   - package_manager: "docker"
     directory: "/backend"
-    update_schedule: "daily"
+    update_schedule: "weekly"
     default_reviewers:
       - "rm3l"
     default_labels:
