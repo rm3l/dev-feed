@@ -1,34 +1,104 @@
 # Dev Feed
 
-[![License](https://img.shields.io/badge/license-MIT-green.svg?style=flat)](https://github.com/rm3l/dev-feed/blob/master/LICENSE) 
+[![License](https://img.shields.io/badge/license-MIT-green.svg?style=flat)](https://github.com/rm3l/dev-feed/blob/master/LICENSE)
 
 [![CircleCI](https://circleci.com/gh/rm3l/dev-feed.svg?style=svg)](https://circleci.com/gh/rm3l/dev-feed)
 
 [![Heroku](https://img.shields.io/badge/heroku-deployed%20on%20free%20dyno-blue.svg)](https://dev-feed-api.herokuapp.com/graphiql)
 
-[![Docker Automated build](https://img.shields.io/docker/cloud/automated/rm3l/dev-feed.svg)](https://hub.docker.com/r/rm3l/dev-feed) 
-[![Docker Build Status](https://img.shields.io/docker/cloud/build/rm3l/dev-feed.svg)](https://hub.docker.com/r/rm3l/dev-feed) 
-[![Docker Stars](https://img.shields.io/docker/stars/rm3l/dev-feed.svg)](https://hub.docker.com/r/rm3l/dev-feed) 
+[![Docker Automated build](https://img.shields.io/docker/cloud/automated/rm3l/dev-feed.svg)](https://hub.docker.com/r/rm3l/dev-feed)
+[![Docker Build Status](https://img.shields.io/docker/cloud/build/rm3l/dev-feed.svg)](https://hub.docker.com/r/rm3l/dev-feed)
+[![Docker Stars](https://img.shields.io/docker/stars/rm3l/dev-feed.svg)](https://hub.docker.com/r/rm3l/dev-feed)
 [![Docker Pulls](https://img.shields.io/docker/pulls/rm3l/dev-feed.svg)](https://hub.docker.com/r/rm3l/dev-feed)
 
-TODO Add more description here.
+Dev Feed is a Flutter-based mobile application allowing to keep up with top engineering content from
+companies all over the world.
+It initiated from my own needs to not only follow a curated list of tech-related blogs, but also
+play a little bit with the excellent [Flutter](https://flutter.dev/) SDK.
+
+![demo](https://raw.githubusercontent.com/rm3l/dev-feed/master/mobile/deployment/screenshots/android/latest_news.png)
+
+## Tech Stack
+
+The tech stack is rather simple:
+* Backend
+  * A [Spring Boot](https://spring.io/projects/spring-boot) application written in [Kotlin](https://kotlinlang.org/), which contains crawlers, in charge of crawling certain websites for articles and feeding a local database. It then exposes such articles over a [GraphQL](https://graphql.org/) API, with the ability to search for articles, or by tags, or to read past articles. At the moment, the single crawler plugin available reads the article list from [DiscoverDev.io](https://www.discoverdev.io/), but additional crawlers may be added later on. The Backend application is published to the [Docker Hub](https://hub.docker.com/r/rm3l/dev-feed), and continuously deployed to [Heroku](https://dev-feed-api.herokuapp.com/graphiql) as well.
+* Mobile
+  * A mobile UI application written in [Dart](https://dart.dev/), using the [Flutter](https://flutter.dev/) SDK. Please note that there is no sync'ing mechanism, and all search/favorite articles are stored on the local device. This is something that might be added later on.
+
+### Building and running
+
+1. Clone the repo
+
+```sh
+git clone https://github.com/rm3l/dev-feed && cd dev-feed
+```
+
+2. Build the Backend
+
+```sh
+./backend/gradlew -p ./backend build --stacktrace
+```
+
+3. Run the Backend
+
+```sh
+java -jar backend/build/libs/dev-feed-backend-0.2.0-SNAPSHOT.jar
+```
+
+You can then access the GraphiQL browser by heading to http://localhost:8080/graphiql
+
+4. Install Flutter by following the instructions on the [official website](https://flutter.dev/docs/get-started/install)
+
+5. Prepare the configuration environment
+
+Skip this to use the default Heroku Backend. Otherwise, if you have a custom Backend (either local or remote), you need to create a specific environment file (say `my_personal_backend.dart`) in the `mobile/lib/environments` folder, e.g.:
+
+```dart
+import 'package:dev_feed/env.dart';
+
+void main() => MyPersonalBackend();
+
+class MyPersonalBackend extends Env {
+  final String baseUrl = 'https://my-dev-feed-backend-api.example.org';
+}
+```
+
+6. Build the mobile apps
+
+First `cd` to the `mobile` directory:
+
+```sh
+cd mobile
+```
+
+If you simply want to target the default Heroku backend, just run:
+
+```sh
+flutter build apk
+```
+
+Otherwise, if you have a custom Backend (and its related Dart environment file) declared under `mobile/lib/environments/my_personal_backend.dart`, then run:
+
+```sh
+flutter build apk -t lib/environments/my_personal_backend.dart
+```
+
+You will then find the mobile applications built under the respective platform folders. For example, the APK for Android can be found under `build/app/outputs/apk/`.
+
+7. Install and run the APK either in an emulator or in a real device
+
+```sh
+adb install -r build/app/outputs/apk/app.apk
+```
 
 ## Contribution Guidelines
 
-Contributions and issue reporting are more than welcome. So to help out, do feel free to fork this repo and open up a pull request.
+Contributions and issue reporting are more than welcome. So to help out (e.g., with a new Article crawler plugin in the Backend), do feel free to fork this repo and open up a pull request.
 I'll review and merge your changes as quickly as possible.
 
 You can use [GitHub issues](https://github.com/rm3l/awesome-dev/issues) to report bugs.
 However, please make sure your description is clear enough and has sufficient instructions to be able to reproduce the issue.
-
-### Source Code Layout
-
-TODO
-
-### Building from source
-
-TODO
-
 
 ## Credits / Inspiration
 
@@ -38,7 +108,7 @@ TODO
 
 * Armel Soro
   * [keybase.io/rm3l](https://keybase.io/rm3l)
-  * [rm3l.org](https://rm3l.org) - &lt;apps+awesome_dev@rm3l.org&gt; - [@rm3l](https://twitter.com/rm3l)
+  * [rm3l.org](https://rm3l.org) - &lt;apps+dev_feed@rm3l.org&gt; - [@rm3l](https://twitter.com/rm3l)
   * [paypal.me/rm3l](https://paypal.me/rm3l)
   * [coinbase.com/rm3l](https://www.coinbase.com/rm3l)
 
