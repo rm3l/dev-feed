@@ -16,3 +16,18 @@ update_configs:
     default_labels:
       - "dependencies"
 
+  - package_manager: "java:gradle"
+    directory: "/mobile/android"
+    update_schedule: "weekly"
+    default_reviewers:
+      - "rm3l"
+    default_labels:
+      - "dependencies"
+
+  - package_manager: "java:gradle"
+    directory: "/mobile/android/app"
+    update_schedule: "weekly"
+    default_reviewers:
+      - "rm3l"
+    default_labels:
+      - "dependencies"
