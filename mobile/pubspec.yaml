@@ -53,7 +53,7 @@ dev_dependencies:
   flutter_test:
     sdk: flutter
 
-  flutter_stetho: "0.5.0"
+  flutter_stetho: "^0.5.0"
   flutter_launcher_icons: "^0.7.0"
 
 # https://pub.dartlang.org/packages/flutter_launcher_icons
@@ -108,5 +108,5 @@ flutter:
           - asset: assets/fonts/Inconsolata-Bold.ttf
             weight: 400
   #
-  # For details regarding fonts from package dependencies, 
+  # For details regarding fonts from package dependencies,
   # see https://flutter.io/custom-fonts/#from-packages
