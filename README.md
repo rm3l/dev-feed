@@ -16,7 +16,7 @@ companies all over the world.
 It initiated from my own needs to not only follow a curated list of tech-related blogs, but also
 play a little bit with the excellent [Flutter](https://flutter.dev/) SDK.
 
-![demo](https://raw.githubusercontent.com/rm3l/dev-feed/master/mobile/deployment/screenshots/android/latest_news.png)
+![demo](https://raw.githubusercontent.com/rm3l/dev-feed/master/mobile/deployment/screenshots/android/latest_news_w400.png)
 
 ## Tech Stack
 
