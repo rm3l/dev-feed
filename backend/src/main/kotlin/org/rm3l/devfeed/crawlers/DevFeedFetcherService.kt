@@ -67,6 +67,12 @@ class DevFeedFetcherService(private val dao: DevFeedDao,
                             articles
                         } }
                         .flatMap { it.join() }
+                        .map {
+                            if (!dao.existArticlesByTitleAndUrl(it.title, it.url)) {
+                                dao.insertArticle(it)
+                            }
+                            it
+                        }
                         .map { CompletableFuture.supplyAsync(
                                 ArticleScreenshotGrabber(dao, it),
                                 screenshotDownloaderExecutorService) }
@@ -104,7 +110,7 @@ class DevFeedFetcherService(private val dao: DevFeedDao,
                     .filter { it.screenshot?.data != null }
                     .map {
                         CompletableFuture.supplyAsync(
-                                ArticleUpdater(dao, it, true),
+                                ArticleUpdater(dao, it),
                                 crawlersExecutorService)
                     }.toTypedArray()
             CompletableFuture.allOf(*futures).get() //Wait for all of them to finish

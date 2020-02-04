@@ -32,6 +32,7 @@ import org.springframework.stereotype.Service
 import java.util.concurrent.CompletableFuture
 import java.util.concurrent.ExecutionException
 import java.util.concurrent.ExecutorService
+import java.util.concurrent.TimeUnit
 import java.util.function.Supplier
 
 const val BACKEND_BASE_URL = "https://www.discoverdev.io"
@@ -55,6 +56,7 @@ class DiscoverDevIoCrawler: DevFeedCrawler {
         try {
             logger.info(">>> Crawling website: $BACKEND_ARCHIVE_URL")
 
+            val start = System.nanoTime()
             val articles = Jsoup.connect(BACKEND_ARCHIVE_URL)
                     .userAgent(USER_AGENT)
                     .get()
@@ -70,7 +72,9 @@ class DiscoverDevIoCrawler: DevFeedCrawler {
                                 .flatMap { it.join() }
                                 .toList()
                     }
-            logger.info("<<< Done crawling website: $BACKEND_ARCHIVE_URL")
+            logger.info("<<< Done crawling website: $BACKEND_ARCHIVE_URL" +
+                    " in ${TimeUnit.NANOSECONDS.toMillis(System.nanoTime() - start)}ms" +
+                    " => ${articles.size} articles")
             return articles
         } catch (e: ExecutionException) {
             logger.warn("Crawling execution could not complete successfully - " +
@@ -112,7 +116,10 @@ private class DiscoverDevIoCrawlerArchiveFetcherFutureSupplier(private val date:
                         articlesList
                     }
         } catch (e: Exception) {
-            logger.warn("Error while fetching articles for $date: ${e.message}", e)
+            logger.warn("Error while fetching articles for $date: ${e.message}")
+            if (logger.isDebugEnabled) {
+                logger.debug(e.message, e)
+            }
 	        return emptyList()
         }
     }
