@@ -50,7 +50,7 @@ class ArticleScreenshotGrabber(private val dao: DevFeedDao,
         val url = GOOGLE_PAGESPEED_URL_FORMAT.format(article.url)
         try {
             //Check if (title, url) pair already exist in the DB
-            if (updater || !dao.existArticlesByTitleAndUrl(article.title, article.url)) {
+            if (updater || !dao.shouldRequestScreenshot(article.title, article.url)) {
                 val getRequest = khttp.get(url)
                 if (getRequest.statusCode in 200..399) {
                     val screenshotJsonObject: JSONObject? =

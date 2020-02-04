@@ -27,8 +27,7 @@ import org.slf4j.LoggerFactory
 import java.util.function.Supplier
 
 class ArticleUpdater(private val dao: DevFeedDao,
-                     private val article: Article,
-                     private val updater: Boolean = false):
+                     private val article: Article):
         Supplier<Unit> {
 
     companion object {
@@ -41,19 +40,17 @@ class ArticleUpdater(private val dao: DevFeedDao,
             logger.debug(">>> Handling article crawled: $article")
         }
 
-        if (updater) {
+        //Check if (title, url) pair already exist in the DB
+        val existArticlesByTitleAndUrl =
+                dao.existArticlesByTitleAndUrl(article.title, article.url)
+        if (logger.isDebugEnabled) {
+            logger.debug("$existArticlesByTitleAndUrl = " +
+                    "existArticlesByTitleAndUrl(${article.title}, ${article.url})")
+        }
+        if (!existArticlesByTitleAndUrl) {
+            dao.insertArticle(article)
+        } else if (dao.shouldRequestScreenshot(article.title, article.url)) {
             dao.updateArticleScreenshotData(article)
-        } else {
-            //Check if (title, url) pair already exist in the DB
-            val existArticlesByTitleAndUrl =
-                    dao.existArticlesByTitleAndUrl(article.title, article.url)
-            if (logger.isDebugEnabled) {
-                logger.debug("$existArticlesByTitleAndUrl = " +
-                        "existArticlesByTitleAndUrl(${article.title}, ${article.url})")
-            }
-            if (!existArticlesByTitleAndUrl) {
-                dao.insertArticle(article)
-            }
         }
     }
 }

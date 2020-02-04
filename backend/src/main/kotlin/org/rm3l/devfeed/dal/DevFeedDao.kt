@@ -30,12 +30,15 @@ import org.jetbrains.exposed.sql.transactions.transaction
 import org.rm3l.devfeed.contract.Article
 import org.rm3l.devfeed.contract.ArticleParsed
 import org.rm3l.devfeed.contract.Screenshot
+import org.rm3l.devfeed.crawlers.impl.discoverdev_io.DiscoverDevIoCrawler
 import org.rm3l.devfeed.graphql.ArticleFilter
 import org.rm3l.devfeed.utils.asSupportedTimestamp
+import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.http.converter.json.Jackson2ObjectMapperBuilder
 import org.springframework.stereotype.Component
+import java.lang.IllegalStateException
 import java.net.URL
 import javax.annotation.PostConstruct
 
@@ -96,6 +99,11 @@ class DevFeedDao {
 
     private lateinit var objectMapper: ObjectMapper
 
+    companion object {
+        @JvmStatic
+        private val logger = LoggerFactory.getLogger(DevFeedDao::class.java)
+    }
+
     @PostConstruct
     fun init() {
         this.objectMapper = jackson2ObjectMapperBuilder.build()
@@ -137,10 +145,11 @@ class DevFeedDao {
     }
 
     @Synchronized
-    fun insertArticle(article: Article) {
+    fun insertArticle(article: Article): Int {
 
+        var articleIdentifier: Int? = null
         transaction {
-            val articleIdentifier = Articles.insert {
+            articleIdentifier = Articles.insert {
                 it[timestamp] = article.timestamp
                 it[title] = article.title
                 it[description] = article.description
@@ -175,11 +184,35 @@ class DevFeedDao {
                 articleTag
             }?.forEach { tagIdInserted ->
                 ArticlesTags.insert {
-                    it[articleId] = articleIdentifier
+                    it[articleId] = articleIdentifier!!
                     it[tagName] = tagIdInserted
                 }
             }
         }
+        return articleIdentifier?:throw IllegalStateException(
+                "Could not retrieve identifier for <${article.title},${article.url}>")
+    }
+
+    @Synchronized
+    fun shouldRequestScreenshot(title: String, url: String): Boolean {
+        var result = false
+        transaction {
+            result = Articles
+                    .select { Articles.title.eq(title) and Articles.link.eq(url) and Articles.screenshotData.isNotNull() and not(Articles.screenshotData eq "") }
+                    .empty()
+        }
+        return result
+    }
+
+    @Synchronized
+    fun shouldRequestScreenshot(articleId: Int): Boolean {
+        var result = false
+        transaction {
+            result = Articles
+                    .select { Articles.id.eq(articleId) and Articles.screenshotData.isNotNull() and not(Articles.screenshotData eq "") }
+                    .empty()
+        }
+        return result
     }
 
     @Synchronized
@@ -401,6 +434,7 @@ class DevFeedDao {
     }
 
     fun getRecentArticles(limit: Int? = null, offset: Int? = null): Collection<Article> {
+        logger.trace("getRecentArticles")
         val result = mutableListOf<Article>()
         transaction {
             Articles.slice(Articles.timestamp).selectAll()
@@ -410,6 +444,7 @@ class DevFeedDao {
                     .map { it[Articles.timestamp] }
                     .firstOrNull()
                     ?.let {
+                        logger.trace("getRecentArticles")
                         val query = Articles.select { Articles.timestamp.eq(it) }
                         limit?.let { query.limit(it, offset?: DEFAULT_OFFSET) }
                         query.orderBy(Articles.timestamp, order = SortOrder.DESC)
@@ -462,9 +497,11 @@ class DevFeedDao {
         transaction {
             val tagNameSlice = Tags.slice(Tags.name)
             val query = if (search != null && search.isNotEmpty()) {
-                tagNameSlice.select {
-                    OrOpMultiple(search.map { Tags.name.like("%$it%") }.toList())
+                var searchOp: Op<Boolean> = Op.TRUE
+                for (tag in search) {
+                    searchOp = searchOp.or(Tags.name.like("%$tag%"))
                 }
+                tagNameSlice.select { searchOp }
             } else {
                 tagNameSlice.selectAll()
             }
@@ -475,9 +512,4 @@ class DevFeedDao {
         return result.toSet()
     }
 
-}
-
-class OrOpMultiple<T>(private val expressions: Collection<Expression<T>>): Op<Boolean>() {
-    override fun toSQL(queryBuilder: QueryBuilder) =
-            expressions.joinToString(separator = " OR ", prefix = "(", postfix = ")") { it.toSQL(queryBuilder) }
 }
