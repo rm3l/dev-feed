@@ -1,6 +1,6 @@
 # Dev Feed
 
-[![Download app](https://raw.githubusercontent.com/rm3l/google-play-badge-svg/master/img/en_get.svg?sanitize=true)](https://play.google.com/store/apps/details?id=org.rm3l.awesome_dev)
+[![Download app](https://github.com/rm3l/dev-feed/raw/master/mobile/deployment/screenshots/android/google-play-badge.png)](https://play.google.com/store/apps/details?id=org.rm3l.awesome_dev)
 
 [![License](https://img.shields.io/badge/license-MIT-green.svg?style=flat)](https://github.com/rm3l/dev-feed/blob/master/LICENSE)
 
