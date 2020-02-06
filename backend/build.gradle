@@ -80,9 +80,9 @@ dependencies {
     compile 'com.h2database:h2:1.4.200'
 
     // GraphQL and GraphiQL
-    compile 'com.graphql-java:graphql-spring-boot-starter:4.0.0'
-    compile 'com.graphql-java:graphiql-spring-boot-starter:4.0.0'
-    compile 'com.graphql-java:graphql-java-tools:5.2.4'
+    compile 'com.graphql-java-kickstart:graphql-spring-boot-starter:6.0.1'
+    compile 'com.graphql-java-kickstart:graphiql-spring-boot-starter:6.0.1'
+    compile 'com.graphql-java-kickstart:graphql-java-tools:5.7.1'
 
     compile 'khttp:khttp:1.0.0'
 
