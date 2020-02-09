@@ -68,11 +68,13 @@ class DevFeedFetcherService(private val dao: DevFeedDao,
                         } }
                         .flatMap { it.join() }
                         .map {
+                            var identifier: Long? = null
                             if (!dao.existArticlesByTitleAndUrl(it.title, it.url)) {
-                                dao.insertArticle(it)
+                                identifier = dao.insertArticle(it)
                             }
-                            it
+                            identifier?.let {dao.findArticleById(identifier)  }
                         }
+                        .filterNotNull()
                         .map { CompletableFuture.supplyAsync(
                                 ArticleScreenshotGrabber(dao, it),
                                 screenshotDownloaderExecutorService) }

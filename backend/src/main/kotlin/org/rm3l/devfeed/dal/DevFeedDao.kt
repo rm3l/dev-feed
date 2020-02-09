@@ -43,7 +43,7 @@ import java.net.URL
 import javax.annotation.PostConstruct
 
 object Articles : Table(name = "articles") {
-    val id = integer(name = "id").autoIncrement().primaryKey()
+    val id = long(name = "id").autoIncrement().primaryKey()
     val timestamp = long(name = "timestamp")
     val title = text(name = "title")
     val description = text(name = "description").nullable()
@@ -60,12 +60,12 @@ object Tags : Table(name = "tags") {
 }
 
 object ArticlesTags : Table(name = "articles_tags") {
-    val articleId = (integer("article_id") references Articles.id)
+    val articleId = (long("article_id") references Articles.id)
     val tagName = (varchar("tag_name", length=65535) references Tags.name)
 }
 
 object ArticlesParsed : Table(name = "articles_parsed") {
-    val id = integer(name = "id").autoIncrement().primaryKey()
+    val id = long(name = "id").autoIncrement().primaryKey()
     val url = (varchar(name = "link", length=65535) references Articles.link)
     val title = text(name = "title").nullable()
     val author = text(name = "author").nullable()
@@ -127,6 +127,15 @@ class DevFeedDao {
     }
 
     @Synchronized
+    fun deleteByTitleAndUrl(title: String, url: String): Int {
+        var result = 0
+        transaction {
+            result = Articles.deleteWhere { Articles.title.eq(title) and Articles.link.eq(url) }
+        }
+        return result
+    }
+
+    @Synchronized
     fun existArticleParsed(url: String): Boolean {
         var result = false
         transaction {
@@ -145,9 +154,54 @@ class DevFeedDao {
     }
 
     @Synchronized
-    fun insertArticle(article: Article): Int {
+    fun findArticleById(articleId: Long): Article? {
+        var result : Article? = null
+        transaction {
+            result = Articles.select { Articles.id.eq(articleId) }
+                    .limit(1)
+                    .map { articleResultRow ->
+                        val article = Article(id = articleResultRow[Articles.id].toLong(),
+                                title = articleResultRow[Articles.title],
+                                url = articleResultRow[Articles.link],
+                                domain = articleResultRow[Articles.hostname]
+                                        ?: URL(articleResultRow[Articles.link]).host,
+                                timestamp = articleResultRow[Articles.timestamp],
+                                screenshot = Screenshot(
+                                        data = articleResultRow[Articles.screenshotData],
+                                        mimeType = articleResultRow[Articles.screenshotMimeType],
+                                        width = articleResultRow[Articles.screenshotWidth],
+                                        height = articleResultRow[Articles.screenshotHeight]
+                                ),
+                                parsed = ArticlesParsed.select { ArticlesParsed.url.eq(articleResultRow[Articles.link]) }
+                                        .map {
+                                            ArticleParsed(
+                                                    url = articleResultRow[Articles.link],
+                                                    title = it[ArticlesParsed.title],
+                                                    description = it[ArticlesParsed.description],
+                                                    body = it[ArticlesParsed.body],
+                                                    author = it[ArticlesParsed.author],
+                                                    image = if (it[ArticlesParsed.image].isNullOrBlank()) null else it[ArticlesParsed.image],
+                                                    published = it[ArticlesParsed.published]
+                                                    //TODO Fix videos and keywords
+//                                                        videos = objectMapper.readValue(it[ArticlesParsed.videos]?:"", ArrayList::class.java)
+                                            )
+                                        }.firstOrNull())
+                        val tags = ArticlesTags.slice(ArticlesTags.tagName)
+                                .select { ArticlesTags.articleId.eq(articleResultRow[Articles.id]) }
+                                .map { it[ArticlesTags.tagName] }
+                                .toSet()
+                        article.tags = tags
+                        article
+                    }
+                    .firstOrNull()
+        }
+        return result
+    }
 
-        var articleIdentifier: Int? = null
+    @Synchronized
+    fun insertArticle(article: Article): Long {
+
+        var articleIdentifier: Long? = null
         transaction {
             articleIdentifier = Articles.insert {
                 it[timestamp] = article.timestamp
@@ -205,7 +259,7 @@ class DevFeedDao {
     }
 
     @Synchronized
-    fun shouldRequestScreenshot(articleId: Int): Boolean {
+    fun shouldRequestScreenshot(articleId: Long): Boolean {
         var result = false
         transaction {
             result = Articles
@@ -218,7 +272,7 @@ class DevFeedDao {
     @Synchronized
     fun updateArticleScreenshotData(article: Article) {
         transaction {
-            Articles.update({ Articles.id eq article.id!!.toInt() }) {
+            Articles.update({ Articles.id eq article.id!! }) {
                 it[screenshotData] = article.screenshot?.data
                 it[screenshotMimeType] = article.screenshot?.mimeType
                 it[screenshotWidth] = article.screenshot?.width

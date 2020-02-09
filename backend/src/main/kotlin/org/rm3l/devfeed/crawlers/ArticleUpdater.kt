@@ -47,9 +47,13 @@ class ArticleUpdater(private val dao: DevFeedDao,
             logger.debug("$existArticlesByTitleAndUrl = " +
                     "existArticlesByTitleAndUrl(${article.title}, ${article.url})")
         }
-        if (!existArticlesByTitleAndUrl) {
+        if (article.id == null) {
+            if (existArticlesByTitleAndUrl) {
+                dao.deleteByTitleAndUrl(article.title, article.url)
+            }
             dao.insertArticle(article)
-        } else if (dao.shouldRequestScreenshot(article.title, article.url)) {
+        }
+        if (dao.shouldRequestScreenshot(article.title, article.url)) {
             dao.updateArticleScreenshotData(article)
         }
     }
