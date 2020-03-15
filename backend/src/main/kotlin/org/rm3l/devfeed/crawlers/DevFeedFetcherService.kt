@@ -43,7 +43,6 @@ class DevFeedFetcherService(private val dao: DevFeedDao,
             CompletableFuture.runAsync {
                 triggerRemoteWebsiteCrawling()
                 triggerScreenshotUpdater()
-                initDone.set(true)
             }.exceptionally { t ->
                 logger.info(t.message, t)
                 null
@@ -87,11 +86,15 @@ class DevFeedFetcherService(private val dao: DevFeedDao,
                                 ArticleUpdater(dao, it), crawlersExecutorService) }
                         .toTypedArray()
                 CompletableFuture.allOf(*futures).get() //Wait for all of them to finish
-                initDone.set(true)
+                logger.warn("Done crawling remote websites successfully")
+                remoteWebsiteCrawlingSucceeded.set(true)
+                remoteWebsiteCrawlingErrored.set(false)
             }
         } catch (e: Exception) {
             logger.warn("Crawling remote websites could not complete successfully - " +
                     "will try again later", e)
+            remoteWebsiteCrawlingErrored.set(true)
+            remoteWebsiteCrawlingSucceeded.set(false)
         }
     }
 
@@ -105,7 +108,7 @@ class DevFeedFetcherService(private val dao: DevFeedDao,
                     .map {
                         CompletableFuture.supplyAsync(
                                 ArticleScreenshotGrabber(dao, it, true),
-                                screenshotDownloaderExecutorService)
+                                crawlersExecutorService)
                     }
                     .map { it.join() }
                     .filter { it.screenshot?.data != null }
@@ -115,19 +118,22 @@ class DevFeedFetcherService(private val dao: DevFeedDao,
                                 crawlersExecutorService)
                     }.toTypedArray()
             CompletableFuture.allOf(*futures).get() //Wait for all of them to finish
-            initDone.set(true)
             logger.info("<<< Done inspecting and updating ${articleIdsWithNoScreenshots.size} " +
                     "articles with no screenshots. Now, there remains " +
                     "${dao.getArticlesWithNoScreenshots().size} articles with no screenshots " +
                     "=> will check again in a near future.")
+            screenshotUpdatesSucceeded.set(true)
+            screenshotUpdatesErrored.set(false)
         } catch (e: ExecutionException) {
             logger.warn("Updating missing screenshots could not complete successfully - " +
                     "will try again later", e)
+            screenshotUpdatesErrored.set(true)
+            screenshotUpdatesSucceeded.set(false)
         }
     }
 
     override fun health(): Health =
-            if (initDone.get()) {
+            if (remoteWebsiteCrawlingSucceeded.get()) {
                 Health.up().build()
             } else {
                 Health.outOfService().build()
