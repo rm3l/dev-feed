@@ -45,4 +45,4 @@ EXPOSE 8080
 # /management Actuator endpoints
 EXPOSE 8081
 
-ENTRYPOINT ["java", "-jar", "/app.jar"]
+ENTRYPOINT ["java", "-XX:+UseG1GC", "-jar", "/app.jar"]
