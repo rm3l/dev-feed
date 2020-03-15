@@ -41,8 +41,7 @@ class DevFeedFetcherService(private val dao: DevFeedDao,
         logger.info("ApplicationReady => scheduling crawling tasks...")
         try {
             CompletableFuture.runAsync {
-                triggerRemoteWebsiteCrawling()
-                triggerScreenshotUpdater()
+                triggerRemoteWebsiteCrawlingAndScreenshotUpdater()
             }.exceptionally { t ->
                 logger.info(t.message, t)
                 null
@@ -54,7 +53,7 @@ class DevFeedFetcherService(private val dao: DevFeedDao,
     }
 
     @Scheduled(cron = "\${crawlers.task.cron-expression}")
-    @Synchronized fun triggerRemoteWebsiteCrawling() {
+    @Synchronized fun triggerRemoteWebsiteCrawlingAndScreenshotUpdater() {
         try {
             if (!crawlers.isNullOrEmpty()) {
                 val futures = crawlers
@@ -95,11 +94,12 @@ class DevFeedFetcherService(private val dao: DevFeedDao,
                     "will try again later", e)
             remoteWebsiteCrawlingErrored.set(true)
             remoteWebsiteCrawlingSucceeded.set(false)
+        } finally {
+            triggerScreenshotUpdater()
         }
     }
 
-    @Scheduled(cron = "\${crawlers.screenshot-updater.task.cron-expression}")
-    @Synchronized fun triggerScreenshotUpdater() {
+    private fun triggerScreenshotUpdater() {
         try {
             val articleIdsWithNoScreenshots = dao.getArticlesWithNoScreenshots()
             logger.info(">>> Inspecting (and trying to update) " +
@@ -136,6 +136,6 @@ class DevFeedFetcherService(private val dao: DevFeedDao,
             if (remoteWebsiteCrawlingSucceeded.get()) {
                 Health.up().build()
             } else {
-                Health.outOfService().build()
+                Health.down().build()
             }
 }
