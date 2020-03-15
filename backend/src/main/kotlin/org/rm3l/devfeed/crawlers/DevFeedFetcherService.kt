@@ -4,6 +4,7 @@ import org.rm3l.devfeed.dal.DevFeedDao
 import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.beans.factory.annotation.Qualifier
+import org.springframework.beans.factory.annotation.Value
 import org.springframework.boot.actuate.health.Health
 import org.springframework.boot.actuate.health.HealthIndicator
 import org.springframework.scheduling.annotation.Scheduled
@@ -30,11 +31,10 @@ class DevFeedFetcherService(private val dao: DevFeedDao,
     @Value("\${crawlers.document-parser-api.subscription-key}")
     private lateinit var documentParserApiKey: String
 
-    @Autowired
-    @Qualifier("articleExtractorExecutorService")
-    private lateinit var articleExtractorExecutorService: ExecutorService
-
-    private val initDone = AtomicBoolean(false)
+    private val remoteWebsiteCrawlingSucceeded = AtomicBoolean(false)
+    private val remoteWebsiteCrawlingErrored = AtomicBoolean(false)
+    private val screenshotUpdatesSucceeded = AtomicBoolean(false)
+    private val screenshotUpdatesErrored = AtomicBoolean(false)
 
     @PostConstruct
     fun init() {
@@ -76,7 +76,7 @@ class DevFeedFetcherService(private val dao: DevFeedDao,
                         .filterNotNull()
                         .map { CompletableFuture.supplyAsync(
                                 ArticleScreenshotGrabber(dao, it),
-                                screenshotDownloaderExecutorService) }
+                                crawlersExecutorService) }
                         .map { it.join() }
                         .map { CompletableFuture.supplyAsync(
                                 ArticleExtractor(dao, documentParserApiKey, it),

@@ -36,18 +36,7 @@ class DevFeedAsyncConfiguration {
     @Value("\${crawlers.task.thread-pool-size}")
     private lateinit var threadPoolSize: String
 
-    @Value("\${crawlers.screenshot-grabber.task.thread-pool-size}")
-    private lateinit var screenshotUpdaterThreadPoolSize: String
-
     @Bean(name = ["crawlersExecutorService"], destroyMethod = "shutdownNow")
     fun crawlersExecutorService(): ExecutorService
             = Executors.newFixedThreadPool(threadPoolSize.toInt())
-
-    @Bean(name = ["screenshotDownloaderExecutorService"], destroyMethod = "shutdownNow")
-    fun screenshotDownloaderExecutorService(): ExecutorService
-            = Executors.newFixedThreadPool(screenshotUpdaterThreadPoolSize.toInt())
-
-    @Bean(name = ["articleExtractorExecutorService"], destroyMethod = "shutdownNow")
-    fun articleExtractorExecutorService(): ExecutorService
-            = Executors.newFixedThreadPool(screenshotUpdaterThreadPoolSize.toInt())
 }
