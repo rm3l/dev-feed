@@ -36,6 +36,8 @@ import org.rm3l.devfeed.utils.asSupportedTimestamp
 import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.beans.factory.annotation.Value
+import org.springframework.boot.actuate.health.Health
+import org.springframework.boot.actuate.health.HealthIndicator
 import org.springframework.http.converter.json.Jackson2ObjectMapperBuilder
 import org.springframework.stereotype.Component
 import java.lang.IllegalStateException
@@ -80,7 +82,7 @@ object ArticlesParsed : Table(name = "articles_parsed") {
 const val DEFAULT_OFFSET = 0
 
 @Component
-class DevFeedDao {
+class DevFeedDao: HealthIndicator {
 
     @Value("\${datasource.url}")
     private lateinit var datasourceUrl: String
@@ -564,6 +566,18 @@ class DevFeedDao {
             result.addAll(query.map { it[Tags.name] }.toSet())
         }
         return result.toSet()
+    }
+
+    override fun health(): Health {
+        return try {
+            //Just attempt to read from the database
+            transaction {
+                Articles.slice(Articles.timestamp).selectAll().limit(1)
+            }
+            Health.up().build()
+        } catch (exception: Exception) {
+            Health.down(exception).build()
+        }
     }
 
 }
