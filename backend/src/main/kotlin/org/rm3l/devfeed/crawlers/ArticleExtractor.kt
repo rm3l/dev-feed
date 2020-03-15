@@ -28,26 +28,20 @@ import org.slf4j.LoggerFactory
 import java.util.concurrent.atomic.AtomicBoolean
 import java.util.function.Supplier
 
-class ArticleExtractor(private val dao: DevFeedDao, private val article: Article): Supplier<Article> {
+class ArticleExtractor(private val dao: DevFeedDao, private val documentParserApiKey:String,
+                       private val article: Article): Supplier<Article> {
 
     companion object {
 
         private const val ARTICLE_EXTRACTION_API_URL_FORMAT = "https://document-parser-api.lateral.io/?url=%s"
-        private const val ARTICLE_EXTRACTION_API_SUBSCRIPTION_KEY = "e6c16b3ec541b7ed385921023a9704e1"
 
         @JvmStatic
         private val logger = LoggerFactory.getLogger(ArticleExtractor::class.java)
-
-        private val debugDone = AtomicBoolean(false)
     }
 
     override fun get(): Article {
         val url = ARTICLE_EXTRACTION_API_URL_FORMAT.format(article.url)
         try {
-            //FIXME Remove in DEBUG mode
-//            if (debugDone.getAndSet(true)) {
-//                return article
-//            }
             if (!dao.existArticleParsed(article.url)) {
                 if (logger.isDebugEnabled) {
                     logger.debug("Getting article extraction data from url: $url")
@@ -56,7 +50,7 @@ class ArticleExtractor(private val dao: DevFeedDao, private val article: Article
                         khttp.get(url,
                                 headers = mapOf(
                                         "Content-Type" to "application/json",
-                                        "subscription-key" to ARTICLE_EXTRACTION_API_SUBSCRIPTION_KEY
+                                        "subscription-key" to documentParserApiKey
                                 )).jsonObject
 
                 val parsedImage = articleExtractionJsonObject.optString("image")

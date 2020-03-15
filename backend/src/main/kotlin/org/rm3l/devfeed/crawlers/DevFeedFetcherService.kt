@@ -27,9 +27,8 @@ class DevFeedFetcherService(private val dao: DevFeedDao,
     @Qualifier("crawlersExecutorService")
     private lateinit var crawlersExecutorService: ExecutorService
 
-    @Autowired
-    @Qualifier("screenshotDownloaderExecutorService")
-    private lateinit var screenshotDownloaderExecutorService: ExecutorService
+    @Value("\${crawlers.document-parser-api.subscription-key}")
+    private lateinit var documentParserApiKey: String
 
     @Autowired
     @Qualifier("articleExtractorExecutorService")
@@ -80,8 +79,8 @@ class DevFeedFetcherService(private val dao: DevFeedDao,
                                 screenshotDownloaderExecutorService) }
                         .map { it.join() }
                         .map { CompletableFuture.supplyAsync(
-                                ArticleExtractor(dao, it),
-                                articleExtractorExecutorService
+                                ArticleExtractor(dao, documentParserApiKey, it),
+                                crawlersExecutorService
                         ) }
                         .map { it.join() }
                         .map { CompletableFuture.supplyAsync(
