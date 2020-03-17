@@ -73,7 +73,7 @@ dependencies {
     compile("org.jetbrains.kotlin:kotlin-stdlib-jdk8")
     compile("org.jetbrains.kotlin:kotlin-reflect")
 
-    compile ("org.jsoup:jsoup:1.12.2")
+    compile ("org.jsoup:jsoup:1.13.1")
 
     compile ("org.jetbrains.exposed:exposed:0.17.7")
 
