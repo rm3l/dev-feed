@@ -16,24 +16,15 @@ workflows:
           source: true
     scripts:
       - |
-        # set up debug keystore
-        rm -f ~/.android/debug.keystore
-        keytool -genkeypair \
-          -alias androiddebugkey \
-          -keypass android \
-          -keystore ~/.android/debug.keystore \
-          -storepass android \
-          -dname 'CN=Android Debug,O=Android,C=US' \
-          -keyalg 'RSA' \
-          -keysize 2048 \
-          -validity 10000
-      - |
         # set up local properties
         echo "flutter.sdk=$HOME/programs/flutter" > "$FCI_BUILD_DIR/mobile/android/local.properties"
+
       - cd mobile && flutter packages pub get
       - cd mobile && flutter test
       - cd mobile && flutter build apk --debug
+
       - find . -name "Podfile" -execdir pod install \;
+      -
       - cd mobile && flutter build ios --debug --no-codesign
     artifacts:
       - mobile/build/**/outputs/**/*.apk
