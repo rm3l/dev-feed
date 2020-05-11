@@ -23,9 +23,11 @@ workflows:
       - cd mobile && flutter test
       - cd mobile && flutter build apk --debug
 
-      - find . -name "Podfile" -execdir pod install \;
-      -
-      - cd mobile && flutter build ios --debug --no-codesign
+      # Disable IOS build - not used for now
+      #- find . -name "Podfile" -execdir pod install \;
+      #- keychain initialize
+      #-
+      # - cd mobile && flutter build ios --debug --no-codesign
     artifacts:
       - mobile/build/**/outputs/**/*.apk
       - mobile/build/**/outputs/**/*.aab
