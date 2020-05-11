@@ -21,7 +21,7 @@
 //SOFTWARE.
 package org.rm3l.devfeed.graphql
 
-import com.coxautodev.graphql.tools.GraphQLQueryResolver
+import graphql.kickstart.tools.GraphQLQueryResolver
 import org.rm3l.devfeed.dal.DevFeedDao
 import org.springframework.stereotype.Component
 
