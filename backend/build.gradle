@@ -65,13 +65,14 @@ repositories {
 
 dependencies {
     compile('org.springframework.boot:spring-boot-starter-actuator')
-    compile('io.micrometer:micrometer-registry-prometheus:1.5.0')
+//    compile('io.micrometer:micrometer-registry-prometheus:1.5.0')
 
     compile('org.springframework.boot:spring-boot-starter-web')
     // compile('org.springframework.boot:spring-boot-starter-security')
     compile('com.fasterxml.jackson.module:jackson-module-kotlin')
     compile("org.jetbrains.kotlin:kotlin-stdlib-jdk8")
     compile("org.jetbrains.kotlin:kotlin-reflect")
+    compile('org.jetbrains.kotlinx:kotlinx-coroutines-core:1.2.1') //Constrained by graphql-java-tools
 
     compile ("org.jsoup:jsoup:1.13.1")
 
@@ -84,7 +85,7 @@ dependencies {
     // GraphQL and GraphiQL
     compile 'com.graphql-java-kickstart:graphql-spring-boot-starter:7.0.1'
     compile 'com.graphql-java-kickstart:graphiql-spring-boot-starter:7.0.1'
-    compile 'com.graphql-java-kickstart:graphql-java-tools:5.7.1'
+    compile 'com.graphql-java-kickstart:graphql-java-tools:6.0.2'
 
     compile 'khttp:khttp:1.0.0'
 
