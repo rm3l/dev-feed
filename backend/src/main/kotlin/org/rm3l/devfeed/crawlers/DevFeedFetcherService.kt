@@ -133,7 +133,7 @@ class DevFeedFetcherService(private val dao: DevFeedDao,
     }
 
     override fun health(): Health =
-            if (remoteWebsiteCrawlingSucceeded.get()) {
+            if (dao.getRecentArticles(limit = 1).isNotEmpty()) {
                 Health.up().build()
             } else {
                 Health.down().build()
