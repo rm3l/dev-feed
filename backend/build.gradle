@@ -19,30 +19,20 @@
 //LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 //OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 //SOFTWARE.
-buildscript {
-    ext {
-        kotlinVersion = '1.3.72'
-        springBootVersion = '2.2.7.RELEASE'
-    }
-    repositories {
-        mavenCentral()
-    }
-    dependencies {
-        classpath("org.springframework.boot:spring-boot-gradle-plugin:${springBootVersion}")
-        classpath("org.jetbrains.kotlin:kotlin-gradle-plugin:${kotlinVersion}")
-        classpath("org.jetbrains.kotlin:kotlin-allopen:${kotlinVersion}")
-    }
-}
+//
 
-apply plugin: 'kotlin'
-apply plugin: 'kotlin-spring'
-apply plugin: 'eclipse'
-apply plugin: 'org.springframework.boot'
-apply plugin: 'io.spring.dependency-management'
+plugins {
+    id 'org.jetbrains.kotlin.jvm' version '1.3.72'
+    id "org.jetbrains.kotlin.plugin.spring" version "1.3.72"
+    id 'org.springframework.boot' version '2.3.0.RELEASE'
+    id 'io.spring.dependency-management' version "1.0.9.RELEASE"
+    id 'com.google.cloud.tools.jib' version '2.2.0'
+}
 
 group = 'org.rm3l'
 version = '0.2.0-SNAPSHOT'
 sourceCompatibility = 11
+
 compileKotlin {
     kotlinOptions {
         freeCompilerArgs = ["-Xjsr305=strict"]
@@ -59,43 +49,42 @@ compileTestKotlin {
 repositories {
     jcenter()
     mavenCentral()
-    maven { url 'https://dl.bintray.com/kotlin/exposed' }
     maven { url "https://jitpack.io" }
 }
 
 dependencies {
-    compile('org.springframework.boot:spring-boot-starter-actuator')
-//    compile('io.micrometer:micrometer-registry-prometheus:1.5.0')
+    implementation 'org.springframework.boot:spring-boot-starter-actuator'
+    implementation('org.springframework.boot:spring-boot-starter-web')
 
-    compile('org.springframework.boot:spring-boot-starter-web')
-    // compile('org.springframework.boot:spring-boot-starter-security')
-    compile('com.fasterxml.jackson.module:jackson-module-kotlin')
-    compile("org.jetbrains.kotlin:kotlin-stdlib-jdk8")
-    compile("org.jetbrains.kotlin:kotlin-reflect")
-    compile('org.jetbrains.kotlinx:kotlinx-coroutines-core:1.2.1') //Constrained by graphql-java-tools
+    implementation('com.fasterxml.jackson.module:jackson-module-kotlin')
 
-    compile ("org.jsoup:jsoup:1.13.1")
+    implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk8"
+    implementation "org.jetbrains.kotlin:kotlin-reflect"
+    implementation('org.jetbrains.kotlinx:kotlinx-coroutines-core:1.2.1') //Constrained by graphql-java-tools
 
-    compile ("org.jetbrains.exposed:exposed:0.17.7")
+    implementation ("org.jsoup:jsoup:1.13.1")
+
+    implementation ("org.jetbrains.exposed:exposed-core:0.24.1")
+    implementation ("org.jetbrains.exposed:exposed-dao:0.24.1")
+    implementation ("org.jetbrains.exposed:exposed-jdbc:0.24.1")
 
     //JDBC Drivers
-    compile 'org.xerial:sqlite-jdbc:3.31.1'
-    compile 'com.h2database:h2:1.4.200'
+    implementation 'org.xerial:sqlite-jdbc:3.31.1'
+    implementation 'com.h2database:h2:1.4.200'
 
     // GraphQL and GraphiQL
-    compile 'com.graphql-java-kickstart:graphql-spring-boot-starter:7.0.1'
-    compile 'com.graphql-java-kickstart:graphiql-spring-boot-starter:7.0.1'
-    compile 'com.graphql-java-kickstart:graphql-java-tools:6.0.2'
+    implementation 'com.graphql-java-kickstart:graphql-spring-boot-starter:7.0.1'
+    implementation 'com.graphql-java-kickstart:graphiql-spring-boot-starter:7.0.1'
+    implementation 'com.graphql-java-kickstart:graphql-java-tools:6.0.2'
 
-    compile 'khttp:khttp:1.0.0'
+    implementation 'khttp:khttp:1.0.0'
 
-    compile ('com.github.karussell:snacktory:-SNAPSHOT') {
+    implementation ('com.github.karussell:snacktory:-SNAPSHOT') {
         exclude group: 'org.jsoup', module: 'jsoup'
         exclude group: 'org.slf4j'
         exclude group: 'log4j', module: 'log4j'
     }
 
-    testCompile('org.springframework.boot:spring-boot-starter-test')
-    // testCompile('org.springframework.security:spring-security-test')
-    testCompile('io.projectreactor:reactor-test')
+    testImplementation 'org.springframework.boot:spring-boot-starter-test'
+    testImplementation 'io.projectreactor:reactor-test'
 }
