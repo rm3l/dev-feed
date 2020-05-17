@@ -29,16 +29,16 @@ import org.springframework.stereotype.Component
 @Component
 class Query(private val dao: DevFeedDao): GraphQLQueryResolver {
 
-    fun articleDates(limit: Int?, offset: Int?) = dao.getArticlesDates(limit, offset)
+    fun articleDates(limit: Int?, offset: Long?) = dao.getArticlesDates(limit, offset)
 
-    fun articles(limit: Int?, offset: Int?, filter: ArticleFilter?) = dao.getArticles(limit, offset, filter)
+    fun articles(limit: Int?, offset: Long?, filter: ArticleFilter?) = dao.getArticles(limit, offset, filter)
 
-    fun recentArticles(limit: Int?, offset: Int?) = dao.getRecentArticles(limit, offset)
+    fun recentArticles(limit: Int?, offset: Long?) = dao.getRecentArticles(limit, offset)
 
-    fun allButRecentArticles(limit: Int?, offset: Int?, filter: ArticleFilter?) =
+    fun allButRecentArticles(limit: Int?, offset: Long?, filter: ArticleFilter?) =
             dao.allButRecentArticles(limit, offset, filter)
 
-    fun tags(limit: Int?, offset: Int?, search: List<String>?) = dao.getTags(limit, offset, search)
+    fun tags(limit: Int?, offset: Long?, search: List<String>?) = dao.getTags(limit, offset, search)
 
     fun articlesWithNoScreenshots() = dao.getArticlesWithNoScreenshots()
 }

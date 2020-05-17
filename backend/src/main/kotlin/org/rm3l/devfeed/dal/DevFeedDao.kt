@@ -26,6 +26,7 @@ import org.jetbrains.exposed.sql.*
 import org.jetbrains.exposed.sql.SchemaUtils.createMissingTablesAndColumns
 import org.jetbrains.exposed.sql.SqlExpressionBuilder.between
 import org.jetbrains.exposed.sql.SqlExpressionBuilder.like
+import org.jetbrains.exposed.sql.transactions.TransactionManager
 import org.jetbrains.exposed.sql.transactions.transaction
 import org.rm3l.devfeed.contract.Article
 import org.rm3l.devfeed.contract.ArticleParsed
@@ -42,6 +43,7 @@ import org.springframework.http.converter.json.Jackson2ObjectMapperBuilder
 import org.springframework.stereotype.Component
 import java.lang.IllegalStateException
 import java.net.URL
+import java.sql.Connection
 import javax.annotation.PostConstruct
 
 object Articles : Table(name = "articles") {
@@ -79,7 +81,7 @@ object ArticlesParsed : Table(name = "articles_parsed") {
     val body = text(name = "body")
 }
 
-const val DEFAULT_OFFSET = 0
+const val DEFAULT_OFFSET = 0L
 
 @Component
 class DevFeedDao: HealthIndicator {
@@ -114,12 +116,22 @@ class DevFeedDao: HealthIndicator {
                 driver = datasourceDriver,
                 user = datasourceUser,
                 password = datasourcePassword)
+
+        //Adjust Transaction isolation levels, as queries may not succeed in certain circumstances.
+        //See https://github.com/JetBrains/Exposed/wiki/FAQ
+        if ("org.sqlite.JDBC" == datasourceDriver) {
+            // Or Connection.TRANSACTION_READ_UNCOMMITTED
+            TransactionManager.manager.defaultIsolationLevel = Connection.TRANSACTION_SERIALIZABLE
+        } else if ("oracle.jdbc.OracleDriver" == datasourceDriver) {
+            // Or Connection.TRANSACTION_SERIALIZABLE
+            TransactionManager.manager.defaultIsolationLevel = Connection.TRANSACTION_READ_COMMITTED
+        }
+
         transaction {
             createMissingTablesAndColumns(Articles, Tags, ArticlesTags, ArticlesParsed)
         }
     }
 
-    @Synchronized
     fun existArticlesByTitleAndUrl(title: String, url: String): Boolean {
         var result = false
         transaction {
@@ -128,7 +140,6 @@ class DevFeedDao: HealthIndicator {
         return result
     }
 
-    @Synchronized
     fun deleteByTitleAndUrl(title: String, url: String): Int {
         var result = 0
         transaction {
@@ -137,7 +148,6 @@ class DevFeedDao: HealthIndicator {
         return result
     }
 
-    @Synchronized
     fun existArticleParsed(url: String): Boolean {
         var result = false
         transaction {
@@ -146,7 +156,6 @@ class DevFeedDao: HealthIndicator {
         return result
     }
 
-    @Synchronized
     fun existTagByName(name: String): Boolean {
         var result = false
         transaction {
@@ -155,7 +164,6 @@ class DevFeedDao: HealthIndicator {
         return result
     }
 
-    @Synchronized
     fun findArticleById(articleId: Long): Article? {
         var result : Article? = null
         transaction {
@@ -200,7 +208,6 @@ class DevFeedDao: HealthIndicator {
         return result
     }
 
-    @Synchronized
     fun insertArticle(article: Article): Long {
 
         var articleIdentifier: Long? = null
@@ -249,7 +256,6 @@ class DevFeedDao: HealthIndicator {
                 "Could not retrieve identifier for <${article.title},${article.url}>")
     }
 
-    @Synchronized
     fun shouldRequestScreenshot(title: String, url: String): Boolean {
         var result = false
         transaction {
@@ -260,7 +266,6 @@ class DevFeedDao: HealthIndicator {
         return result
     }
 
-    @Synchronized
     fun shouldRequestScreenshot(articleId: Long): Boolean {
         var result = false
         transaction {
@@ -271,7 +276,6 @@ class DevFeedDao: HealthIndicator {
         return result
     }
 
-    @Synchronized
     fun updateArticleScreenshotData(article: Article) {
         transaction {
             Articles.update({ Articles.id eq article.id!! }) {
@@ -283,7 +287,7 @@ class DevFeedDao: HealthIndicator {
         }
     }
 
-    fun allButRecentArticles(limit: Int? = null, offset: Int? = null, filter: ArticleFilter? = null): Collection<Article> {
+    fun allButRecentArticles(limit: Int? = null, offset: Long? = null, filter: ArticleFilter? = null): Collection<Article> {
         val result = mutableListOf<Article>()
         transaction {
             Articles.slice(Articles.timestamp)
@@ -406,7 +410,7 @@ class DevFeedDao: HealthIndicator {
         return result.toList()
     }
 
-    fun getArticles(limit: Int? = null, offset: Int? = null, filter: ArticleFilter? = null): Collection<Article> {
+    fun getArticles(limit: Int? = null, offset: Long? = null, filter: ArticleFilter? = null): Collection<Article> {
         val result = mutableListOf<Article>()
         transaction {
             val query: Query
@@ -477,7 +481,7 @@ class DevFeedDao: HealthIndicator {
         return result.toList()
     }
 
-    fun getArticlesDates(limit: Int? = null, offset: Int? = null): Set<Long> {
+    fun getArticlesDates(limit: Int? = null, offset: Long? = null): Set<Long> {
         val result = mutableSetOf<Long>()
         transaction {
             val query = Articles.slice(Articles.timestamp).selectAll()
@@ -489,7 +493,7 @@ class DevFeedDao: HealthIndicator {
         return result.toSet()
     }
 
-    fun getRecentArticles(limit: Int? = null, offset: Int? = null): Collection<Article> {
+    fun getRecentArticles(limit: Int? = null, offset: Long? = null): Collection<Article> {
         logger.trace("getRecentArticles")
         val result = mutableListOf<Article>()
         transaction {
@@ -548,7 +552,7 @@ class DevFeedDao: HealthIndicator {
         return result.toList()
     }
 
-    fun getTags(limit: Int? = null, offset: Int? = null, search: Collection<String>?): Collection<String> {
+    fun getTags(limit: Int? = null, offset: Long? = null, search: Collection<String>?): Collection<String> {
         val result = mutableSetOf<String>()
         transaction {
             val tagNameSlice = Tags.slice(Tags.name)
@@ -572,7 +576,7 @@ class DevFeedDao: HealthIndicator {
         return try {
             //Just attempt to read from the database
             transaction {
-                Articles.slice(Articles.timestamp).selectAll().limit(1)
+                Tags.slice(Tags.name).selectAll().limit(1)
             }
             Health.up().build()
         } catch (exception: Exception) {
