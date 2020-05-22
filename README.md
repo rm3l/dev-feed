@@ -1,13 +1,9 @@
 # Dev Feed
 
-<p align="center">
-  <a href="https://play.google.com/store/apps/details?id=org.rm3l.awesome_dev"><img src="https://cdn.rawgit.com/steverichey/google-play-badge-svg/master/img/en_get.svg" width="50%"/></a>
-<!--[![Download app](https://github.com/rm3l/dev-feed/raw/master/mobile/deployment/screenshots/android/google-play-badge.png)](https://play.google.com/store/apps/details?id=org.rm3l.awesome_dev)-->
-</p>
-
 [![License](https://img.shields.io/badge/license-MIT-green.svg?style=flat)](https://github.com/rm3l/dev-feed/blob/master/LICENSE)
 
-[![CircleCI](https://circleci.com/gh/rm3l/dev-feed.svg?style=svg)](https://circleci.com/gh/rm3l/dev-feed)
+[![Backend Build Workflow](https://github.com/rm3l/dev-feed/workflows/Backend%20Build%20and%20Publish%20Docker%20Image/badge.svg)](https://github.com/rm3l/dev-feed/actions?query=workflow%3A%22Backend+Build+and+Publish+Docker+Image%22)
+[![Mobile Build Workflow](https://github.com/rm3l/dev-feed/workflows/Mobile%20Build/badge.svg)](https://github.com/rm3l/dev-feed/actions?query=workflow%3A%22Mobile+Build%22)
 
 [![Heroku](https://img.shields.io/badge/heroku-deployed%20on%20free%20dyno-blue.svg)](https://dev-feed-api.herokuapp.com/graphiql)
 
@@ -18,6 +14,10 @@ Dev Feed is a Flutter-based mobile application allowing to keep up with top engi
 companies all over the world.
 It initiated from my own needs to not only follow a curated list of tech-related blogs, but also
 play a little bit with the excellent [Flutter](https://flutter.dev/) SDK.
+
+<p align="center">
+  <a href="https://play.google.com/store/apps/details?id=org.rm3l.awesome_dev"><img src="https://cdn.rawgit.com/steverichey/google-play-badge-svg/master/img/en_get.svg" width="50%"/></a>
+</p>
 
 ![demo](https://raw.githubusercontent.com/rm3l/dev-feed/master/mobile/deployment/screenshots/android/latest_news_w400.png)
 
