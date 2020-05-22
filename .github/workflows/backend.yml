@@ -1,0 +1,87 @@
+# This workflow will build a Java project with Gradle
+# For more information see: https://help.github.com/actions/language-and-framework-guides/building-and-testing-java-with-gradle
+
+name: Backend Build and Publish Docker Image
+
+on:
+  push:
+    branches:
+      - master
+    tags:
+      - '*'
+  pull_request:
+    branches: [ master ]
+
+jobs:
+  build:
+
+    runs-on: ubuntu-latest
+
+    steps:
+
+    - uses: actions/checkout@v2
+
+    - name: Set up JDK 14
+      uses: actions/setup-java@v1
+      with:
+        java-version: 14
+
+    - uses: actions/cache@master
+      #Using master because of the multi-paths feature (reportedly only available on master at the moment)
+      with:
+        path: |
+          ~/.gradle/wrapper
+          ~/.gradle/caches
+        key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle*') }}
+        restore-keys: |
+          ${{ runner.os }}-gradle-
+
+    - name: Grant execute permission for gradlew
+      run: chmod +x ./backend/gradlew
+
+    - name: Build with Gradle
+      run: ./backend/gradlew -p ./backend build --stacktrace
+
+  docker:
+    if: github.event_name == 'push' && (github.ref == 'refs/heads/master' || startsWith(github.ref, 'refs/tags/'))
+    needs: build
+
+    runs-on: ubuntu-latest
+
+    env:
+      DOCKER_BUILDKIT: 1
+
+    steps:
+
+      - uses: actions/checkout@v2
+
+      - name: Set up JDK 14
+        uses: actions/setup-java@v1
+        with:
+          java-version: 14
+
+      - uses: actions/cache@master
+        #Using master because of the multi-paths feature (reportedly only available on master at the moment)
+        with:
+          path: |
+            ~/.gradle/wrapper
+            ~/.gradle/caches
+            application/build/jib-cache
+          key: ${{ runner.os }}-jib-${{ hashFiles('**/*.gradle*') }}
+          restore-keys: |
+            ${{ runner.os }}-gradle-
+
+      - name: Grant execute permission for gradlew
+        run: chmod +x ./backend/gradlew
+
+      - name: Retrieve branch or tag name
+        id: refvar
+        run: echo "::set-output name=gitRefName::${GITHUB_REF#refs/*/}"
+
+      - name: Run Gradle Jib task
+        if: startsWith(github.ref, 'refs/tags/')
+        run: ./backend/gradlew -p ./backend jib -Djib.to.image="registry.hub.docker.com/rm3l/dev-feed:${{ steps.refvar.outputs.gitRefName }}" -Djib.to.auth.username="${{ secrets.DOCKER_HUB_USERNAME }}" -Djib.to.auth.password="${{ secrets.DOCKER_HUB_PASSWORD }}"
+
+      - name: Push latest Docker image
+        if: github.ref == 'refs/heads/master'
+        run: ./backend/gradlew -p ./backend jib -Djib.to.image="registry.hub.docker.com/rm3l/dev-feed:latest" -Djib.to.auth.username="${{ secrets.DOCKER_HUB_USERNAME }}" -Djib.to.auth.password="${{ secrets.DOCKER_HUB_PASSWORD }}"
