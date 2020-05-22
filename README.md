@@ -46,7 +46,7 @@ git clone https://github.com/rm3l/dev-feed && cd dev-feed
 3. Run the Backend
 
 ```sh
-java -jar backend/build/libs/dev-feed-backend-0.3.0.jar
+java -jar backend/build/libs/dev-feed-backend-0.3.1.jar
 ```
 
 You can then access the GraphiQL browser by heading to http://localhost:8080/graphiql
