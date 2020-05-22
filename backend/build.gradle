@@ -88,3 +88,19 @@ dependencies {
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
     testImplementation 'io.projectreactor:reactor-test'
 }
+
+jib {
+    to {
+        image = "${project.group}/dev-feed-api"
+    }
+    container {
+        labels = [
+            "maintainer": "Armel Soro <armel@rm3l.org>"
+        ]
+        jvmFlags = ['-Djava.security.egd=file:/dev/./urandom']
+        ports = ['8080', '8081']
+        format = 'OCI'
+    }
+
+}
+
