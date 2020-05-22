@@ -30,7 +30,7 @@ plugins {
 }
 
 group = 'org.rm3l'
-version = '0.2.0-SNAPSHOT'
+version = '0.3.0'
 sourceCompatibility = 11
 
 compileKotlin {
