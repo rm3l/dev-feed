@@ -1,6 +1,9 @@
 # Dev Feed
 
-[![Download app](https://github.com/rm3l/dev-feed/raw/master/mobile/deployment/screenshots/android/google-play-badge.png)](https://play.google.com/store/apps/details?id=org.rm3l.awesome_dev)
+<p align="center">
+  <a href="https://play.google.com/store/apps/details?id=org.rm3l.awesome_dev"><img src="https://cdn.rawgit.com/steverichey/google-play-badge-svg/master/img/en_get.svg" width="50%"/></a>
+<!--[![Download app](https://github.com/rm3l/dev-feed/raw/master/mobile/deployment/screenshots/android/google-play-badge.png)](https://play.google.com/store/apps/details?id=org.rm3l.awesome_dev)-->
+</p>
 
 [![License](https://img.shields.io/badge/license-MIT-green.svg?style=flat)](https://github.com/rm3l/dev-feed/blob/master/LICENSE)
 
@@ -8,8 +11,6 @@
 
 [![Heroku](https://img.shields.io/badge/heroku-deployed%20on%20free%20dyno-blue.svg)](https://dev-feed-api.herokuapp.com/graphiql)
 
-[![Docker Automated build](https://img.shields.io/docker/cloud/automated/rm3l/dev-feed.svg)](https://hub.docker.com/r/rm3l/dev-feed)
-[![Docker Build Status](https://img.shields.io/docker/cloud/build/rm3l/dev-feed.svg)](https://hub.docker.com/r/rm3l/dev-feed)
 [![Docker Stars](https://img.shields.io/docker/stars/rm3l/dev-feed.svg)](https://hub.docker.com/r/rm3l/dev-feed)
 [![Docker Pulls](https://img.shields.io/docker/pulls/rm3l/dev-feed.svg)](https://hub.docker.com/r/rm3l/dev-feed)
 
