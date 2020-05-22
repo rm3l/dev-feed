@@ -8,7 +8,7 @@ on:
 name: Mobile Build
 jobs:
   build:
-    name: Build APK
+    name: Build and test APK
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v1
@@ -17,14 +17,17 @@ jobs:
         java-version: '9.x'
     - uses: subosito/flutter-action@v1
       with:
-        flutter-version: '1.17.1'
-    - run: |
+        flutter-version: '1.7.8+hotfix.4'
+    - name: Get Flutter packages
+      run: |
         cd mobile
         flutter pub get
-    - run: |
+    - name: Run Flutter tests
+      run: |
         cd mobile
         flutter test
-    - run: |
+    - name: Build APK
+      run: |
         cd mobile
         flutter build apk --debug --split-per-abi
     #- name: Push APK to Releases
