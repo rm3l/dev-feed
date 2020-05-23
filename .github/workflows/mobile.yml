@@ -30,9 +30,8 @@ jobs:
       run: |
         cd mobile
         flutter build apk --debug --split-per-abi
-    #- name: Push APK to Releases
-    #  uses: ncipollo/release-action@v1
-    #  with:
-    #    artifacts: "build/app/outputs/apk/debug/*.apk"
-    #    token: ${{ secrets.TOKEN }}
-
+    - name: Archive artifacts
+      uses: actions/upload-artifact@@v2
+      with:
+        name: APKs
+        path: build/app/outputs/apk/debug/app-*.apk
