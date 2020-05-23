@@ -1,7 +1,5 @@
 # Dev Feed
 
-[![License](https://img.shields.io/badge/license-MIT-green.svg?style=flat)](https://github.com/rm3l/dev-feed/blob/master/LICENSE)
-
 [![Backend Build Workflow](https://github.com/rm3l/dev-feed/workflows/Backend%20Build%20and%20Publish%20Docker%20Image/badge.svg)](https://github.com/rm3l/dev-feed/actions?query=workflow%3A%22Backend+Build+and+Publish+Docker+Image%22)
 [![Mobile Build Workflow](https://github.com/rm3l/dev-feed/workflows/Mobile%20Build/badge.svg)](https://github.com/rm3l/dev-feed/actions?query=workflow%3A%22Mobile+Build%22)
 
@@ -10,14 +8,14 @@
 [![Docker Stars](https://img.shields.io/docker/stars/rm3l/dev-feed.svg)](https://hub.docker.com/r/rm3l/dev-feed)
 [![Docker Pulls](https://img.shields.io/docker/pulls/rm3l/dev-feed.svg)](https://hub.docker.com/r/rm3l/dev-feed)
 
+[![License](https://img.shields.io/badge/license-MIT-green.svg?style=flat)](https://github.com/rm3l/dev-feed/blob/master/LICENSE)
+
 Dev Feed is a Flutter-based mobile application allowing to keep up with top engineering content from
 companies all over the world.
-It initiated from my own needs to not only follow a curated list of tech-related blogs, but also
+It stemmed from my own needs to not only follow a curated list of tech-related blogs, but also
 play a little bit with the excellent [Flutter](https://flutter.dev/) SDK.
 
-<p align="center">
-  <a href="https://play.google.com/store/apps/details?id=org.rm3l.awesome_dev"><img src="https://cdn.rawgit.com/steverichey/google-play-badge-svg/master/img/en_get.svg" width="50%"/></a>
-</p>
+<a href="https://play.google.com/store/apps/details?id=org.rm3l.awesome_dev"><img src="https://github.com/rm3l/dev-feed/raw/master/mobile/deployment/screenshots/android/google-play-badge.png" width="50%"/></a>
 
 ![demo](https://raw.githubusercontent.com/rm3l/dev-feed/master/mobile/deployment/screenshots/android/latest_news_w400.png)
 
