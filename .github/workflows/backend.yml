@@ -78,10 +78,10 @@ jobs:
         id: refvar
         run: echo "::set-output name=gitRefName::${GITHUB_REF#refs/*/}"
 
-      - name: Run Gradle Jib task
+      - name: Push Docker image (tag)
         if: startsWith(github.ref, 'refs/tags/')
         run: ./backend/gradlew -p ./backend jib -Djib.to.image="registry.hub.docker.com/rm3l/dev-feed:${{ steps.refvar.outputs.gitRefName }}" -Djib.to.auth.username="${{ secrets.DOCKER_HUB_USERNAME }}" -Djib.to.auth.password="${{ secrets.DOCKER_HUB_PASSWORD }}"
 
-      - name: Push latest Docker image
+      - name: Push latest Docker image (master)
         if: github.ref == 'refs/heads/master'
         run: ./backend/gradlew -p ./backend jib -Djib.to.image="registry.hub.docker.com/rm3l/dev-feed:latest" -Djib.to.auth.username="${{ secrets.DOCKER_HUB_USERNAME }}" -Djib.to.auth.password="${{ secrets.DOCKER_HUB_PASSWORD }}"
