@@ -1,0 +1,42 @@
+version: 2
+updates:
+- package-ecosystem: gradle
+  directory: "/mobile/android/app"
+  schedule:
+    interval: weekly
+    time: '04:00'
+  open-pull-requests-limit: 10
+  reviewers:
+  - rm3l
+  labels:
+  - dependencies
+- package-ecosystem: gradle
+  directory: "/mobile/android"
+  schedule:
+    interval: weekly
+    time: '04:00'
+  open-pull-requests-limit: 10
+  reviewers:
+  - rm3l
+  labels:
+  - dependencies
+- package-ecosystem: gradle
+  directory: "/backend"
+  schedule:
+    interval: weekly
+    time: '04:00'
+  open-pull-requests-limit: 10
+  reviewers:
+  - rm3l
+  labels:
+  - dependencies
+- package-ecosystem: docker
+  directory: "/backend"
+  schedule:
+    interval: weekly
+    time: '04:00'
+  open-pull-requests-limit: 10
+  reviewers:
+  - rm3l
+  labels:
+  - dependencies
