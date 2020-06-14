@@ -79,11 +79,7 @@ dependencies {
 
     implementation 'khttp:khttp:1.0.0'
 
-    implementation ('com.github.karussell:snacktory:-SNAPSHOT') {
-        exclude group: 'org.jsoup', module: 'jsoup'
-        exclude group: 'org.slf4j'
-        exclude group: 'log4j', module: 'log4j'
-    }
+    implementation ('com.github.chimbori:crux:2.2.0')
 
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
     testImplementation 'io.projectreactor:reactor-test'
