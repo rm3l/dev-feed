@@ -78,7 +78,7 @@ dependencies {
     // GraphQL and GraphiQL
     implementation 'com.graphql-java-kickstart:graphql-spring-boot-starter:7.0.1'
     implementation 'com.graphql-java-kickstart:graphiql-spring-boot-starter:7.1.0'
-    implementation 'com.graphql-java-kickstart:graphql-java-tools:6.0.2'
+    implementation 'com.graphql-java-kickstart:graphql-java-tools:6.1.0'
 
     implementation 'khttp:khttp:1.0.0'
 
