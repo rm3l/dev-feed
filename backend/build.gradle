@@ -33,6 +33,10 @@ group = 'org.rm3l'
 version = '0.3.1'
 sourceCompatibility = 11
 
+ext {
+    exposedVersion = '0.26.1'
+}
+
 compileKotlin {
     kotlinOptions {
         freeCompilerArgs = ["-Xjsr305=strict"]
@@ -64,9 +68,9 @@ dependencies {
 
     implementation ("org.jsoup:jsoup:1.13.1")
 
-    implementation ("org.jetbrains.exposed:exposed-core:0.25.1")
-    implementation ("org.jetbrains.exposed:exposed-dao:0.26.1")
-    implementation ("org.jetbrains.exposed:exposed-jdbc:0.26.1")
+    implementation ("org.jetbrains.exposed:exposed-core:${exposedVersion}")
+    implementation ("org.jetbrains.exposed:exposed-dao:${exposedVersion}")
+    implementation ("org.jetbrains.exposed:exposed-jdbc:${exposedVersion}")
 
     //JDBC Drivers
     implementation 'org.xerial:sqlite-jdbc:3.32.3'
