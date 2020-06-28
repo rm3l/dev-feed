@@ -35,6 +35,7 @@ sourceCompatibility = 11
 
 ext {
     exposedVersion = '0.26.1'
+    graphqlSpringBootStarterVersion = '7.1.0'
 }
 
 compileKotlin {
@@ -76,8 +77,8 @@ dependencies {
     implementation 'com.h2database:h2:1.4.200'
 
     // GraphQL and GraphiQL
-    implementation 'com.graphql-java-kickstart:graphql-spring-boot-starter:7.1.0'
-    implementation 'com.graphql-java-kickstart:graphiql-spring-boot-starter:7.1.0'
+    implementation "com.graphql-java-kickstart:graphql-spring-boot-starter:${graphqlSpringBootStarterVersion}"
+    implementation "com.graphql-java-kickstart:graphiql-spring-boot-starter:${graphqlSpringBootStarterVersion}"
 
     implementation 'khttp:khttp:1.0.0'
 
