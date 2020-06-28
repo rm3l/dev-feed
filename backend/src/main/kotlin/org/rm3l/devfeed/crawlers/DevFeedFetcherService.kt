@@ -1,5 +1,6 @@
 package org.rm3l.devfeed.crawlers
 
+import org.rm3l.devfeed.contract.Article
 import org.rm3l.devfeed.dal.DevFeedDao
 import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Autowired
@@ -56,35 +57,14 @@ class DevFeedFetcherService(private val dao: DevFeedDao,
     @Synchronized fun triggerRemoteWebsiteCrawlingAndScreenshotUpdater() {
         try {
             if (!crawlers.isNullOrEmpty()) {
-                val futures = crawlers
+                handleArticles(crawlers
                         .map { crawler -> CompletableFuture.supplyAsync {
                             logger.debug("Crawling from $crawler...")
                             val articles = crawler.fetchArticles()
                             logger.debug("... Done crawling from $crawler : ${articles.size} articles!")
                             articles
                         } }
-                        .flatMap { it.join() }
-                        .map {
-                            var identifier: Long? = null
-                            if (!dao.existArticlesByTitleAndUrl(it.title, it.url)) {
-                                identifier = dao.insertArticle(it)
-                            }
-                            identifier?.let {dao.findArticleById(identifier)  }
-                        }
-                        .filterNotNull()
-                        .map { CompletableFuture.supplyAsync(
-                                ArticleScreenshotGrabber(dao, it),
-                                crawlersExecutorService) }
-                        .map { it.join() }
-                        .map { CompletableFuture.supplyAsync(
-                                ArticleExtractor(dao, documentParserApiKey, it),
-                                crawlersExecutorService
-                        ) }
-                        .map { it.join() }
-                        .map { CompletableFuture.supplyAsync(
-                                ArticleUpdater(dao, it), crawlersExecutorService) }
-                        .toTypedArray()
-                CompletableFuture.allOf(*futures).get() //Wait for all of them to finish
+                        .flatMap { it.join() }.toList(), synchronous = true)
                 logger.warn("Done crawling remote websites successfully")
                 remoteWebsiteCrawlingSucceeded.set(true)
                 remoteWebsiteCrawlingErrored.set(false)
@@ -97,6 +77,34 @@ class DevFeedFetcherService(private val dao: DevFeedDao,
         } finally {
             triggerScreenshotUpdater()
         }
+    }
+
+    fun handleArticles(articles: Collection<Article>, synchronous: Boolean = true):
+            Collection<CompletableFuture<Unit>> {
+        val futures = articles
+                .map {
+                    var identifier: Long? = null
+                    if (!dao.existArticlesByTitleAndUrl(it.title, it.url)) {
+                        identifier = dao.insertArticle(it)
+                    }
+                    identifier?.let {dao.findArticleById(identifier)  }
+                }
+                .filterNotNull()
+                .map { CompletableFuture.supplyAsync(
+                        ArticleScreenshotGrabber(dao, it),
+                        crawlersExecutorService) }
+                .map { it.join() }
+                .map { CompletableFuture.supplyAsync(
+                        ArticleExtractor(dao, documentParserApiKey, it),
+                        crawlersExecutorService
+                ) }
+                .map { it.join() }
+                .map { CompletableFuture.supplyAsync(
+                        ArticleUpdater(dao, it), crawlersExecutorService) }
+        if (synchronous) {
+            CompletableFuture.allOf(*futures.toTypedArray()).get() //Wait for all of them to finish
+        }
+        return futures
     }
 
     private fun triggerScreenshotUpdater() {
