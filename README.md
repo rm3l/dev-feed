@@ -90,6 +90,12 @@ You will then find the mobile applications built under the respective platform f
 7. Install and run the APK either in an emulator or in a real device
 
 ```sh
+flutter install
+```
+
+Or:
+
+```sh
 adb install -r build/app/outputs/apk/app.apk
 ```
 
