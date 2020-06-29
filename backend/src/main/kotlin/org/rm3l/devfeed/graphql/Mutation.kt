@@ -27,7 +27,7 @@ import org.rm3l.devfeed.dal.DevFeedDao
 import org.springframework.stereotype.Component
 
 @Component
-class Mutation(private val dao: DevFeedDao): GraphQLMutationResolver {
+class Mutation(private val dao: DevFeedDao) : GraphQLMutationResolver {
 
     fun addArticle(input: ArticleInput): Article {
         TODO("Not implemented yet")

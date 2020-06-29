@@ -28,6 +28,7 @@ import org.rm3l.devfeed.utils.asSupportedTimestamp
 import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.beans.factory.annotation.Qualifier
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty
 import org.springframework.stereotype.Service
 import java.util.concurrent.CompletableFuture
 import java.util.concurrent.ExecutionException
@@ -40,13 +41,14 @@ const val BACKEND_ARCHIVE_URL = "$BACKEND_BASE_URL/archive"
 const val USER_AGENT = "org.rm3l.devfeed"
 
 @Service
-class DiscoverDevIoCrawler: DevFeedCrawler {
+@ConditionalOnProperty(name = ["crawlers.discoverdev_io.enabled"], havingValue = "true", matchIfMissing = true)
+class DiscoverDevIoCrawler : DevFeedCrawler {
 
     companion object {
         @JvmStatic
         private val logger = LoggerFactory.getLogger(DiscoverDevIoCrawler::class.java)
     }
-    
+
     @Autowired
     @Qualifier("crawlersExecutorService")
     private lateinit var crawlersExecutorService: ExecutorService
@@ -62,13 +64,14 @@ class DiscoverDevIoCrawler: DevFeedCrawler {
                     .get()
                     .run {
                         select("main.archive-page ul.archive-list li a")
-                                .map { it.attr("href")}
+                                .map { it.attr("href") }
                                 .map { it.replaceFirst("/archive/", "", ignoreCase = true) }
                                 .map {
                                     logger.trace("Crawling page: $it ...")
                                     CompletableFuture.supplyAsync(
                                             DiscoverDevIoCrawlerArchiveFetcherFutureSupplier(it),
-                                            crawlersExecutorService) }
+                                            crawlersExecutorService)
+                                }
                                 .flatMap { it.join() }
                                 .toList()
                     }
@@ -84,7 +87,7 @@ class DiscoverDevIoCrawler: DevFeedCrawler {
     }
 }
 
-private class DiscoverDevIoCrawlerArchiveFetcherFutureSupplier(private val date: String):
+private class DiscoverDevIoCrawlerArchiveFetcherFutureSupplier(private val date: String) :
         Supplier<Collection<Article>> {
 
     companion object {
@@ -93,7 +96,7 @@ private class DiscoverDevIoCrawlerArchiveFetcherFutureSupplier(private val date:
     }
 
     override fun get(): Collection<Article> {
-	    try {
+        try {
             return Jsoup.connect("$BACKEND_ARCHIVE_URL/$date")
                     .userAgent(USER_AGENT)
                     .get()
@@ -120,7 +123,7 @@ private class DiscoverDevIoCrawlerArchiveFetcherFutureSupplier(private val date:
             if (logger.isDebugEnabled) {
                 logger.debug(e.message, e)
             }
-	        return emptyList()
+            return emptyList()
         }
     }
 }

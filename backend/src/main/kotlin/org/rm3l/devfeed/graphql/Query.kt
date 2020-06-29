@@ -27,7 +27,7 @@ import org.springframework.stereotype.Component
 
 @Suppress("unused")
 @Component
-class Query(private val dao: DevFeedDao): GraphQLQueryResolver {
+class Query(private val dao: DevFeedDao) : GraphQLQueryResolver {
 
     fun articleDates(limit: Int?, offset: Long?) = dao.getArticlesDates(limit, offset)
 

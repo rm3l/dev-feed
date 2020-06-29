@@ -37,6 +37,5 @@ class DevFeedAsyncConfiguration {
     private lateinit var threadPoolSize: String
 
     @Bean(name = ["crawlersExecutorService"], destroyMethod = "shutdownNow")
-    fun crawlersExecutorService(): ExecutorService
-            = Executors.newFixedThreadPool(threadPoolSize.toInt())
+    fun crawlersExecutorService(): ExecutorService = Executors.newFixedThreadPool(threadPoolSize.toInt())
 }

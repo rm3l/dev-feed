@@ -33,9 +33,9 @@ import org.springframework.test.context.junit4.SpringRunner
 @ActiveProfiles(value = ["test"])
 class DevFeedApplicationIntegrationTests {
 
-	private val logger = LoggerFactory.getLogger(DevFeedApplicationIntegrationTests::class.java)
+    private val logger = LoggerFactory.getLogger(DevFeedApplicationIntegrationTests::class.java)
 
-	@Test
-	fun contextLoads() = logger.info("Hooray! Application Context successfully loaded.")
+    @Test
+    fun contextLoads() = logger.info("Hooray! Application Context successfully loaded.")
 
 }
