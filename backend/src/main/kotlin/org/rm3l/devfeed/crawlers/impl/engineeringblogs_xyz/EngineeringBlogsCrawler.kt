@@ -28,6 +28,7 @@ import com.rometools.rome.io.WireFeedInput
 import com.rometools.rome.io.XmlReader
 import org.rm3l.devfeed.contract.Article
 import org.rm3l.devfeed.crawlers.DevFeedCrawler
+import org.rm3l.devfeed.utils.asSupportedTimestamp
 import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.beans.factory.annotation.Qualifier
@@ -36,6 +37,7 @@ import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty
 import org.springframework.stereotype.Service
 import java.io.ByteArrayInputStream
 import java.net.URL
+import java.text.SimpleDateFormat
 import java.util.concurrent.CompletableFuture
 import java.util.concurrent.ExecutionException
 import java.util.concurrent.ExecutorService
@@ -112,7 +114,8 @@ private class EngineeringBlogsCrawlerArchiveFetcherFutureSupplier(private val ou
                     .filterNot { it.publishedDate == null && it.updatedDate == null }
                     .map { feedEntry ->
                         Article(
-                                timestamp = (feedEntry.publishedDate ?: feedEntry.updatedDate).time,
+                                timestamp = (feedEntry.publishedDate ?: feedEntry.updatedDate)
+                                        .asSupportedTimestamp()!!,
                                 title = feedEntry.title,
                                 url = feedEntry.link ?: outline.htmlUrl,
                                 description = feedEntry.description?.value,
