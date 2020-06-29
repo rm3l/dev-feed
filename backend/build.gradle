@@ -36,6 +36,7 @@ sourceCompatibility = 11
 ext {
     exposedVersion = '0.26.1'
     graphqlSpringBootStarterVersion = '7.1.0'
+    romeVersion = '1.14.1'
 }
 
 compileKotlin {
@@ -65,12 +66,13 @@ dependencies {
 
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk8"
     implementation "org.jetbrains.kotlin:kotlin-reflect"
-    implementation('org.jetbrains.kotlinx:kotlinx-coroutines-core:1.3.7-mpp-dev-11') //Constrained by graphql-java-tools
+    implementation('org.jetbrains.kotlinx:kotlinx-coroutines-core:1.3.7-mpp-dev-11')
+    //Constrained by graphql-java-tools
 
-    implementation ("org.jsoup:jsoup:1.13.1")
+    implementation("org.jsoup:jsoup:1.13.1")
 
-    implementation ("org.jetbrains.exposed:exposed-dao:${exposedVersion}")
-    implementation ("org.jetbrains.exposed:exposed-jdbc:${exposedVersion}")
+    implementation("org.jetbrains.exposed:exposed-dao:${exposedVersion}")
+    implementation("org.jetbrains.exposed:exposed-jdbc:${exposedVersion}")
 
     //JDBC Drivers
     implementation 'org.xerial:sqlite-jdbc:3.32.3'
@@ -82,10 +84,12 @@ dependencies {
 
     implementation 'khttp:khttp:1.0.0'
 
-    implementation ('com.github.chimbori:crux:2.2.0')
+    implementation('com.github.chimbori:crux:2.2.0')
 
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
     testImplementation 'io.projectreactor:reactor-test'
+
+    implementation "com.rometools:rome-opml:${romeVersion}"
 }
 
 jib {
@@ -94,7 +98,7 @@ jib {
     }
     container {
         labels = [
-            "maintainer": "Armel Soro <armel@rm3l.org>"
+                "maintainer": "Armel Soro <armel@rm3l.org>"
         ]
         jvmFlags = ['-Djava.security.egd=file:/dev/./urandom']
         ports = ['8080', '8081']

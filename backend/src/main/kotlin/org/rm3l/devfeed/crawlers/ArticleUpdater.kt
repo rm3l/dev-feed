@@ -27,7 +27,7 @@ import org.slf4j.LoggerFactory
 import java.util.function.Supplier
 
 class ArticleUpdater(private val dao: DevFeedDao,
-                     private val article: Article):
+                     private val article: Article) :
         Supplier<Unit> {
 
     companion object {

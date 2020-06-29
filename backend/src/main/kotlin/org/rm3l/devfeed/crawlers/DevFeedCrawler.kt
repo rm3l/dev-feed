@@ -22,7 +22,6 @@
 package org.rm3l.devfeed.crawlers
 
 import org.rm3l.devfeed.contract.Article
-import java.lang.Exception
 
 interface DevFeedCrawler {
 

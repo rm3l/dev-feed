@@ -33,8 +33,8 @@ import java.util.function.Supplier
  * https://shkspr.mobi/blog/2015/11/google-secret-screenshot-api/
  */
 class ArticleScreenshotGrabber(private val dao: DevFeedDao,
-                                       private val article: Article,
-                                       private val updater: Boolean = false):
+                               private val article: Article,
+                               private val updater: Boolean = false) :
         Supplier<Article> {
 
     companion object {

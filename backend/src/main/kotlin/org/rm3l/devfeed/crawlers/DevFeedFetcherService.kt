@@ -18,7 +18,7 @@ import javax.annotation.PostConstruct
 
 @Service
 class DevFeedFetcherService(private val dao: DevFeedDao,
-                            private val crawlers: Collection<DevFeedCrawler>? = null): HealthIndicator {
+                            private val crawlers: Collection<DevFeedCrawler>? = null) : HealthIndicator {
 
     companion object {
         @JvmStatic
@@ -54,16 +54,19 @@ class DevFeedFetcherService(private val dao: DevFeedDao,
     }
 
     @Scheduled(cron = "\${crawlers.task.cron-expression}")
-    @Synchronized fun triggerRemoteWebsiteCrawlingAndScreenshotUpdater() {
+    @Synchronized
+    fun triggerRemoteWebsiteCrawlingAndScreenshotUpdater() {
         try {
             if (!crawlers.isNullOrEmpty()) {
                 handleArticles(crawlers
-                        .map { crawler -> CompletableFuture.supplyAsync {
-                            logger.debug("Crawling from $crawler...")
-                            val articles = crawler.fetchArticles()
-                            logger.debug("... Done crawling from $crawler : ${articles.size} articles!")
-                            articles
-                        } }
+                        .map { crawler ->
+                            CompletableFuture.supplyAsync {
+                                logger.debug("Crawling from $crawler...")
+                                val articles = crawler.fetchArticles()
+                                logger.debug("... Done crawling from $crawler : ${articles.size} articles!")
+                                articles
+                            }
+                        }
                         .flatMap { it.join() }.toList(), synchronous = true)
                 logger.warn("Done crawling remote websites successfully")
                 remoteWebsiteCrawlingSucceeded.set(true)
@@ -87,20 +90,26 @@ class DevFeedFetcherService(private val dao: DevFeedDao,
                     if (!dao.existArticlesByTitleAndUrl(it.title, it.url)) {
                         identifier = dao.insertArticle(it)
                     }
-                    identifier?.let {dao.findArticleById(identifier)  }
+                    identifier?.let { dao.findArticleById(identifier) }
                 }
                 .filterNotNull()
-                .map { CompletableFuture.supplyAsync(
-                        ArticleScreenshotGrabber(dao, it),
-                        crawlersExecutorService) }
+                .map {
+                    CompletableFuture.supplyAsync(
+                            ArticleScreenshotGrabber(dao, it),
+                            crawlersExecutorService)
+                }
                 .map { it.join() }
-                .map { CompletableFuture.supplyAsync(
-                        ArticleExtractor(dao, documentParserApiKey, it),
-                        crawlersExecutorService
-                ) }
+                .map {
+                    CompletableFuture.supplyAsync(
+                            ArticleExtractor(dao, documentParserApiKey, it),
+                            crawlersExecutorService
+                    )
+                }
                 .map { it.join() }
-                .map { CompletableFuture.supplyAsync(
-                        ArticleUpdater(dao, it), crawlersExecutorService) }
+                .map {
+                    CompletableFuture.supplyAsync(
+                            ArticleUpdater(dao, it), crawlersExecutorService)
+                }
         if (synchronous) {
             CompletableFuture.allOf(*futures.toTypedArray()).get() //Wait for all of them to finish
         }

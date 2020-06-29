@@ -31,8 +31,8 @@ data class ArticleFilter(
 )
 
 data class ArticleInput(
-       val date: String,
-       val description: String,
-       val url: String,
-       val tags: List<String>? = null
+        val date: String,
+        val description: String,
+        val url: String,
+        val tags: List<String>? = null
 )

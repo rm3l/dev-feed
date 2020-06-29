@@ -25,11 +25,10 @@ import org.rm3l.devfeed.contract.Article
 import org.rm3l.devfeed.contract.ArticleParsed
 import org.rm3l.devfeed.dal.DevFeedDao
 import org.slf4j.LoggerFactory
-import java.util.concurrent.atomic.AtomicBoolean
 import java.util.function.Supplier
 
-class ArticleExtractor(private val dao: DevFeedDao, private val documentParserApiKey:String,
-                       private val article: Article): Supplier<Article> {
+class ArticleExtractor(private val dao: DevFeedDao, private val documentParserApiKey: String,
+                       private val article: Article) : Supplier<Article> {
 
     companion object {
 

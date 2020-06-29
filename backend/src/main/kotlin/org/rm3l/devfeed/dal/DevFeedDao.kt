@@ -31,7 +31,6 @@ import org.jetbrains.exposed.sql.transactions.transaction
 import org.rm3l.devfeed.contract.Article
 import org.rm3l.devfeed.contract.ArticleParsed
 import org.rm3l.devfeed.contract.Screenshot
-import org.rm3l.devfeed.crawlers.impl.discoverdev_io.DiscoverDevIoCrawler
 import org.rm3l.devfeed.graphql.ArticleFilter
 import org.rm3l.devfeed.utils.asSupportedTimestamp
 import org.slf4j.LoggerFactory
@@ -41,7 +40,6 @@ import org.springframework.boot.actuate.health.Health
 import org.springframework.boot.actuate.health.HealthIndicator
 import org.springframework.http.converter.json.Jackson2ObjectMapperBuilder
 import org.springframework.stereotype.Component
-import java.lang.IllegalStateException
 import java.net.URL
 import java.sql.Connection
 import javax.annotation.PostConstruct
@@ -51,7 +49,7 @@ object Articles : Table(name = "articles") {
     val timestamp = long(name = "timestamp")
     val title = text(name = "title")
     val description = text(name = "description").nullable()
-    val link = varchar(name = "link", length=65535)
+    val link = varchar(name = "link", length = 65535)
     val hostname = text(name = "hostname").nullable()
     val screenshotData = text(name = "screenshot_data").nullable()
     val screenshotWidth = integer(name = "screenshot_width").nullable()
@@ -60,17 +58,17 @@ object Articles : Table(name = "articles") {
 }
 
 object Tags : Table(name = "tags") {
-    val name = varchar(name = "name", length=65535).primaryKey()
+    val name = varchar(name = "name", length = 65535).primaryKey()
 }
 
 object ArticlesTags : Table(name = "articles_tags") {
     val articleId = (long("article_id") references Articles.id)
-    val tagName = (varchar("tag_name", length=65535) references Tags.name)
+    val tagName = (varchar("tag_name", length = 65535) references Tags.name)
 }
 
 object ArticlesParsed : Table(name = "articles_parsed") {
     val id = long(name = "id").autoIncrement().primaryKey()
-    val url = (varchar(name = "link", length=65535) references Articles.link)
+    val url = (varchar(name = "link", length = 65535) references Articles.link)
     val title = text(name = "title").nullable()
     val author = text(name = "author").nullable()
     val published = text(name = "published").nullable() //TODO Use DateTime
@@ -84,7 +82,7 @@ object ArticlesParsed : Table(name = "articles_parsed") {
 const val DEFAULT_OFFSET = 0L
 
 @Component
-class DevFeedDao: HealthIndicator {
+class DevFeedDao : HealthIndicator {
 
     @Value("\${datasource.url}")
     private lateinit var datasourceUrl: String
@@ -159,13 +157,13 @@ class DevFeedDao: HealthIndicator {
     fun existTagByName(name: String): Boolean {
         var result = false
         transaction {
-            result = !Tags.select { Tags.name.eq(name)}.empty()
+            result = !Tags.select { Tags.name.eq(name) }.empty()
         }
         return result
     }
 
     fun findArticleById(articleId: Long): Article? {
-        var result : Article? = null
+        var result: Article? = null
         transaction {
             result = Articles.select { Articles.id.eq(articleId) }
                     .limit(1)
@@ -233,26 +231,31 @@ class DevFeedDao: HealthIndicator {
                     it[image] = articleParsed.image
                     it[description] = articleParsed.description
                     it[body] = articleParsed.body
-                    it[videos] = objectMapper.writeValueAsString(articleParsed.videos?: emptyList<String>())
-                    it[keywords] = objectMapper.writeValueAsString(articleParsed.keywords?: emptyList<String>())
+                    it[videos] = objectMapper.writeValueAsString(articleParsed.videos
+                            ?: emptyList<String>())
+                    it[keywords] = objectMapper.writeValueAsString(articleParsed.keywords
+                            ?: emptyList<String>())
                 }
             }
 
-            article.tags?.map { articleTag ->
-                if (!existTagByName(articleTag)) {
-                    Tags.insert {
-                        it[name] = articleTag
+            article.tags
+                    ?.map { articleTag -> articleTag.toLowerCase().trim().replace("\\s".toRegex(), "-") }
+                    ?.map { articleTag -> if (articleTag.startsWith("#")) articleTag else "#$articleTag" }
+                    ?.map { articleTag ->
+                        if (!existTagByName(articleTag)) {
+                            Tags.insert {
+                                it[name] = articleTag
+                            }
+                        }
+                        articleTag
+                    }?.forEach { tagIdInserted ->
+                        ArticlesTags.insert {
+                            it[articleId] = articleIdentifier!!
+                            it[tagName] = tagIdInserted
+                        }
                     }
-                }
-                articleTag
-            }?.forEach { tagIdInserted ->
-                ArticlesTags.insert {
-                    it[articleId] = articleIdentifier!!
-                    it[tagName] = tagIdInserted
-                }
-            }
         }
-        return articleIdentifier?:throw IllegalStateException(
+        return articleIdentifier ?: throw IllegalStateException(
                 "Could not retrieve identifier for <${article.title},${article.url}>")
     }
 
@@ -305,7 +308,8 @@ class DevFeedDao: HealthIndicator {
                                 whereClause = whereClause.and(
                                         Articles.timestamp.between(
                                                 filter.from.asSupportedTimestamp()!!,
-                                                filter.to?.asSupportedTimestamp()?: System.currentTimeMillis()))
+                                                filter.to?.asSupportedTimestamp()
+                                                        ?: System.currentTimeMillis()))
                             } else if (filter.to != null) {
                                 whereClause = whereClause.and(
                                         Articles.timestamp.between(System.currentTimeMillis(),
@@ -327,7 +331,7 @@ class DevFeedDao: HealthIndicator {
                         query.orderBy(Articles.timestamp, order = SortOrder.DESC)
 
                         val list = query
-                                .map {articleResultRow ->
+                                .map { articleResultRow ->
                                     val article = Article(id = articleResultRow[Articles.id].toLong(),
                                             title = articleResultRow[Articles.title],
                                             url = articleResultRow[Articles.link],
@@ -360,13 +364,17 @@ class DevFeedDao: HealthIndicator {
                                             .toSet()
                                     article to tags
                                 }
-                                .filter { it.second.any { tagsResolvedFromSearch?.contains(it) ?: true } }
+                                .filter {
+                                    it.second.any {
+                                        tagsResolvedFromSearch?.contains(it) ?: true
+                                    }
+                                }
                                 .map {
                                     it.first.tags = it.second
                                     it.first
                                 }
                                 .toList()
-                        result.addAll(if(limit != null) list.take(limit) else list)
+                        result.addAll(if (limit != null) list.take(limit) else list)
                     }
         }
         return result
@@ -414,17 +422,17 @@ class DevFeedDao: HealthIndicator {
         val result = mutableListOf<Article>()
         transaction {
             val query: Query
-            var whereClause: (SqlExpressionBuilder.()->Op<Boolean>)? = null
+            var whereClause: (SqlExpressionBuilder.() -> Op<Boolean>)? = null
             var tagsResolvedFromSearch: Collection<String>? = null
             if (filter != null) {
                 val searchPattern = "%${filter.search}%"
                 whereClause = {
                     Articles.timestamp.between(
-                            filter.from?.asSupportedTimestamp()?: 0L,
-                            filter.to?.asSupportedTimestamp()?: System.currentTimeMillis())
+                            filter.from?.asSupportedTimestamp() ?: 0L,
+                            filter.to?.asSupportedTimestamp() ?: System.currentTimeMillis())
                             .and(if (filter.search != null) (Articles.title.like(searchPattern)
                                     .or(Articles.description like searchPattern).or(Articles.link like searchPattern))
-                                else Articles.title.isNotNull())
+                            else Articles.title.isNotNull())
                             .and(if (filter.titles != null) Articles.title.inList(filter.titles) else Articles.title.isNotNull())
                             .and(if (filter.urls != null) Articles.link.inList(filter.urls) else Articles.link.isNotNull())
                 }
@@ -432,7 +440,11 @@ class DevFeedDao: HealthIndicator {
                     tagsResolvedFromSearch = getTags(search = filter.tags)
                 }
             }
-            query = if (whereClause != null) { Articles.select(whereClause) } else { Articles.selectAll() }
+            query = if (whereClause != null) {
+                Articles.select(whereClause)
+            } else {
+                Articles.selectAll()
+            }
 //            limit?.let { query.limit(it, offset?:DEFAULT_OFFSET) }
             query.orderBy(Articles.timestamp, order = SortOrder.DESC)
 
@@ -476,7 +488,7 @@ class DevFeedDao: HealthIndicator {
                         it.first
                     }
                     .toList()
-            result.addAll(if(limit != null) list.take(limit) else list)
+            result.addAll(if (limit != null) list.take(limit) else list)
         }
         return result.toList()
     }
@@ -487,7 +499,7 @@ class DevFeedDao: HealthIndicator {
             val query = Articles.slice(Articles.timestamp).selectAll()
                     .orderBy(Articles.timestamp, order = SortOrder.DESC)
                     .withDistinct()
-            limit?.let { query.limit(it, offset?: DEFAULT_OFFSET) }
+            limit?.let { query.limit(it, offset ?: DEFAULT_OFFSET) }
             result.addAll(query.map { it[Articles.timestamp] }.toSet())
         }
         return result.toSet()
@@ -506,10 +518,10 @@ class DevFeedDao: HealthIndicator {
                     ?.let {
                         logger.trace("getRecentArticles")
                         val query = Articles.select { Articles.timestamp.eq(it) }
-                        limit?.let { query.limit(it, offset?: DEFAULT_OFFSET) }
+                        limit?.let { query.limit(it, offset ?: DEFAULT_OFFSET) }
                         query.orderBy(Articles.timestamp, order = SortOrder.DESC)
                         result.addAll(query
-                                .map {articleResultRow ->
+                                .map { articleResultRow ->
                                     val article = Article(id = articleResultRow[Articles.id].toLong(),
                                             title = articleResultRow[Articles.title],
                                             url = articleResultRow[Articles.link],
@@ -566,7 +578,7 @@ class DevFeedDao: HealthIndicator {
                 tagNameSlice.selectAll()
             }
             query.withDistinct()
-            limit?.let { query.limit(it, offset?: DEFAULT_OFFSET) }
+            limit?.let { query.limit(it, offset ?: DEFAULT_OFFSET) }
             result.addAll(query.map { it[Tags.name] }.toSet())
         }
         return result.toSet()
