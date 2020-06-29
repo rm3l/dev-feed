@@ -1,1 +1,1 @@
-web: java -Dserver.port=$PORT -Dmanagement.port=$PORT -Dmanagement.security.enabled=true $JAVA_OPTS -Dlogging.level.org.rm3l.devfeed=DEBUG -Dlogging.level.org.rm3l.devfeed.crawlers.impl.discoverdev_io=WARN -jar build/libs/dev-feed-backend-0.3.1.jar
+web: java -Dserver.port=$PORT -Dmanagement.port=$PORT -Dmanagement.security.enabled=true $JAVA_OPTS -Dlogging.level.org.rm3l.devfeed=DEBUG -Dlogging.level.org.rm3l.devfeed.crawlers.impl.discoverdev_io=WARN -jar build/libs/dev-feed-backend-0.4.0.jar
