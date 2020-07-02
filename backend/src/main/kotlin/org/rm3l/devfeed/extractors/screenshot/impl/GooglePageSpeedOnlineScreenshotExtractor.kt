@@ -1,56 +1,35 @@
-//The MIT License (MIT)
-//
-//Copyright (c) 2019 Armel Soro
-//
-//Permission is hereby granted, free of charge, to any person obtaining a copy
-//of this software and associated documentation files (the "Software"), to deal
-//in the Software without restriction, including without limitation the rights
-//to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-//copies of the Software, and to permit persons to whom the Software is
-//furnished to do so, subject to the following conditions:
-//
-//The above copyright notice and this permission notice shall be included in all
-//copies or substantial portions of the Software.
-//
-//THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-//IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-//FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-//AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-//LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-//OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
-//SOFTWARE.
-package org.rm3l.devfeed.crawlers
+package org.rm3l.devfeed.extractors.screenshot.impl
 
 import org.json.JSONObject
 import org.rm3l.devfeed.contract.Article
 import org.rm3l.devfeed.contract.Screenshot
 import org.rm3l.devfeed.dal.DevFeedDao
+import org.rm3l.devfeed.extractors.screenshot.ArticleScreenshotExtractor
 import org.slf4j.LoggerFactory
-import java.util.function.Supplier
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty
+import org.springframework.stereotype.Service
 
 /**
  * Remote Website screenshot grabber. Based upon this article:
  * https://shkspr.mobi/blog/2015/11/google-secret-screenshot-api/
  */
-class ArticleScreenshotGrabber(private val dao: DevFeedDao,
-                               private val article: Article,
-                               private val updater: Boolean = false) :
-        Supplier<Article> {
+@Service
+@ConditionalOnProperty(name = ["article.screenshot.service"], havingValue = "pagespeedonline", matchIfMissing = false)
+class GooglePageSpeedOnlineScreenshotExtractor(private val dao: DevFeedDao) : ArticleScreenshotExtractor {
 
     companion object {
-
         private const val GOOGLE_PAGESPEED_URL_FORMAT =
                 "https://www.googleapis.com/pagespeedonline/v1/runPagespeed?url=%s&screenshot=true"
 
         @JvmStatic
-        private val logger = LoggerFactory.getLogger(ArticleScreenshotGrabber::class.java)
+        private val logger = LoggerFactory.getLogger(GooglePageSpeedOnlineScreenshotExtractor::class.java)
     }
 
-    override fun get(): Article {
+    override fun extractScreenshot(article: Article) {
         val url = GOOGLE_PAGESPEED_URL_FORMAT.format(article.url)
         try {
             //Check if (title, url) pair already exist in the DB
-            if (updater || !dao.shouldRequestScreenshot(article.title, article.url)) {
+            if (dao.shouldRequestScreenshot(article.title, article.url)) {
                 val getRequest = khttp.get(url)
                 if (getRequest.statusCode in 200..399) {
                     val screenshotJsonObject: JSONObject? =
@@ -76,7 +55,5 @@ class ArticleScreenshotGrabber(private val dao: DevFeedDao,
                 logger.warn("Could not fetch screenshot data for ${article.url}: $url", e)
             }
         }
-        return article
     }
-
 }

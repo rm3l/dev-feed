@@ -20,7 +20,9 @@ import javax.annotation.PostConstruct
 
 @Service
 class DevFeedFetcherService(private val dao: DevFeedDao,
-                            private val crawlers: Collection<DevFeedCrawler>? = null) : HealthIndicator {
+                            private val crawlers: Collection<DevFeedCrawler>? = null,
+                            private val articleExtractor: ArticleExtractor? = null,
+                            private val articleScreenshotExtractor: ArticleScreenshotExtractor? = null) : HealthIndicator {
 
     companion object {
         @JvmStatic
@@ -92,9 +94,12 @@ class DevFeedFetcherService(private val dao: DevFeedDao,
                     identifier?.let { dao.findArticleById(identifier) }
                 }
                 .filterNotNull()
-                .map {
+                .map { article ->
                     CompletableFuture.supplyAsync(
-                            ArticleScreenshotGrabber(dao, it),
+                            Supplier {
+                                articleScreenshotExtractor?.extractScreenshot(article)
+                                article
+                            },
                             crawlersExecutorService)
                 }
                 .map { it.join() }
@@ -124,9 +129,12 @@ class DevFeedFetcherService(private val dao: DevFeedDao,
             logger.info(">>> Inspecting (and trying to update) " +
                     "${articleIdsWithNoScreenshots.size} articles with no screenshots")
             val futures = articleIdsWithNoScreenshots
-                    .map {
+                    .map { article ->
                         CompletableFuture.supplyAsync(
-                                ArticleScreenshotGrabber(dao, it, true),
+                                Supplier {
+                                    articleScreenshotExtractor?.extractScreenshot(article)
+                                    article
+                                },
                                 crawlersExecutorService)
                     }
                     .map { it.join() }
