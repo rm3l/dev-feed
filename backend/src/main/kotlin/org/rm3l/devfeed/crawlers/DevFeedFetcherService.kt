@@ -2,10 +2,11 @@ package org.rm3l.devfeed.crawlers
 
 import org.rm3l.devfeed.contract.Article
 import org.rm3l.devfeed.dal.DevFeedDao
+import org.rm3l.devfeed.extractors.article.ArticleExtractor
+import org.rm3l.devfeed.extractors.screenshot.ArticleScreenshotExtractor
 import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.beans.factory.annotation.Qualifier
-import org.springframework.beans.factory.annotation.Value
 import org.springframework.boot.actuate.health.Health
 import org.springframework.boot.actuate.health.HealthIndicator
 import org.springframework.scheduling.annotation.Scheduled
@@ -14,6 +15,7 @@ import java.util.concurrent.CompletableFuture
 import java.util.concurrent.ExecutionException
 import java.util.concurrent.ExecutorService
 import java.util.concurrent.atomic.AtomicBoolean
+import java.util.function.Supplier
 import javax.annotation.PostConstruct
 
 @Service
@@ -28,9 +30,6 @@ class DevFeedFetcherService(private val dao: DevFeedDao,
     @Autowired
     @Qualifier("crawlersExecutorService")
     private lateinit var crawlersExecutorService: ExecutorService
-
-    @Value("\${crawlers.document-parser-api.subscription-key}")
-    private lateinit var documentParserApiKey: String
 
     private val remoteWebsiteCrawlingSucceeded = AtomicBoolean(false)
     private val remoteWebsiteCrawlingErrored = AtomicBoolean(false)
@@ -99,9 +98,12 @@ class DevFeedFetcherService(private val dao: DevFeedDao,
                             crawlersExecutorService)
                 }
                 .map { it.join() }
-                .map {
+                .map { article ->
                     CompletableFuture.supplyAsync(
-                            ArticleExtractor(dao, documentParserApiKey, it),
+                            Supplier {
+                                articleExtractor?.extractArticleData(article)
+                                article
+                            },
                             crawlersExecutorService
                     )
                 }
