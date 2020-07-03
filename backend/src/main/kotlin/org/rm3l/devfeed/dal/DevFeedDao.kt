@@ -45,7 +45,7 @@ import java.sql.Connection
 import javax.annotation.PostConstruct
 
 object Articles : Table(name = "articles") {
-    val id = long(name = "id").autoIncrement().primaryKey()
+    val id = long(name = "id").autoIncrement()
     val timestamp = long(name = "timestamp")
     val title = text(name = "title")
     val description = text(name = "description").nullable()
@@ -55,10 +55,12 @@ object Articles : Table(name = "articles") {
     val screenshotWidth = integer(name = "screenshot_width").nullable()
     val screenshotHeight = integer(name = "screenshot_height").nullable()
     val screenshotMimeType = varchar(name = "screenshot_mime_type", length = 255).nullable()
+    override val primaryKey = PrimaryKey(id, name = "article_id_pk")
 }
 
 object Tags : Table(name = "tags") {
-    val name = varchar(name = "name", length = 65535).primaryKey()
+    val name = varchar(name = "name", length = 65535)
+    override val primaryKey = PrimaryKey(name, name = "tag_name_pk")
 }
 
 object ArticlesTags : Table(name = "articles_tags") {
@@ -67,7 +69,7 @@ object ArticlesTags : Table(name = "articles_tags") {
 }
 
 object ArticlesParsed : Table(name = "articles_parsed") {
-    val id = long(name = "id").autoIncrement().primaryKey()
+    val id = long(name = "id").autoIncrement()
     val url = (varchar(name = "link", length = 65535) references Articles.link)
     val title = text(name = "title").nullable()
     val author = text(name = "author").nullable()
@@ -77,6 +79,7 @@ object ArticlesParsed : Table(name = "articles_parsed") {
     val keywords = text(name = "keywords").nullable()
     val description = text(name = "description").nullable()
     val body = text(name = "body")
+    override val primaryKey = PrimaryKey(id, name = "article_parsed_id")
 }
 
 const val DEFAULT_OFFSET = 0L
@@ -292,7 +295,6 @@ class DevFeedDao : HealthIndicator {
 
             article.tags
                     ?.filterNotNull()
-                    ?.map { it!! }
                     ?.map { articleTag -> articleTag.toLowerCase().trim().replace("\\s".toRegex(), "-") }
                     ?.map { articleTag -> if (articleTag.startsWith("#")) articleTag else "#$articleTag" }
                     ?.map { articleTag ->
