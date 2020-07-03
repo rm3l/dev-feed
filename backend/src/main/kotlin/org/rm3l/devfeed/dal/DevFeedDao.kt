@@ -138,6 +138,14 @@ class DevFeedDao : HealthIndicator {
         return result
     }
 
+    fun existArticlesByUrl(url: String): Boolean {
+        var result = false
+        transaction {
+            result = !Articles.select { Articles.link.eq(url) }.empty()
+        }
+        return result
+    }
+
     fun deleteByTitleAndUrl(title: String, url: String): Int {
         var result = 0
         transaction {
@@ -239,6 +247,8 @@ class DevFeedDao : HealthIndicator {
             }
 
             article.tags
+                    ?.filterNotNull()
+                    ?.map { it!! }
                     ?.map { articleTag -> articleTag.toLowerCase().trim().replace("\\s".toRegex(), "-") }
                     ?.map { articleTag -> if (articleTag.startsWith("#")) articleTag else "#$articleTag" }
                     ?.map { articleTag ->

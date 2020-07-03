@@ -41,19 +41,13 @@ class ArticleUpdater(private val dao: DevFeedDao,
         }
 
         //Check if (title, url) pair already exist in the DB
-        val existArticlesByTitleAndUrl =
-                dao.existArticlesByTitleAndUrl(article.title, article.url)
+        val existArticlesByUrl =
+                dao.existArticlesByUrl(article.url)
         if (logger.isDebugEnabled) {
-            logger.debug("$existArticlesByTitleAndUrl = " +
-                    "existArticlesByTitleAndUrl(${article.title}, ${article.url})")
+            logger.debug("$existArticlesByUrl = " +
+                    "existArticlesByUrl(${article.title}, ${article.url})")
         }
-        if (article.id == null) {
-            if (existArticlesByTitleAndUrl) {
-                dao.deleteByTitleAndUrl(article.title, article.url)
-            }
-            dao.insertArticle(article)
-        }
-        if (dao.shouldRequestScreenshot(article.title, article.url)) {
+        if (article.id != null && dao.shouldRequestScreenshot(article.title, article.url)) {
             dao.updateArticleScreenshotData(article)
         }
     }

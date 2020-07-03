@@ -29,7 +29,7 @@ data class Article(val id: Long? = null,
                    val description: String? = null,
                    val url: String,
                    val domain: String = URL(url).host,
-                   var tags: Collection<String>? = setOf(),
+                   var tags: Collection<String?>? = setOf(),
                    var screenshot: Screenshot? = null,
                    var parsed: ArticleParsed? = null)
 
@@ -43,7 +43,7 @@ data class ArticleParsed(val url: String,
                          val author: String? = null,
                          val published: String? = null, //TODO Use DateTime
                          val image: String? = null,
-                         val videos: Collection<String>? = null,
-                         val keywords: Collection<String>? = null,
+                         val videos: Collection<String?>? = null,
+                         val keywords: Collection<String?>? = null,
                          val description: String? = null,
                          val body: String)

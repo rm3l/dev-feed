@@ -90,8 +90,9 @@ class DevFeedFetcherService(private val dao: DevFeedDao,
                 .map { article ->
                     CompletableFuture.supplyAsync(
                             Supplier {
+                                article.tags = article.tags?.filterNotNull() ?: emptyList()
                                 var identifier: Long? = null
-                                if (!dao.existArticlesByTitleAndUrl(article.title, article.url)) {
+                                if (!dao.existArticlesByUrl(article.url)) {
                                     identifier = dao.insertArticle(article)
                                 }
                                 identifier?.let { dao.findArticleById(identifier) }
