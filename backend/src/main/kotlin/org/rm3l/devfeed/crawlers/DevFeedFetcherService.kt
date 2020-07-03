@@ -86,14 +86,22 @@ class DevFeedFetcherService(private val dao: DevFeedDao,
     fun handleArticles(articles: Collection<Article>, synchronous: Boolean = true):
             Collection<CompletableFuture<Unit>> {
         val futures = articles
-                .map {
-                    var identifier: Long? = null
-                    if (!dao.existArticlesByTitleAndUrl(it.title, it.url)) {
-                        identifier = dao.insertArticle(it)
-                    }
-                    identifier?.let { dao.findArticleById(identifier) }
-                }
-                .filterNotNull()
+                .asSequence()
+                .map { article ->
+                    CompletableFuture.supplyAsync(
+                            Supplier {
+                                var identifier: Long? = null
+                                if (!dao.existArticlesByTitleAndUrl(article.title, article.url)) {
+                                    identifier = dao.insertArticle(article)
+                                }
+                                identifier?.let { dao.findArticleById(identifier) }
+                            },
+                            crawlersExecutorService)
+                            .exceptionally {
+                                logger.warn("Could not insert article for $article", it)
+                                null
+                            }
+                }.mapNotNull { it.join() }
                 .map { article ->
                     CompletableFuture.supplyAsync(
                             Supplier {
@@ -116,7 +124,11 @@ class DevFeedFetcherService(private val dao: DevFeedDao,
                 .map {
                     CompletableFuture.supplyAsync(
                             ArticleUpdater(dao, it), crawlersExecutorService)
+                            .exceptionally { exception ->
+                                logger.warn("Could not insert article for $it", exception)
+                            }
                 }
+                .toList()
         if (synchronous) {
             CompletableFuture.allOf(*futures.toTypedArray()).get() //Wait for all of them to finish
         }
