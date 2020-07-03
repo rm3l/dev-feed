@@ -53,7 +53,9 @@ class Rm3lOrgCrawler : DevFeedCrawler {
             val start = System.nanoTime()
 
             val articles = SyndFeedInput()
-                    .build(XmlReader(ByteArrayInputStream(URL(RSS_FEED_URL).readText().toByteArray())))
+                    .build(XmlReader(ByteArrayInputStream(URL(RSS_FEED_URL).readText()
+                            .replace("https://cms.rm3l.org", "https://rm3l.org", ignoreCase = true)
+                            .toByteArray())))
                     .entries
                     .filterNot { it.publishedDate == null && it.updatedDate == null }
                     .map { feedEntry ->
