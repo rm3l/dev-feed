@@ -25,8 +25,11 @@ import org.junit.Test
 import org.junit.runner.RunWith
 import org.slf4j.LoggerFactory
 import org.springframework.boot.test.context.SpringBootTest
+import org.springframework.context.annotation.Bean
 import org.springframework.test.context.ActiveProfiles
 import org.springframework.test.context.junit4.SpringRunner
+import java.util.concurrent.ExecutorService
+import java.util.concurrent.Executors
 
 @RunWith(SpringRunner::class)
 @SpringBootTest
@@ -34,6 +37,10 @@ import org.springframework.test.context.junit4.SpringRunner
 class DevFeedApplicationIntegrationTests {
 
     private val logger = LoggerFactory.getLogger(DevFeedApplicationIntegrationTests::class.java)
+
+    @Bean(name = ["devFeedExecutorService"], destroyMethod = "shutdownNow")
+    fun devFeedExecutorService(): ExecutorService =
+            Executors.newSingleThreadExecutor()
 
     @Test
     fun contextLoads() = logger.info("Hooray! Application Context successfully loaded.")

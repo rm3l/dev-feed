@@ -1,5 +1,6 @@
 package org.rm3l.devfeed.crawlers
 
+import org.apache.commons.lang3.concurrent.BasicThreadFactory
 import org.rm3l.devfeed.contract.Article
 import org.rm3l.devfeed.dal.DevFeedDao
 import org.rm3l.devfeed.extractors.article.ArticleExtractor
@@ -14,9 +15,11 @@ import org.springframework.stereotype.Service
 import java.util.concurrent.CompletableFuture
 import java.util.concurrent.ExecutionException
 import java.util.concurrent.ExecutorService
+import java.util.concurrent.Executors
 import java.util.concurrent.atomic.AtomicBoolean
 import java.util.function.Supplier
 import javax.annotation.PostConstruct
+import javax.annotation.PreDestroy
 
 @Service
 class DevFeedFetcherService(private val dao: DevFeedDao,
@@ -30,8 +33,10 @@ class DevFeedFetcherService(private val dao: DevFeedDao,
     }
 
     @Autowired
-    @Qualifier("crawlersExecutorService")
-    private lateinit var crawlersExecutorService: ExecutorService
+    @Qualifier("devFeedExecutorService")
+    private lateinit var devFeedExecutorService: ExecutorService
+
+    private var crawlersExecutor: ExecutorService? = null
 
     private val remoteWebsiteCrawlingSucceeded = AtomicBoolean(false)
     private val remoteWebsiteCrawlingErrored = AtomicBoolean(false)
@@ -41,17 +46,29 @@ class DevFeedFetcherService(private val dao: DevFeedDao,
     @PostConstruct
     fun init() {
         logger.info("ApplicationReady => scheduling crawling tasks...")
-        try {
-            CompletableFuture.runAsync {
-                triggerRemoteWebsiteCrawlingAndScreenshotUpdater()
-            }.exceptionally { t ->
-                logger.info(t.message, t)
-                null
-            }
-        } catch (e: Exception) {
-            logger.warn("init() could not complete successfully - " +
-                    "will try again later", e)
+
+        val threadFactory = BasicThreadFactory.Builder().namingPattern("crawlers-%d").build()
+        this.crawlersExecutor = if (crawlers.isNullOrEmpty()) {
+            Executors.newSingleThreadExecutor(threadFactory)
+        } else {
+            Executors.newFixedThreadPool(crawlers.size + 1, threadFactory)
         }
+
+        CompletableFuture.runAsync(
+                Runnable {
+                    triggerRemoteWebsiteCrawlingAndScreenshotUpdater()
+                }, this.crawlersExecutor)
+                .exceptionally {
+                    logger.info(it.message, it)
+                    null
+                }
+
+        return
+    }
+
+    @PreDestroy
+    fun destroy() {
+        crawlersExecutor?.shutdownNow()
     }
 
     @Scheduled(cron = "\${crawlers.task.cron-expression}")
@@ -59,16 +76,15 @@ class DevFeedFetcherService(private val dao: DevFeedDao,
     fun triggerRemoteWebsiteCrawlingAndScreenshotUpdater() {
         try {
             if (!crawlers.isNullOrEmpty()) {
-                handleArticles(crawlers
-                        .map { crawler ->
-                            CompletableFuture.supplyAsync {
+                crawlers.map { crawler ->
+                    CompletableFuture.runAsync(
+                            Runnable {
                                 logger.debug("Crawling from $crawler...")
                                 val articles = crawler.fetchArticles()
+                                handleArticles(articles, synchronous = true)
                                 logger.debug("... Done crawling from $crawler : ${articles.size} articles!")
-                                articles
-                            }
-                        }
-                        .flatMap { it.join() }.toList(), synchronous = true)
+                            }, crawlersExecutor!!)
+                }.forEach { it.join() }
                 logger.warn("Done crawling remote websites successfully")
                 remoteWebsiteCrawlingSucceeded.set(true)
                 remoteWebsiteCrawlingErrored.set(false)
@@ -91,13 +107,14 @@ class DevFeedFetcherService(private val dao: DevFeedDao,
                     CompletableFuture.supplyAsync(
                             Supplier {
                                 article.tags = article.tags?.filterNotNull() ?: emptyList()
-                                var identifier: Long? = null
                                 if (!dao.existArticlesByUrl(article.url)) {
-                                    identifier = dao.insertArticle(article)
+                                    val identifier = dao.insertArticle(article)
+                                    dao.findArticleById(identifier)
+                                } else {
+                                    dao.findArticleByUrl(article.url)
                                 }
-                                identifier?.let { dao.findArticleById(identifier) }
                             },
-                            crawlersExecutorService)
+                            devFeedExecutorService)
                             .exceptionally {
                                 logger.warn("Could not insert article for $article", it)
                                 null
@@ -106,25 +123,29 @@ class DevFeedFetcherService(private val dao: DevFeedDao,
                 .map { article ->
                     CompletableFuture.supplyAsync(
                             Supplier {
-                                articleScreenshotExtractor?.extractScreenshot(article)
+                                if (articleScreenshotExtractor != null && article.screenshot == null) {
+                                    articleScreenshotExtractor.extractScreenshot(article)
+                                }
                                 article
                             },
-                            crawlersExecutorService)
+                            devFeedExecutorService)
                 }
                 .map { it.join() }
                 .map { article ->
                     CompletableFuture.supplyAsync(
                             Supplier {
-                                articleExtractor?.extractArticleData(article)
+                                if (articleExtractor != null && article.parsed == null) {
+                                    articleExtractor.extractArticleData(article)
+                                }
                                 article
                             },
-                            crawlersExecutorService
+                            devFeedExecutorService
                     )
                 }
                 .map { it.join() }
                 .map {
                     CompletableFuture.supplyAsync(
-                            ArticleUpdater(dao, it), crawlersExecutorService)
+                            ArticleUpdater(dao, it), devFeedExecutorService)
                             .exceptionally { exception ->
                                 logger.warn("Could not insert article for $it", exception)
                             }
@@ -137,6 +158,10 @@ class DevFeedFetcherService(private val dao: DevFeedDao,
     }
 
     private fun triggerScreenshotUpdater() {
+        if (articleScreenshotExtractor == null) {
+            logger.info("No Article Screenshot provider found => skipping screenshot extraction task")
+            return
+        }
         try {
             val articleIdsWithNoScreenshots = dao.getArticlesWithNoScreenshots()
             logger.info(">>> Inspecting (and trying to update) " +
@@ -145,17 +170,17 @@ class DevFeedFetcherService(private val dao: DevFeedDao,
                     .map { article ->
                         CompletableFuture.supplyAsync(
                                 Supplier {
-                                    articleScreenshotExtractor?.extractScreenshot(article)
+                                    articleScreenshotExtractor.extractScreenshot(article)
                                     article
                                 },
-                                crawlersExecutorService)
+                                devFeedExecutorService)
                     }
                     .map { it.join() }
                     .filter { it.screenshot?.data != null }
                     .map {
                         CompletableFuture.supplyAsync(
                                 ArticleUpdater(dao, it),
-                                crawlersExecutorService)
+                                devFeedExecutorService)
                     }.toTypedArray()
             CompletableFuture.allOf(*futures).get() //Wait for all of them to finish
             logger.info("<<< Done inspecting and updating ${articleIdsWithNoScreenshots.size} " +

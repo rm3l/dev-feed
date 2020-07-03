@@ -53,8 +53,8 @@ class EngineeringBlogsCrawler : DevFeedCrawler {
     }
 
     @Autowired
-    @Qualifier("crawlersExecutorService")
-    private lateinit var crawlersExecutorService: ExecutorService
+    @Qualifier("devFeedExecutorService")
+    private lateinit var devFeedExecutorService: ExecutorService
 
     @Value("\${crawlers.engineeringblogx_xyz.opml.url}")
     private lateinit var opmlUrl: String
@@ -82,7 +82,7 @@ class EngineeringBlogsCrawler : DevFeedCrawler {
                         logger.trace("Handling RSS feed for '${it.title}': ${it.xmlUrl}")
                         CompletableFuture.supplyAsync(
                                 EngineeringBlogsCrawlerArchiveFetcherFutureSupplier(it),
-                                crawlersExecutorService)
+                                devFeedExecutorService)
                     }
                     ?.flatMap { it.join() }
                     ?.toList()

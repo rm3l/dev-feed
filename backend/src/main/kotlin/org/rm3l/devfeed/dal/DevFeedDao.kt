@@ -214,6 +214,50 @@ class DevFeedDao : HealthIndicator {
         return result
     }
 
+    fun findArticleByUrl(url: String): Article? {
+        var result: Article? = null
+        transaction {
+            result = Articles.select { Articles.link.eq(url) }
+                    .limit(1)
+                    .map { articleResultRow ->
+                        val article = Article(id = articleResultRow[Articles.id].toLong(),
+                                title = articleResultRow[Articles.title],
+                                url = articleResultRow[Articles.link],
+                                domain = articleResultRow[Articles.hostname]
+                                        ?: URL(articleResultRow[Articles.link]).host,
+                                timestamp = articleResultRow[Articles.timestamp],
+                                screenshot = Screenshot(
+                                        data = articleResultRow[Articles.screenshotData],
+                                        mimeType = articleResultRow[Articles.screenshotMimeType],
+                                        width = articleResultRow[Articles.screenshotWidth],
+                                        height = articleResultRow[Articles.screenshotHeight]
+                                ),
+                                parsed = ArticlesParsed.select { ArticlesParsed.url.eq(articleResultRow[Articles.link]) }
+                                        .map {
+                                            ArticleParsed(
+                                                    url = articleResultRow[Articles.link],
+                                                    title = it[ArticlesParsed.title],
+                                                    description = it[ArticlesParsed.description],
+                                                    body = it[ArticlesParsed.body],
+                                                    author = it[ArticlesParsed.author],
+                                                    image = if (it[ArticlesParsed.image].isNullOrBlank()) null else it[ArticlesParsed.image],
+                                                    published = it[ArticlesParsed.published]
+                                                    //TODO Fix videos and keywords
+//                                                        videos = objectMapper.readValue(it[ArticlesParsed.videos]?:"", ArrayList::class.java)
+                                            )
+                                        }.firstOrNull())
+                        val tags = ArticlesTags.slice(ArticlesTags.tagName)
+                                .select { ArticlesTags.articleId.eq(articleResultRow[Articles.id]) }
+                                .map { it[ArticlesTags.tagName] }
+                                .toSet()
+                        article.tags = tags
+                        article
+                    }
+                    .firstOrNull()
+        }
+        return result
+    }
+
     fun insertArticle(article: Article): Long {
 
         var articleIdentifier: Long? = null

@@ -50,8 +50,8 @@ class DiscoverDevIoCrawler : DevFeedCrawler {
     }
 
     @Autowired
-    @Qualifier("crawlersExecutorService")
-    private lateinit var crawlersExecutorService: ExecutorService
+    @Qualifier("devFeedExecutorService")
+    private lateinit var devFeedExecutorService: ExecutorService
 
     @Throws(Exception::class)
     override fun fetchArticles(): Collection<Article> {
@@ -70,7 +70,7 @@ class DiscoverDevIoCrawler : DevFeedCrawler {
                                     logger.trace("Crawling page: $it ...")
                                     CompletableFuture.supplyAsync(
                                             DiscoverDevIoCrawlerArchiveFetcherFutureSupplier(it),
-                                            crawlersExecutorService)
+                                            devFeedExecutorService)
                                 }
                                 .flatMap { it.join() }
                                 .toList()
