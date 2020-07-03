@@ -63,6 +63,7 @@ input ArticleFilter {
     tags: [String]
     titles: [String]
     urls: [String]
+    domains: [String]
 }
 
 input ArticleInput {

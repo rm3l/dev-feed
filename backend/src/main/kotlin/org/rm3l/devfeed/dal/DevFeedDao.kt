@@ -485,10 +485,12 @@ class DevFeedDao : HealthIndicator {
                             filter.from?.asSupportedTimestamp() ?: 0L,
                             filter.to?.asSupportedTimestamp() ?: System.currentTimeMillis())
                             .and(if (filter.search != null) (Articles.title.like(searchPattern)
-                                    .or(Articles.description like searchPattern).or(Articles.link like searchPattern))
+                                    .or(Articles.description like searchPattern).or(Articles.link like searchPattern)
+                                    .or(Articles.hostname like searchPattern))
                             else Articles.title.isNotNull())
                             .and(if (filter.titles != null) Articles.title.inList(filter.titles) else Articles.title.isNotNull())
                             .and(if (filter.urls != null) Articles.link.inList(filter.urls) else Articles.link.isNotNull())
+                            .and(if (filter.domains != null) Articles.hostname.inList(filter.domains) else Articles.hostname.isNotNull())
                 }
                 if (filter.tags != null) {
                     tagsResolvedFromSearch = getTags(search = filter.tags)
