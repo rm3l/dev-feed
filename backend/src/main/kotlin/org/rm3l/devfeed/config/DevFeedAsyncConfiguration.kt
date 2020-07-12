@@ -22,6 +22,7 @@
 package org.rm3l.devfeed.config
 
 import org.apache.commons.lang3.concurrent.BasicThreadFactory
+import org.springframework.beans.factory.annotation.Value
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 import java.util.concurrent.ExecutorService
@@ -33,8 +34,11 @@ import java.util.concurrent.Executors
 @Configuration
 class DevFeedAsyncConfiguration {
 
+    @Value("\${executor.thread-pool.size}")
+    private lateinit var numberOfThreadsInPool: String
+
     @Bean(name = ["devFeedExecutorService"], destroyMethod = "shutdownNow")
     fun devFeedExecutorService(): ExecutorService =
-            Executors.newCachedThreadPool(
+            Executors.newFixedThreadPool(numberOfThreadsInPool.toInt(),
                     BasicThreadFactory.Builder().namingPattern("dev-feed-%d").build())
 }
