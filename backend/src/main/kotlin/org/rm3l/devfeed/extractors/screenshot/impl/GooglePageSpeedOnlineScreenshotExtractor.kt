@@ -19,7 +19,7 @@ class GooglePageSpeedOnlineScreenshotExtractor(private val dao: DevFeedDao) : Ar
 
     companion object {
         private const val GOOGLE_PAGESPEED_URL_FORMAT =
-                "https://www.googleapis.com/pagespeedonline/v1/runPagespeed?url=%s&screenshot=true"
+                "https://www.googleapis.com/pagespeedonline/v5/runPagespeed?url=%s&screenshot=true"
 
         @JvmStatic
         private val logger = LoggerFactory.getLogger(GooglePageSpeedOnlineScreenshotExtractor::class.java)
