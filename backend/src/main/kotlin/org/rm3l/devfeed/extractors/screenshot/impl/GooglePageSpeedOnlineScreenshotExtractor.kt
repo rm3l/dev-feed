@@ -6,8 +6,10 @@ import org.rm3l.devfeed.contract.Screenshot
 import org.rm3l.devfeed.dal.DevFeedDao
 import org.rm3l.devfeed.extractors.screenshot.ArticleScreenshotExtractor
 import org.slf4j.LoggerFactory
+import org.springframework.beans.factory.annotation.Value
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty
 import org.springframework.stereotype.Service
+import javax.annotation.PostConstruct
 
 /**
  * Remote Website screenshot grabber. Based upon this article:
@@ -25,8 +27,23 @@ class GooglePageSpeedOnlineScreenshotExtractor(private val dao: DevFeedDao) : Ar
         private val logger = LoggerFactory.getLogger(GooglePageSpeedOnlineScreenshotExtractor::class.java)
     }
 
+    @Value("\${pagespeedonline.api.key}")
+    private lateinit var pageSpeedOnlineApiKey: String
+
+    private var googlePageSpeedOnlineApiUrlFormat: String? = null
+
+    @PostConstruct
+    fun init() {
+        googlePageSpeedOnlineApiUrlFormat = if (pageSpeedOnlineApiKey.isBlank()) {
+            GOOGLE_PAGESPEED_URL_FORMAT
+        } else {
+            "${GOOGLE_PAGESPEED_URL_FORMAT}&key=$pageSpeedOnlineApiKey"
+        }
+    }
+
     override fun extractScreenshot(article: Article) {
-        val url = GOOGLE_PAGESPEED_URL_FORMAT.format(article.url)
+        val url = googlePageSpeedOnlineApiUrlFormat?.format(article.url)
+                ?: GOOGLE_PAGESPEED_URL_FORMAT
         try {
             //Check if (title, url) pair already exist in the DB
             if (dao.shouldRequestScreenshot(article.title, article.url)) {
