@@ -30,6 +30,9 @@ class GooglePageSpeedOnlineScreenshotExtractor(private val dao: DevFeedDao) : Ar
     @Value("\${pagespeedonline.api.key}")
     private lateinit var pageSpeedOnlineApiKey: String
 
+    @Value("\${pagespeedonline.api.timeoutSeconds}")
+    private lateinit var pageSpeedOnlineTimeoutSeconds: String
+
     private var googlePageSpeedOnlineApiUrlFormat: String? = null
 
     @PostConstruct
@@ -47,7 +50,8 @@ class GooglePageSpeedOnlineScreenshotExtractor(private val dao: DevFeedDao) : Ar
         try {
             //Check if (title, url) pair already exist in the DB
             if (dao.shouldRequestScreenshot(article.title, article.url)) {
-                val getRequest = khttp.get(url)
+                val getRequest = khttp.get(url,
+                        timeout = pageSpeedOnlineTimeoutSeconds.toDouble())
                 if (getRequest.statusCode in 200..399) {
                     val screenshotJsonObject: JSONObject? =
                             getRequest.jsonObject.optJSONObject("lighthouseResult")
@@ -72,7 +76,13 @@ class GooglePageSpeedOnlineScreenshotExtractor(private val dao: DevFeedDao) : Ar
             }
         } catch (e: Exception) {
             if (logger.isWarnEnabled) {
-                logger.warn("Could not fetch screenshot data for ${article.url}: $url", e)
+                logger.warn(
+                        "Could not fetch screenshot data for ${article.url}. " +
+                                "Exception message is: '${e.message}' " +
+                                "when retrieving data from the following link: $url")
+            }
+            if (logger.isDebugEnabled) {
+                logger.debug(e.message, e)
             }
         }
     }
