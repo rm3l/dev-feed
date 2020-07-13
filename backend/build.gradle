@@ -30,7 +30,7 @@ plugins {
 }
 
 group = 'org.rm3l'
-version = '0.7.0'
+version = '0.7.1'
 sourceCompatibility = 11
 
 ext {
