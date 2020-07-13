@@ -211,6 +211,7 @@ class DevFeedDao : HealthIndicator {
                         val tags = ArticlesTags.slice(ArticlesTags.tagName)
                                 .select { ArticlesTags.articleId.eq(articleResultRow[Articles.id]) }
                                 .map { it[ArticlesTags.tagName] }
+                                .filter { it.length >= 2 }
                                 .toSet()
                         article.tags = tags
                         article
@@ -255,6 +256,7 @@ class DevFeedDao : HealthIndicator {
                         val tags = ArticlesTags.slice(ArticlesTags.tagName)
                                 .select { ArticlesTags.articleId.eq(articleResultRow[Articles.id]) }
                                 .map { it[ArticlesTags.tagName] }
+                                .filter { it.length >= 2 }
                                 .toSet()
                         article.tags = tags
                         article
@@ -420,6 +422,7 @@ class DevFeedDao : HealthIndicator {
                                     val tags = ArticlesTags.slice(ArticlesTags.tagName)
                                             .select { ArticlesTags.articleId.eq(articleResultRow[Articles.id]) }
                                             .map { it[ArticlesTags.tagName] }
+                                            .filter { it.length >= 2 }
                                             .toSet()
                                     article to tags
                                 }
@@ -540,6 +543,7 @@ class DevFeedDao : HealthIndicator {
                         val tags = ArticlesTags.slice(ArticlesTags.tagName)
                                 .select { ArticlesTags.articleId.eq(articleResultRow[Articles.id]) }
                                 .map { it[ArticlesTags.tagName] }
+                                .filter { it.length >= 2 }
                                 .toSet()
                         article to tags
                     }
@@ -612,6 +616,7 @@ class DevFeedDao : HealthIndicator {
                                     val tags = ArticlesTags.slice(ArticlesTags.tagName)
                                             .select { ArticlesTags.articleId.eq(articleResultRow[Articles.id]) }
                                             .map { it[ArticlesTags.tagName] }
+                                            .filter { it.length >= 2 }
                                             .toSet()
                                     article to tags
                                 }
@@ -640,7 +645,7 @@ class DevFeedDao : HealthIndicator {
             }
             query.withDistinct()
             limit?.let { query.limit(it, offset ?: DEFAULT_OFFSET) }
-            result.addAll(query.map { it[Tags.name] }.toSet())
+            result.addAll(query.map { it[Tags.name] }.filter { it.length >= 2 }.toSet())
         }
         return result.toSet()
     }
