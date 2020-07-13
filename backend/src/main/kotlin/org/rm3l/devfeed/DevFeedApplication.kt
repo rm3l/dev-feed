@@ -23,6 +23,7 @@ package org.rm3l.devfeed
 
 import org.springframework.boot.SpringApplication
 import org.springframework.boot.autoconfigure.SpringBootApplication
+import org.springframework.boot.context.properties.EnableConfigurationProperties
 import org.springframework.context.annotation.PropertySource
 import org.springframework.context.annotation.PropertySources
 import org.springframework.scheduling.annotation.EnableScheduling
@@ -31,10 +32,12 @@ import org.springframework.scheduling.annotation.EnableScheduling
  * Entry-point
  */
 @SpringBootApplication
+@EnableConfigurationProperties
 @PropertySources(value = [
     //The order matters here. If a same property key is found in many files, the last one wins.
-    PropertySource(value = ["classpath:application.properties"]),
-    PropertySource(value = ["file:/etc/dev-feed/backend.properties"], ignoreResourceNotFound = true)]
+    PropertySource(value = ["classpath:service.properties"]),
+    PropertySource(value = ["file:/etc/dev-feed/backend.properties"], ignoreResourceNotFound = true),
+    PropertySource(value = ["file:\${user.home}/.dev-feed/backend.properties"], ignoreResourceNotFound = true)]
 )
 @EnableScheduling
 class DevFeedApplication

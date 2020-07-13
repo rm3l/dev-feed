@@ -112,6 +112,9 @@ class DevFeedDao : HealthIndicator {
     @PostConstruct
     fun init() {
         this.objectMapper = jackson2ObjectMapperBuilder.build()
+
+        logger.info("Database located at: '$datasourceUrl'. Driver is $datasourceDriver")
+
         Database.connect(
                 url = datasourceUrl,
                 driver = datasourceDriver,
