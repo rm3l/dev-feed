@@ -26,6 +26,7 @@ The tech stack is rather simple:
   * A [Spring Boot](https://spring.io/projects/spring-boot) application written in [Kotlin](https://kotlinlang.org/), which contains scheduled crawlers in charge of analyzing certain remote websites for articles and feeding a local database. It then aggregates and exposes such data over a [GraphQL](https://graphql.org/) API, with the ability to search for articles, or by tags, or to read past articles. This Backend application is published to the [Docker Hub](https://hub.docker.com/r/rm3l/dev-feed), and continuously deployed to [Heroku](https://dev-feed-api.herokuapp.com/graphiql) as well. At the moment, articles are fetched from the list below, but additional sources may be added later on:
     * [DiscoverDev.io](https://www.discoverdev.io/)
     * [EngineeringBlogs.xyz](https://engineeringblogs.xyz/)
+    * my own blog, located at [rm3l.org](https://rm3l.org)
 * Mobile
   * A cross-platform mobile UI application written in [Dart](https://dart.dev/), using the [Flutter](https://flutter.dev/) SDK. Please note that there is no sync'ing mechanism, and all search/favorite articles are stored on the local device. This is an enhancement that might be implemented later on.
 
