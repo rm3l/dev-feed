@@ -50,7 +50,10 @@ class GooglePageSpeedOnlineScreenshotExtractor(private val dao: DevFeedDao) : Ar
                 val getRequest = khttp.get(url)
                 if (getRequest.statusCode in 200..399) {
                     val screenshotJsonObject: JSONObject? =
-                            getRequest.jsonObject.optJSONObject("screenshot")
+                            getRequest.jsonObject.optJSONObject("lighthouseResult")
+                                    .optJSONObject("audits")
+                                    .optJSONObject("final-screenshot")
+                                    .optJSONObject("details")
                     //Weird, but for reasons best known to Google, / is replaced with _, and +
                     // is replaced with -
                     val base64ImageData = screenshotJsonObject?.optString("data")
