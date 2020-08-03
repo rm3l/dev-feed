@@ -75,7 +75,7 @@ dependencies {
     implementation("org.jetbrains.exposed:exposed-jdbc:${exposedVersion}")
 
     //JDBC Drivers
-    implementation 'org.xerial:sqlite-jdbc:3.32.3'
+    implementation 'org.xerial:sqlite-jdbc:3.32.3.2'
     implementation 'com.h2database:h2:1.4.200'
 
     // GraphQL and GraphiQL
