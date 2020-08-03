@@ -36,7 +36,7 @@ sourceCompatibility = 11
 ext {
     exposedVersion = '0.27.1'
     graphqlSpringBootStarterVersion = '7.1.0'
-    romeVersion = '1.14.1'
+    romeVersion = '1.15.0'
 }
 
 compileKotlin {
