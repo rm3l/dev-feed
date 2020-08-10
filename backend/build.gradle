@@ -34,7 +34,7 @@ version = '0.7.1'
 sourceCompatibility = 11
 
 ext {
-    exposedVersion = '0.26.1'
+    exposedVersion = '0.26.2'
     graphqlSpringBootStarterVersion = '7.1.0'
     romeVersion = '1.14.1'
 }
