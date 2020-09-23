@@ -41,14 +41,16 @@ ext {
 
 compileKotlin {
     kotlinOptions {
-        freeCompilerArgs = ["-Xjsr305=strict"]
-        jvmTarget = "11"
+        languageVersion = "1.4"
+        freeCompilerArgs = ["-Xjsr305=strict", "-Xopt-in=kotlin.RequiresOptIn"]
+        jvmTarget = JavaVersion.VERSION_14.majorVersion
     }
 }
 compileTestKotlin {
     kotlinOptions {
-        freeCompilerArgs = ["-Xjsr305=strict"]
-        jvmTarget = "11"
+        languageVersion = "1.4"
+        freeCompilerArgs = ["-Xjsr305=strict", "-Xopt-in=kotlin.RequiresOptIn"]
+        jvmTarget = JavaVersion.VERSION_14.majorVersion
     }
 }
 
