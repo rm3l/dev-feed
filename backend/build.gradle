@@ -30,7 +30,7 @@ plugins {
 
 group = 'org.rm3l'
 version = '0.7.1'
-sourceCompatibility = 11
+sourceCompatibility = 15
 
 ext {
     exposedVersion = '0.27.1'
@@ -43,14 +43,14 @@ compileKotlin {
     kotlinOptions {
         languageVersion = "1.4"
         freeCompilerArgs = ["-Xjsr305=strict", "-Xopt-in=kotlin.RequiresOptIn"]
-        jvmTarget = JavaVersion.VERSION_14.majorVersion
+        jvmTarget = JavaVersion.VERSION_15.majorVersion
     }
 }
 compileTestKotlin {
     kotlinOptions {
         languageVersion = "1.4"
         freeCompilerArgs = ["-Xjsr305=strict", "-Xopt-in=kotlin.RequiresOptIn"]
-        jvmTarget = JavaVersion.VERSION_14.majorVersion
+        jvmTarget = JavaVersion.VERSION_15.majorVersion
     }
 }
 
