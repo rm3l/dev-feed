@@ -146,13 +146,6 @@ packages:
       url: "https://pub.dartlang.org"
     source: hosted
     version: "0.7.5"
-  flutter_stetho:
-    dependency: "direct dev"
-    description:
-      name: flutter_stetho
-      url: "https://pub.dartlang.org"
-    source: hosted
-    version: "0.5.2"
   flutter_test:
     dependency: "direct dev"
     description: flutter

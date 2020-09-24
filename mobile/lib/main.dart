@@ -34,7 +34,6 @@ import 'package:dev_feed/ui/tags.dart';
 import 'package:fluro/fluro.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:flutter_stetho/flutter_stetho.dart';
 //import 'package:logging/logging.dart';
 import 'package:url_launcher/url_launcher.dart';
 
