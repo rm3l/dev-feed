@@ -30,7 +30,7 @@ jobs:
     - name: Build APK
       run: |
         cd mobile
-        flutter build apk --debug --split-per-abi
+        flutter build apk --debug
     - name: Archive artifacts
       uses: actions/upload-artifact@v2
       with:
