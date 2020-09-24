@@ -131,7 +131,7 @@ class ArticleLinkScreenshot {
         height = json['height'],
         mimeType = json['mimeType'],
         dataBytes = json['data'] != null
-            ? base64.decode(json['data'].toString())
+            ? base64.decode(json['data'].toString().split(',').last)
             : null;
 
   @override
