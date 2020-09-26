@@ -29,7 +29,7 @@ plugins {
 }
 
 group = 'org.rm3l'
-version = '0.8.0'
+version = '0.9.0'
 sourceCompatibility = 14
 targetCompatibility = 11
 
