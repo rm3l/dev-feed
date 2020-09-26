@@ -22,12 +22,25 @@
 package org.rm3l.devfeed.dal
 
 import com.fasterxml.jackson.databind.ObjectMapper
-import org.jetbrains.exposed.sql.*
+import org.jetbrains.exposed.sql.Database
+import org.jetbrains.exposed.sql.Op
+import org.jetbrains.exposed.sql.Query
 import org.jetbrains.exposed.sql.SchemaUtils.createMissingTablesAndColumns
+import org.jetbrains.exposed.sql.SortOrder
+import org.jetbrains.exposed.sql.SqlExpressionBuilder
 import org.jetbrains.exposed.sql.SqlExpressionBuilder.between
 import org.jetbrains.exposed.sql.SqlExpressionBuilder.like
+import org.jetbrains.exposed.sql.Table
+import org.jetbrains.exposed.sql.and
+import org.jetbrains.exposed.sql.deleteWhere
+import org.jetbrains.exposed.sql.insert
+import org.jetbrains.exposed.sql.not
+import org.jetbrains.exposed.sql.or
+import org.jetbrains.exposed.sql.select
+import org.jetbrains.exposed.sql.selectAll
 import org.jetbrains.exposed.sql.transactions.TransactionManager
 import org.jetbrains.exposed.sql.transactions.transaction
+import org.jetbrains.exposed.sql.update
 import org.rm3l.devfeed.contract.Article
 import org.rm3l.devfeed.contract.ArticleParsed
 import org.rm3l.devfeed.contract.Screenshot
@@ -49,7 +62,7 @@ object Articles : Table(name = "articles") {
     val timestamp = long(name = "timestamp")
     val title = text(name = "title")
     val description = text(name = "description").nullable()
-    val link = varchar(name = "link", length = 65535)
+    val link = varchar(name = "link", length = 21844)
     val hostname = text(name = "hostname").nullable()
     val screenshotData = text(name = "screenshot_data").nullable()
     val screenshotWidth = integer(name = "screenshot_width").nullable()
@@ -59,18 +72,18 @@ object Articles : Table(name = "articles") {
 }
 
 object Tags : Table(name = "tags") {
-    val name = varchar(name = "name", length = 65535)
+    val name = varchar(name = "name", length = 21844)
     override val primaryKey = PrimaryKey(name, name = "tag_name_pk")
 }
 
 object ArticlesTags : Table(name = "articles_tags") {
     val articleId = (long("article_id") references Articles.id)
-    val tagName = (varchar("tag_name", length = 65535) references Tags.name)
+    val tagName = (varchar("tag_name", length = 21844) references Tags.name)
 }
 
 object ArticlesParsed : Table(name = "articles_parsed") {
     val id = long(name = "id").autoIncrement()
-    val url = (varchar(name = "link", length = 65535) references Articles.link)
+    val url = (varchar(name = "link", length = 21844) references Articles.link)
     val title = text(name = "title").nullable()
     val author = text(name = "author").nullable()
     val published = text(name = "published").nullable() //TODO Use DateTime
