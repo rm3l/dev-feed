@@ -79,6 +79,8 @@ dependencies {
     //JDBC Drivers
     implementation 'org.xerial:sqlite-jdbc:3.32.3.2'
     implementation 'com.h2database:h2:1.4.200'
+    implementation 'org.postgresql:postgresql:42.2.16'
+    implementation 'org.mariadb.jdbc:mariadb-java-client:2.7.0'
 
     // GraphQL and GraphiQL
     implementation "com.graphql-java-kickstart:graphql-spring-boot-starter:${graphqlSpringBootStarterVersion}"
