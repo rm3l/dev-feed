@@ -31,6 +31,7 @@ plugins {
 group = 'org.rm3l'
 version = '0.7.1'
 sourceCompatibility = 14
+targetCompatibility = 11
 
 ext {
     exposedVersion = '0.27.1'
@@ -98,6 +99,9 @@ dependencies {
 jib {
     to {
         image = "${project.group}/dev-feed-api"
+    }
+    from {
+        image = 'gcr.io/distroless/java:11'
     }
     container {
         labels = [
