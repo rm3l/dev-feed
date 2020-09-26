@@ -1,4 +1,4 @@
 #!/usr/bin/env bash
 set -eux
 
-docker image build -t org.rm3l/dev-feed-backend:0.7.1 .
+docker image build -t org.rm3l/dev-feed-backend:0.8.0 .
