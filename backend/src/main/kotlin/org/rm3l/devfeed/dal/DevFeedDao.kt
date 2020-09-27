@@ -58,13 +58,13 @@ import java.sql.Connection
 import javax.annotation.PostConstruct
 
 object ArticlesTags : Table(name = "articles_tags") {
-  val articleId = (long("article_id") references Articles.id)
-  val tagName = (varchar("tag_name", length = 380) references Tags.name)
+  val articleId = long("article_id")
+  val tagName = varchar("tag_name", length = 380)
 }
 
 object ArticlesParsed : Table(name = "articles_parsed") {
   val id = long(name = "id").autoIncrement()
-  val articleLink = (varchar(name = "article_link", length = 380) references Articles.link)
+  val articleLink = varchar(name = "article_link", length = 380)
   val title = text(name = "title").nullable()
   val author = text(name = "author").nullable()
   val published = text(name = "published").nullable() //TODO Use DateTime
