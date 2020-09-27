@@ -62,8 +62,8 @@ object Articles : Table(name = "articles") {
     val timestamp = long(name = "timestamp")
     val title = text(name = "title")
     val description = text(name = "description").nullable()
-    val link = varchar(name = "link", length = 21844)
-    val hostname = text(name = "hostname").nullable()
+  val link = varchar(name = "link", length = 2047)
+  val hostname = text(name = "hostname").nullable()
     val screenshotData = text(name = "screenshot_data").nullable()
     val screenshotWidth = integer(name = "screenshot_width").nullable()
     val screenshotHeight = integer(name = "screenshot_height").nullable()
@@ -72,19 +72,19 @@ object Articles : Table(name = "articles") {
 }
 
 object Tags : Table(name = "tags") {
-    val name = varchar(name = "name", length = 21844)
-    override val primaryKey = PrimaryKey(name, name = "tag_name_pk")
+  val name = varchar(name = "name", length = 2047)
+  override val primaryKey = PrimaryKey(name, name = "tag_name_pk")
 }
 
 object ArticlesTags : Table(name = "articles_tags") {
-    val articleId = (long("article_id") references Articles.id)
-    val tagName = (varchar("tag_name", length = 21844) references Tags.name)
+  val articleId = (long("article_id") references Articles.id)
+  val tagName = (varchar("tag_name", length = 2047) references Tags.name)
 }
 
 object ArticlesParsed : Table(name = "articles_parsed") {
-    val id = long(name = "id").autoIncrement()
-    val url = (varchar(name = "link", length = 21844) references Articles.link)
-    val title = text(name = "title").nullable()
+  val id = long(name = "id").autoIncrement()
+  val url = (varchar(name = "link", length = 2047) references Articles.link)
+  val title = text(name = "title").nullable()
     val author = text(name = "author").nullable()
     val published = text(name = "published").nullable() //TODO Use DateTime
     val image = text(name = "image").nullable()
