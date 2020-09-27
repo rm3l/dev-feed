@@ -83,7 +83,7 @@ object ArticlesTags : Table(name = "articles_tags") {
 
 object ArticlesParsed : Table(name = "articles_parsed") {
     val id = long(name = "id").autoIncrement()
-    val url = (varchar(name = "link", length = 380) references Articles.link)
+    val url = (varchar(name = "url", length = 380) references Articles.link)
     val title = text(name = "title").nullable()
     val author = text(name = "author").nullable()
     val published = text(name = "published").nullable() //TODO Use DateTime
@@ -92,7 +92,7 @@ object ArticlesParsed : Table(name = "articles_parsed") {
     val keywords = text(name = "keywords").nullable()
     val description = text(name = "description").nullable()
     val body = text(name = "body")
-    override val primaryKey = PrimaryKey(id, name = "article_parsed_id")
+    override val primaryKey = PrimaryKey(id, name = "article_parsed_id_pk")
 }
 
 const val DEFAULT_OFFSET = 0L
