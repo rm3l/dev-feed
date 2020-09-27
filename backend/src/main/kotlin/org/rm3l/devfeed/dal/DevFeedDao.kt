@@ -57,6 +57,25 @@ import java.net.URL
 import java.sql.Connection
 import javax.annotation.PostConstruct
 
+object ArticlesTags : Table(name = "articles_tags") {
+  val articleId = (long("article_id") references Articles.id)
+  val tagName = (varchar("tag_name", length = 380) references Tags.name)
+}
+
+object ArticlesParsed : Table(name = "articles_parsed") {
+  val id = long(name = "id").autoIncrement()
+  val articleLink = (varchar(name = "article_link", length = 380) references Articles.link)
+  val title = text(name = "title").nullable()
+  val author = text(name = "author").nullable()
+  val published = text(name = "published").nullable() //TODO Use DateTime
+  val image = text(name = "image").nullable()
+  val videos = text(name = "videos").nullable()
+  val keywords = text(name = "keywords").nullable()
+  val description = text(name = "description").nullable()
+  val body = text(name = "body")
+  override val primaryKey = PrimaryKey(id, name = "article_parsed_id_pk")
+}
+
 object Articles : Table(name = "articles") {
     val id = long(name = "id").autoIncrement()
     val timestamp = long(name = "timestamp")
@@ -74,25 +93,6 @@ object Articles : Table(name = "articles") {
 object Tags : Table(name = "tags") {
     val name = varchar(name = "name", length = 380)
     override val primaryKey = PrimaryKey(name, name = "tag_name_pk")
-}
-
-object ArticlesTags : Table(name = "articles_tags") {
-    val articleId = (long("article_id") references Articles.id)
-    val tagName = (varchar("tag_name", length = 380) references Tags.name)
-}
-
-object ArticlesParsed : Table(name = "articles_parsed") {
-    val id = long(name = "id").autoIncrement()
-    val url = (varchar(name = "url", length = 380) references Articles.link)
-    val title = text(name = "title").nullable()
-    val author = text(name = "author").nullable()
-    val published = text(name = "published").nullable() //TODO Use DateTime
-    val image = text(name = "image").nullable()
-    val videos = text(name = "videos").nullable()
-    val keywords = text(name = "keywords").nullable()
-    val description = text(name = "description").nullable()
-    val body = text(name = "body")
-    override val primaryKey = PrimaryKey(id, name = "article_parsed_id_pk")
 }
 
 const val DEFAULT_OFFSET = 0L
@@ -176,7 +176,7 @@ class DevFeedDao : HealthIndicator {
     fun existArticleParsed(url: String): Boolean {
         var result = false
         transaction {
-            result = !ArticlesParsed.select { ArticlesParsed.url.eq(url) }.empty()
+            result = !ArticlesParsed.select { ArticlesParsed.articleLink.eq(url) }.empty()
         }
         return result
     }
@@ -207,7 +207,7 @@ class DevFeedDao : HealthIndicator {
                                         width = articleResultRow[Articles.screenshotWidth],
                                         height = articleResultRow[Articles.screenshotHeight]
                                 ),
-                                parsed = ArticlesParsed.select { ArticlesParsed.url.eq(articleResultRow[Articles.link]) }
+                                parsed = ArticlesParsed.select { ArticlesParsed.articleLink.eq(articleResultRow[Articles.link]) }
                                         .map {
                                             ArticleParsed(
                                                     url = articleResultRow[Articles.link],
@@ -252,7 +252,7 @@ class DevFeedDao : HealthIndicator {
                                         width = articleResultRow[Articles.screenshotWidth],
                                         height = articleResultRow[Articles.screenshotHeight]
                                 ),
-                                parsed = ArticlesParsed.select { ArticlesParsed.url.eq(articleResultRow[Articles.link]) }
+                                parsed = ArticlesParsed.select { ArticlesParsed.articleLink.eq(articleResultRow[Articles.link]) }
                                         .map {
                                             ArticleParsed(
                                                     url = articleResultRow[Articles.link],
@@ -297,7 +297,7 @@ class DevFeedDao : HealthIndicator {
 
             article.parsed?.let { articleParsed ->
                 ArticlesParsed.insert {
-                    it[url] = articleParsed.url
+                    it[articleLink] = articleParsed.url
                     it[title] = articleParsed.title
                     it[author] = articleParsed.author
                     it[published] = articleParsed.published
@@ -418,7 +418,7 @@ class DevFeedDao : HealthIndicator {
                                                     width = articleResultRow[Articles.screenshotWidth],
                                                     height = articleResultRow[Articles.screenshotHeight]
                                             ),
-                                            parsed = ArticlesParsed.select { ArticlesParsed.url.eq(articleResultRow[Articles.link]) }
+                                            parsed = ArticlesParsed.select { ArticlesParsed.articleLink.eq(articleResultRow[Articles.link]) }
                                                     .map {
                                                         ArticleParsed(
                                                                 url = articleResultRow[Articles.link],
@@ -473,7 +473,7 @@ class DevFeedDao : HealthIndicator {
                                         width = articleResultRow[Articles.screenshotWidth],
                                         height = articleResultRow[Articles.screenshotHeight]
                                 ),
-                                parsed = ArticlesParsed.select { ArticlesParsed.url.eq(articleResultRow[Articles.link]) }
+                                parsed = ArticlesParsed.select { ArticlesParsed.articleLink.eq(articleResultRow[Articles.link]) }
                                         .map {
                                             ArticleParsed(
                                                     url = articleResultRow[Articles.link],
@@ -539,7 +539,7 @@ class DevFeedDao : HealthIndicator {
                                         width = articleResultRow[Articles.screenshotWidth],
                                         height = articleResultRow[Articles.screenshotHeight]
                                 ),
-                                parsed = ArticlesParsed.select { ArticlesParsed.url.eq(articleResultRow[Articles.link]) }
+                                parsed = ArticlesParsed.select { ArticlesParsed.articleLink.eq(articleResultRow[Articles.link]) }
                                         .map {
                                             ArticleParsed(
                                                     url = articleResultRow[Articles.link],
@@ -612,7 +612,7 @@ class DevFeedDao : HealthIndicator {
                                                     width = articleResultRow[Articles.screenshotWidth],
                                                     height = articleResultRow[Articles.screenshotHeight]
                                             ),
-                                            parsed = ArticlesParsed.select { ArticlesParsed.url.eq(articleResultRow[Articles.link]) }
+                                            parsed = ArticlesParsed.select { ArticlesParsed.articleLink.eq(articleResultRow[Articles.link]) }
                                                     .map {
                                                         ArticleParsed(
                                                                 url = articleResultRow[Articles.link],
