@@ -286,7 +286,11 @@ class DevFeedDao : HealthIndicator {
             articleIdentifier = Articles.insert {
                 it[timestamp] = article.timestamp
                 it[title] = article.title
-                it[description] = article.description
+                it[description] =
+                  if (article.description?.length?:0 > 65_530)
+                    article.description?.substring(0 until 65_530)?.plus("...")
+                  else
+                    article.description
                 it[link] = article.url
                 it[hostname] = article.domain
                 it[screenshotData] = article.screenshot?.data
@@ -302,7 +306,11 @@ class DevFeedDao : HealthIndicator {
                     it[author] = articleParsed.author
                     it[published] = articleParsed.published
                     it[image] = articleParsed.image
-                    it[description] = articleParsed.description
+                    it[description] =
+                      if (articleParsed.description?.length?:0 > 65_530)
+                        articleParsed.description?.substring(0 until 65_530)?.plus("...")
+                      else
+                        articleParsed.description
                     it[body] = articleParsed.body
                     it[videos] = objectMapper.writeValueAsString(articleParsed.videos
                             ?: emptyList<String>())
