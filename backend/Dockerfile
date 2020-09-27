@@ -37,7 +37,7 @@ RUN ./gradlew build --stacktrace
 
 FROM adoptopenjdk:14-jdk-openj9
 
-COPY --from=builder /dev-feed-backend/build/libs/dev-feed-backend-0.10.2.jar /app.jar
+COPY --from=builder /dev-feed-backend/build/libs/dev-feed-backend-0.10.3.jar /app.jar
 
 # /graphql and /graphiql endpoints
 EXPOSE 8080
