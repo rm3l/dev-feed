@@ -22,6 +22,8 @@
 package org.rm3l.devfeed.dal
 
 import com.fasterxml.jackson.databind.ObjectMapper
+import com.zaxxer.hikari.HikariConfig
+import com.zaxxer.hikari.HikariDataSource
 import org.jetbrains.exposed.sql.Database
 import org.jetbrains.exposed.sql.Op
 import org.jetbrains.exposed.sql.Query
@@ -112,6 +114,9 @@ class DevFeedDao : HealthIndicator {
     @Value("\${datasource.password}")
     private lateinit var datasourcePassword: String
 
+    @Value("\${datasource.poolSize}")
+    private lateinit var datasourcePoolSize: String
+
     @Autowired
     private lateinit var jackson2ObjectMapperBuilder: Jackson2ObjectMapperBuilder
 
@@ -128,11 +133,13 @@ class DevFeedDao : HealthIndicator {
 
         logger.info("Database located at: '$datasourceUrl'. Driver is $datasourceDriver")
 
-        Database.connect(
-                url = datasourceUrl,
-                driver = datasourceDriver,
-                user = datasourceUser,
-                password = datasourcePassword)
+        Database.connect(HikariDataSource(HikariConfig().apply {
+          jdbcUrl = datasourceUrl
+          driverClassName = datasourceDriver
+          username = datasourceUser
+          password = datasourcePassword
+          maximumPoolSize = datasourcePoolSize.toInt()
+        }))
 
         //Adjust Transaction isolation levels, as queries may not succeed in certain circumstances.
         //See https://github.com/JetBrains/Exposed/wiki/FAQ
