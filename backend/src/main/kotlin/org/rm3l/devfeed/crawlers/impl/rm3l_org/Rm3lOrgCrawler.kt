@@ -29,8 +29,8 @@ import org.rm3l.devfeed.utils.asSupportedTimestamp
 import org.slf4j.LoggerFactory
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty
 import org.springframework.stereotype.Service
-import java.io.ByteArrayInputStream
 import java.net.URL
+import java.io.ByteArrayInputStream
 import java.util.concurrent.ExecutionException
 import java.util.concurrent.TimeUnit
 
@@ -60,6 +60,7 @@ class Rm3lOrgCrawler : DevFeedCrawler {
                     .filterNot { it.publishedDate == null && it.updatedDate == null }
                     .map { feedEntry ->
                         Article(
+                                source = "https://rm3l.org/",
                                 timestamp = (feedEntry.publishedDate ?: feedEntry.updatedDate)
                                         .asSupportedTimestamp()!!,
                                 title = feedEntry.title,

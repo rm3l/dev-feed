@@ -35,8 +35,8 @@ import org.springframework.beans.factory.annotation.Qualifier
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty
 import org.springframework.stereotype.Service
-import java.io.ByteArrayInputStream
 import java.net.URL
+import java.io.ByteArrayInputStream
 import java.util.concurrent.CompletableFuture
 import java.util.concurrent.ExecutionException
 import java.util.concurrent.ExecutorService
@@ -113,6 +113,7 @@ private class EngineeringBlogsCrawlerArchiveFetcherFutureSupplier(private val ou
                     .filterNot { it.publishedDate == null && it.updatedDate == null }
                     .map { feedEntry ->
                         Article(
+                                source = "https://engineeringblogs.xyz/",
                                 timestamp = (feedEntry.publishedDate ?: feedEntry.updatedDate)
                                         .asSupportedTimestamp()!!,
                                 title = feedEntry.title,

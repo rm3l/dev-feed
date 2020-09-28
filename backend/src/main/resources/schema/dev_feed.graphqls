@@ -3,6 +3,8 @@ schema {
     mutation: Mutation
 }
 
+scalar Long
+
 type Query {
     articleDates(limit: Int, offset: Int): [Long]
     articles(limit: Int, offset: Int, filter: ArticleFilter): [Article]
@@ -27,6 +29,7 @@ type Mutation {
 
 type Article {
     id: ID!
+    source: String!
     timestamp: Long!
     title: String!
     description: String

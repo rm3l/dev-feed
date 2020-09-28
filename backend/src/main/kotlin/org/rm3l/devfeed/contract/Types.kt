@@ -23,7 +23,7 @@ package org.rm3l.devfeed.contract
 
 import java.net.URL
 
-data class Article(val id: Long? = null,
+data class Article(val id: String? = null,
                    val timestamp: Long = System.currentTimeMillis(),
                    val title: String,
                    val description: String? = null,
@@ -31,7 +31,8 @@ data class Article(val id: Long? = null,
                    val domain: String = URL(url).host,
                    var tags: Collection<String?>? = setOf(),
                    var screenshot: Screenshot? = null,
-                   var parsed: ArticleParsed? = null)
+                   var parsed: ArticleParsed? = null,
+                   var source: String? = null)
 
 data class Screenshot(val data: String? = null,
                       val height: Int? = null,

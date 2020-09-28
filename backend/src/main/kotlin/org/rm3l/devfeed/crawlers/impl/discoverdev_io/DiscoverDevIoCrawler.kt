@@ -105,6 +105,7 @@ private class DiscoverDevIoCrawlerArchiveFetcherFutureSupplier(private val date:
                                 .map { element ->
                                     val titleAndLink = element.select("h1.title a")
                                     Article(
+                                            source = BACKEND_BASE_URL,
                                             timestamp = date.asSupportedTimestamp()!!,
                                             title = titleAndLink.text(),
                                             url = titleAndLink.attr("href"),
