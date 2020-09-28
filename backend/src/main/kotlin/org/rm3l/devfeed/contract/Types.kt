@@ -23,7 +23,7 @@ package org.rm3l.devfeed.contract
 
 import java.net.URL
 
-data class Article(val id: Long? = null,
+data class Article(val id: String? = null,
                    val timestamp: Long = System.currentTimeMillis(),
                    val title: String,
                    val description: String? = null,
