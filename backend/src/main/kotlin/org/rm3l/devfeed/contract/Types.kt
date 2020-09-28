@@ -31,7 +31,8 @@ data class Article(val id: Long? = null,
                    val domain: String = URL(url).host,
                    var tags: Collection<String?>? = setOf(),
                    var screenshot: Screenshot? = null,
-                   var parsed: ArticleParsed? = null)
+                   var parsed: ArticleParsed? = null,
+                   var source: String? = null)
 
 data class Screenshot(val data: String? = null,
                       val height: Int? = null,

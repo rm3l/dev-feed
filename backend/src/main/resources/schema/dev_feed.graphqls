@@ -27,6 +27,7 @@ type Mutation {
 
 type Article {
     id: ID!
+    source: String!
     timestamp: Long!
     title: String!
     description: String

@@ -89,6 +89,7 @@ object Articles : Table(name = "articles") {
     val screenshotWidth = integer(name = "screenshot_width").nullable()
     val screenshotHeight = integer(name = "screenshot_height").nullable()
     val screenshotMimeType = varchar(name = "screenshot_mime_type", length = 255).nullable()
+    val articleSource = varchar(name = "source", length = 255).index()
     override val primaryKey = PrimaryKey(id, name = "article_id_pk")
 }
 
@@ -202,7 +203,8 @@ class DevFeedDao : HealthIndicator {
             result = Articles.select { Articles.id.eq(articleId) }
                     .limit(1)
                     .map { articleResultRow ->
-                        val article = Article(id = articleResultRow[Articles.id].toLong(),
+                        val article = Article(id = articleResultRow[Articles.id],
+                                source = articleResultRow[Articles.articleSource],
                                 title = articleResultRow[Articles.title],
                                 url = articleResultRow[Articles.link],
                                 domain = articleResultRow[Articles.hostname]
@@ -247,7 +249,8 @@ class DevFeedDao : HealthIndicator {
             result = Articles.select { Articles.link.eq(url) }
                     .limit(1)
                     .map { articleResultRow ->
-                        val article = Article(id = articleResultRow[Articles.id].toLong(),
+                        val article = Article(id = articleResultRow[Articles.id],
+                                source = articleResultRow[Articles.articleSource],
                                 title = articleResultRow[Articles.title],
                                 url = articleResultRow[Articles.link],
                                 domain = articleResultRow[Articles.hostname]
@@ -291,6 +294,8 @@ class DevFeedDao : HealthIndicator {
         var articleIdentifier: Long? = null
         transaction {
             articleIdentifier = Articles.insert {
+                it[id] = UUID.randomUUID().toString()
+                it[articleSource] = article.source!!
                 it[timestamp] = article.timestamp
                 it[title] = article.title
                 it[description] =
@@ -421,7 +426,8 @@ class DevFeedDao : HealthIndicator {
 
                         val list = query
                                 .map { articleResultRow ->
-                                    val article = Article(id = articleResultRow[Articles.id].toLong(),
+                                    val article = Article(id = articleResultRow[Articles.id],
+                                            source = articleResultRow[Articles.articleSource],
                                             title = articleResultRow[Articles.title],
                                             url = articleResultRow[Articles.link],
                                             domain = articleResultRow[Articles.hostname]
@@ -476,7 +482,8 @@ class DevFeedDao : HealthIndicator {
             result.addAll(Articles
                     .select { Articles.screenshotData.isNull().or(Articles.screenshotData eq "") }
                     .map { articleResultRow ->
-                        Article(id = articleResultRow[Articles.id].toLong(),
+                        Article(id = articleResultRow[Articles.id],
+                                source = articleResultRow[Articles.articleSource],
                                 title = articleResultRow[Articles.title],
                                 url = articleResultRow[Articles.link],
                                 domain = articleResultRow[Articles.hostname]
@@ -542,7 +549,8 @@ class DevFeedDao : HealthIndicator {
 
             val list = query
                     .map { articleResultRow ->
-                        val article = Article(id = articleResultRow[Articles.id].toLong(),
+                        val article = Article(id = articleResultRow[Articles.id],
+                                source = articleResultRow[Articles.articleSource],
                                 title = articleResultRow[Articles.title],
                                 url = articleResultRow[Articles.link],
                                 domain = articleResultRow[Articles.hostname]
@@ -615,7 +623,8 @@ class DevFeedDao : HealthIndicator {
                         query.orderBy(Articles.timestamp, order = SortOrder.DESC)
                         result.addAll(query
                                 .map { articleResultRow ->
-                                    val article = Article(id = articleResultRow[Articles.id].toLong(),
+                                    val article = Article(id = articleResultRow[Articles.id],
+                                            source = articleResultRow[Articles.articleSource],
                                             title = articleResultRow[Articles.title],
                                             url = articleResultRow[Articles.link],
                                             domain = articleResultRow[Articles.hostname]
