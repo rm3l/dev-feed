@@ -19,22 +19,13 @@
 //LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 //OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 //SOFTWARE.
-rootProject.name = 'dev-feed-backend'
-include ':api'
-include ':crawlers'
-include ':common'
-include ':crawlers:discoverdev_io'
-include ':crawlers:engineeringblogs_xyz'
-include ':crawlers:rm3l_org'
+@file:JvmName("DevFeedCrawler")
+package org.rm3l.devfeed.common.crawlers
 
-project(':api').projectDir = "$rootDir/api" as File
-project(':common').projectDir = "$rootDir/common" as File
-project(':crawlers:discoverdev_io').projectDir = "$rootDir/crawlers/discoverdev.io" as File
-project(':crawlers:engineeringblogs_xyz').projectDir = "$rootDir/crawlers/engineeringblogs.xyz" as File
-project(':crawlers:rm3l_org').projectDir = "$rootDir/crawlers/rm3l.org" as File
+import org.rm3l.devfeed.common.contract.Article
 
-findProject(':api').name = 'dev-feed-api'
-findProject(':common').name = 'dev-feed-common'
-findProject(':crawlers:discoverdev_io').name = 'dev-feed-crawler-discoverdev_io'
-findProject(':crawlers:engineeringblogs_xyz').name = 'dev-feed-crawler-engineeringblogs_xyz'
-findProject(':crawlers:rm3l_org').name = 'dev-feed-crawler-rm3l_org'
+interface DevFeedCrawler {
+
+    @Throws(Exception::class)
+    fun fetchArticles(): Collection<Article>
+}

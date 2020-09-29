@@ -1,0 +1,7 @@
+apply plugin: "com.google.cloud.tools.jib"
+
+description = 'rm3l.org crawler'
+
+dependencies {
+    implementation project(':dev-feed-common')
+}

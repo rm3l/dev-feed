@@ -1,0 +1,7 @@
+apply plugin: "com.google.cloud.tools.jib"
+
+description = 'DiscoverDev.io crawler'
+
+dependencies {
+    implementation project(':dev-feed-common')
+}
