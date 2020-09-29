@@ -1,3 +1,15 @@
+buildscript {
+    repositories {
+        maven {
+            url "https://plugins.gradle.org/m2/"
+        }
+    }
+    dependencies {
+        classpath "org.springframework.boot:spring-boot-gradle-plugin:2.3.4.RELEASE"
+        classpath "gradle.plugin.com.google.cloud.tools:jib-gradle-plugin:2.5.0"
+    }
+}
+
 apply plugin: "org.jetbrains.kotlin.plugin.spring"
 apply plugin: "org.springframework.boot"
 apply plugin: "com.google.cloud.tools.jib"
@@ -7,6 +19,22 @@ description = 'GraphQL API'
 dependencies {
     api project(':dev-feed-common')
     implementation project(':crawlers:dev-feed-crawlers-common')
+    implementation project(':crawlers:dev-feed-crawler-discoverdev_io')
+    implementation project(':crawlers:dev-feed-crawler-engineeringblogs_xyz')
+    implementation project(':crawlers:dev-feed-crawler-rm3l_org')
+
+    implementation('com.fasterxml.jackson.module:jackson-module-kotlin')
+
+    implementation 'org.springframework.boot:spring-boot-starter-actuator'
+    implementation('org.springframework.boot:spring-boot-starter-web')
+    implementation('org.jetbrains.kotlinx:kotlinx-coroutines-core:1.3.9-native-mt-2')
+    //Constrained by graphql-java-tools
+
+    // GraphQL and GraphiQL
+    implementation "com.graphql-java-kickstart:graphql-spring-boot-starter:${graphqlSpringBootStarterVersion}"
+    implementation "com.graphql-java-kickstart:graphiql-spring-boot-starter:${graphqlSpringBootStarterVersion}"
+
+    testImplementation "org.springframework.boot:spring-boot-starter-test:${springBootVersion}"
 }
 
 jib {

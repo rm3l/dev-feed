@@ -24,107 +24,103 @@ package org.rm3l.devfeed.crawlers.discoverdev_io
 import org.jsoup.Jsoup
 import org.rm3l.devfeed.common.contract.Article
 import org.rm3l.devfeed.common.utils.asSupportedTimestamp
+import org.rm3l.devfeed.crawlers.common.DEFAULT_THREAD_POOL_SIZE
 import org.rm3l.devfeed.crawlers.common.DevFeedCrawler
 import org.slf4j.LoggerFactory
-import org.springframework.beans.factory.annotation.Autowired
-import org.springframework.beans.factory.annotation.Qualifier
-import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty
-import org.springframework.stereotype.Service
 import java.util.concurrent.CompletableFuture
 import java.util.concurrent.ExecutionException
 import java.util.concurrent.ExecutorService
+import java.util.concurrent.Executors
 import java.util.concurrent.TimeUnit
 import java.util.function.Supplier
 
-const val BACKEND_BASE_URL = "https://www.discoverdev.io"
-const val BACKEND_ARCHIVE_URL = "$BACKEND_BASE_URL/archive"
-const val USER_AGENT = "org.rm3l.devfeed"
+private const val BACKEND_BASE_URL = "https://www.discoverdev.io"
+private const val BACKEND_ARCHIVE_URL = "$BACKEND_BASE_URL/archive"
+private const val USER_AGENT = "org.rm3l.devfeed"
 
-@Service
-@ConditionalOnProperty(name = ["crawlers.discoverdev_io.enabled"], havingValue = "true", matchIfMissing = true)
-class DiscoverDevIoCrawler : DevFeedCrawler {
+class DiscoverDevIoCrawler(
+  private val executorService: ExecutorService = Executors.newFixedThreadPool(DEFAULT_THREAD_POOL_SIZE)
+) : DevFeedCrawler {
 
-    companion object {
-        @JvmStatic
-        private val logger = LoggerFactory.getLogger(DiscoverDevIoCrawler::class.java)
-    }
+  companion object {
+    @JvmStatic
+    private val logger = LoggerFactory.getLogger(DiscoverDevIoCrawler::class.java)
+  }
 
-    @Autowired
-    @Qualifier("devFeedExecutorService")
-    private lateinit var devFeedExecutorService: ExecutorService
+  override fun getCrawlerSource() = BACKEND_BASE_URL
 
-    @Throws(Exception::class)
-    override fun fetchArticles(): Collection<Article> {
-        try {
-            logger.info(">>> Crawling website: $BACKEND_ARCHIVE_URL")
+  @Throws(Exception::class)
+  override fun fetchArticles(): Collection<Article> {
+    try {
+      logger.info(">>> Crawling website: $BACKEND_ARCHIVE_URL")
 
-            val start = System.nanoTime()
-            val articles = Jsoup.connect(BACKEND_ARCHIVE_URL)
-                    .userAgent(USER_AGENT)
-                    .get()
-                    .run {
-                        select("main.archive-page ul.archive-list li a")
-                                .map { it.attr("href") }
-                                .map { it.replaceFirst("/archive/", "", ignoreCase = true) }
-                                .map {
-                                    logger.trace("Crawling page: $it ...")
-                                    CompletableFuture.supplyAsync(
-                                            DiscoverDevIoCrawlerArchiveFetcherFutureSupplier(it),
-                                            devFeedExecutorService)
-                                }
-                                .flatMap { it.join() }
-                                .toList()
-                    }
-            logger.info("<<< Done crawling website: $BACKEND_ARCHIVE_URL" +
-                    " in ${TimeUnit.NANOSECONDS.toMillis(System.nanoTime() - start)}ms" +
-                    " => ${articles.size} articles")
-            return articles
-        } catch (e: ExecutionException) {
-            logger.warn("Crawling execution could not complete successfully - " +
-                    "will try again later", e)
-            throw e
+      val start = System.nanoTime()
+      val articles = Jsoup.connect(BACKEND_ARCHIVE_URL)
+        .userAgent(USER_AGENT)
+        .get()
+        .run {
+          select("main.archive-page ul.archive-list li a")
+            .map { it.attr("href") }
+            .map { it.replaceFirst("/archive/", "", ignoreCase = true) }
+            .map {
+              logger.trace("Crawling page: $it ...")
+              CompletableFuture.supplyAsync(
+                DiscoverDevIoCrawlerArchiveFetcherFutureSupplier(it),
+                executorService)
+            }
+            .flatMap { it.join() }
+            .toList()
         }
+      logger.info("<<< Done crawling website: $BACKEND_ARCHIVE_URL" +
+        " in ${TimeUnit.NANOSECONDS.toMillis(System.nanoTime() - start)}ms" +
+        " => ${articles.size} articles")
+      return articles
+    } catch (e: ExecutionException) {
+      logger.warn("Crawling execution could not complete successfully - " +
+        "will try again later", e)
+      throw e
     }
+  }
 }
 
 private class DiscoverDevIoCrawlerArchiveFetcherFutureSupplier(private val date: String) :
-        Supplier<Collection<Article>> {
+  Supplier<Collection<Article>> {
 
-    companion object {
-        @JvmStatic
-        private val logger = LoggerFactory.getLogger(DiscoverDevIoCrawlerArchiveFetcherFutureSupplier::class.java)
-    }
+  companion object {
+    @JvmStatic
+    private val logger = LoggerFactory.getLogger(DiscoverDevIoCrawlerArchiveFetcherFutureSupplier::class.java)
+  }
 
-    override fun get(): Collection<Article> {
-        try {
-            return Jsoup.connect("$BACKEND_ARCHIVE_URL/$date")
-                    .userAgent(USER_AGENT)
-                    .get()
-                    .run {
-                        val articlesList = select("main.archive-page ul.archive-list li.post-item")
-                                .map { element ->
-                                    val titleAndLink = element.select("h1.title a")
-                                    Article(
-                                            source = BACKEND_BASE_URL,
-                                            timestamp = date.asSupportedTimestamp()!!,
-                                            title = titleAndLink.text(),
-                                            url = titleAndLink.attr("href"),
-                                            description = element.select("p.description").text(),
-                                            tags = element.select("p.tags a.tlink")
-                                                    .map { tagElement -> tagElement.text() }
-                                                    .toSet())
-                                }.toList()
-                        if (logger.isDebugEnabled) {
-                            logger.trace("Fetched ${articlesList.size} articles for $date")
-                        }
-                        articlesList
-                    }
-        } catch (e: Exception) {
-            logger.warn("Error while fetching articles for $date: ${e.message}")
-            if (logger.isDebugEnabled) {
-                logger.debug(e.message, e)
-            }
-            return emptyList()
+  override fun get(): Collection<Article> {
+    try {
+      return Jsoup.connect("$BACKEND_ARCHIVE_URL/$date")
+        .userAgent(USER_AGENT)
+        .get()
+        .run {
+          val articlesList = select("main.archive-page ul.archive-list li.post-item")
+            .map { element ->
+              val titleAndLink = element.select("h1.title a")
+              Article(
+                source = BACKEND_BASE_URL,
+                timestamp = date.asSupportedTimestamp()!!,
+                title = titleAndLink.text(),
+                url = titleAndLink.attr("href"),
+                description = element.select("p.description").text(),
+                tags = element.select("p.tags a.tlink")
+                  .map { tagElement -> tagElement.text() }
+                  .toSet())
+            }.toList()
+          if (logger.isDebugEnabled) {
+            logger.trace("Fetched ${articlesList.size} articles for $date")
+          }
+          articlesList
         }
+    } catch (e: Exception) {
+      logger.warn("Error while fetching articles for $date: ${e.message}")
+      if (logger.isDebugEnabled) {
+        logger.debug(e.message, e)
+      }
+      return emptyList()
     }
+  }
 }

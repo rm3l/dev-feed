@@ -29,8 +29,6 @@ buildscript {
     dependencies {
         classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:1.4.10"
         classpath "org.jetbrains.kotlin:kotlin-allopen:1.4.10"
-        classpath "org.springframework.boot:spring-boot-gradle-plugin:2.3.4.RELEASE"
-        classpath "gradle.plugin.com.google.cloud.tools:jib-gradle-plugin:2.5.0"
     }
 }
 
@@ -73,15 +71,8 @@ subprojects {
 
     dependencies {
 
-        implementation 'org.springframework.boot:spring-boot-starter-actuator'
-        implementation('org.springframework.boot:spring-boot-starter-web')
-
-        implementation('com.fasterxml.jackson.module:jackson-module-kotlin')
-
         implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk8"
         implementation "org.jetbrains.kotlin:kotlin-reflect"
-        implementation('org.jetbrains.kotlinx:kotlinx-coroutines-core:1.3.9-native-mt-2')
-        //Constrained by graphql-java-tools
 
         implementation("org.jsoup:jsoup:1.13.1")
 
@@ -96,15 +87,9 @@ subprojects {
         implementation 'org.postgresql:postgresql:42.2.16'
         implementation 'org.mariadb.jdbc:mariadb-java-client:2.7.0'
 
-        // GraphQL and GraphiQL
-        implementation "com.graphql-java-kickstart:graphql-spring-boot-starter:${graphqlSpringBootStarterVersion}"
-        implementation "com.graphql-java-kickstart:graphiql-spring-boot-starter:${graphqlSpringBootStarterVersion}"
-
         implementation 'khttp:khttp:1.0.0'
 
         implementation('com.github.chimbori:crux:2.2.0')
-
-        testImplementation "org.springframework.boot:spring-boot-starter-test:${springBootVersion}"
 
         implementation "com.rometools:rome-opml:${romeVersion}"
     }

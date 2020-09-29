@@ -19,12 +19,15 @@
 //LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 //OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 //SOFTWARE.
-@file:JvmName("DevFeedCrawler")
 package org.rm3l.devfeed.crawlers.common
 
 import org.rm3l.devfeed.common.contract.Article
 
+const val DEFAULT_THREAD_POOL_SIZE = 10
+
 interface DevFeedCrawler {
+
+    fun getCrawlerSource(): String
 
     @Throws(Exception::class)
     fun fetchArticles(): Collection<Article>
