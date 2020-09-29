@@ -27,8 +27,6 @@ const val DEFAULT_THREAD_POOL_SIZE = 10
 
 interface DevFeedCrawler {
 
-    fun getCrawlerSource(): String
-
-    @Throws(Exception::class)
-    fun fetchArticles(): Collection<Article>
+  @Throws(Exception::class)
+  fun fetchArticles(): Collection<Article>
 }

@@ -47,8 +47,6 @@ class DiscoverDevIoCrawler(
     private val logger = LoggerFactory.getLogger(DiscoverDevIoCrawler::class.java)
   }
 
-  override fun getCrawlerSource() = BACKEND_BASE_URL
-
   @Throws(Exception::class)
   override fun fetchArticles(): Collection<Article> {
     try {

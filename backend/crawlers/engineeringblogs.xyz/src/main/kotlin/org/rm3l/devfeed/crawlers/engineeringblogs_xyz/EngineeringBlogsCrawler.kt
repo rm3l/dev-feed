@@ -51,8 +51,6 @@ class EngineeringBlogsCrawler(
     private const val OPML_URL = "https://engblogs.s3.amazonaws.com/engblogs.opml"
   }
 
-  override fun getCrawlerSource() = "http://engineeringblogs.xyz"
-
   @Throws(Exception::class)
   override fun fetchArticles(): Collection<Article> {
     try {

@@ -41,8 +41,6 @@ class Rm3lOrgCrawler : DevFeedCrawler {
     private const val RSS_FEED_URL = "https://rm3l.org/rss/"
   }
 
-  override fun getCrawlerSource() = "https://rm3l.org"
-
   @Throws(Exception::class)
   override fun fetchArticles(): Collection<Article> {
     try {
