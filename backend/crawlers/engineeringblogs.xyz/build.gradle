@@ -3,5 +3,6 @@ apply plugin: "com.google.cloud.tools.jib"
 description = 'EngineeringBlogs.xyz crawler'
 
 dependencies {
-    implementation project(':dev-feed-common')
+    api project(':crawlers:dev-feed-crawlers-common')
 }
+

@@ -20,7 +20,7 @@
 //OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 //SOFTWARE.
 @file:JvmName("DevFeedCrawler")
-package org.rm3l.devfeed.common.crawlers
+package org.rm3l.devfeed.crawlers.common
 
 import org.rm3l.devfeed.common.contract.Article
 

@@ -23,8 +23,8 @@ package org.rm3l.devfeed.crawlers.discoverdev_io
 
 import org.jsoup.Jsoup
 import org.rm3l.devfeed.common.contract.Article
-import org.rm3l.devfeed.common.crawlers.DevFeedCrawler
 import org.rm3l.devfeed.common.utils.asSupportedTimestamp
+import org.rm3l.devfeed.crawlers.common.DevFeedCrawler
 import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.beans.factory.annotation.Qualifier

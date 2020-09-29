@@ -2,7 +2,7 @@ package org.rm3l.devfeed.crawlers
 
 import org.apache.commons.lang3.concurrent.BasicThreadFactory
 import org.rm3l.devfeed.common.contract.Article
-import org.rm3l.devfeed.common.crawlers.DevFeedCrawler
+import org.rm3l.devfeed.crawlers.common.DevFeedCrawler
 import org.rm3l.devfeed.dal.DevFeedDao
 import org.rm3l.devfeed.extractors.article.ArticleExtractor
 import org.rm3l.devfeed.extractors.screenshot.ArticleScreenshotExtractor

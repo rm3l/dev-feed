@@ -1,0 +1,5 @@
+description = 'Common APIs for DevFeed crawlers'
+
+dependencies {
+    api project(':dev-feed-common')
+}

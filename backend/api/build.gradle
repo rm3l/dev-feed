@@ -5,7 +5,8 @@ apply plugin: "com.google.cloud.tools.jib"
 description = 'GraphQL API'
 
 dependencies {
-    implementation project(':dev-feed-common')
+    api project(':dev-feed-common')
+    implementation project(':crawlers:dev-feed-crawlers-common')
 }
 
 jib {
