@@ -2,8 +2,8 @@ package org.rm3l.devfeed.extractors.article.impl
 
 import org.rm3l.devfeed.common.contract.Article
 import org.rm3l.devfeed.common.contract.ArticleParsed
-import org.rm3l.devfeed.dal.DevFeedDao
 import org.rm3l.devfeed.extractors.article.ArticleExtractor
+import org.rm3l.devfeed.persistence.DevFeedDao
 import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.beans.factory.annotation.Value

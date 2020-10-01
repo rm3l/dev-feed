@@ -18,6 +18,7 @@ description = 'GraphQL API'
 
 dependencies {
     api project(':dev-feed-common')
+    implementation project(':dev-feed-persistence')
     implementation project(':crawlers:dev-feed-crawlers-common')
     implementation project(':crawlers:dev-feed-crawler-discoverdev_io')
     implementation project(':crawlers:dev-feed-crawler-engineeringblogs_xyz')

@@ -22,23 +22,24 @@
 package org.rm3l.devfeed.graphql
 
 import graphql.kickstart.tools.GraphQLQueryResolver
-import org.rm3l.devfeed.dal.DevFeedDao
+import org.rm3l.devfeed.persistence.ArticleFilter
+import org.rm3l.devfeed.persistence.DevFeedDao
 import org.springframework.stereotype.Component
 
 @Suppress("unused")
 @Component
 class Query(private val dao: DevFeedDao) : GraphQLQueryResolver {
 
-    fun articleDates(limit: Int?, offset: Long?) = dao.getArticlesDates(limit, offset)
+  fun articleDates(limit: Int?, offset: Long?) = dao.getArticlesDates(limit, offset)
 
-    fun articles(limit: Int?, offset: Long?, filter: ArticleFilter?) = dao.getArticles(limit, offset, filter)
+  fun articles(limit: Int?, offset: Long?, filter: ArticleFilter?) = dao.getArticles(limit, offset, filter)
 
-    fun recentArticles(limit: Int?, offset: Long?) = dao.getRecentArticles(limit, offset)
+  fun recentArticles(limit: Int?, offset: Long?) = dao.getRecentArticles(limit, offset)
 
-    fun allButRecentArticles(limit: Int?, offset: Long?, filter: ArticleFilter?) =
-            dao.allButRecentArticles(limit, offset, filter)
+  fun allButRecentArticles(limit: Int?, offset: Long?, filter: ArticleFilter?) =
+    dao.allButRecentArticles(limit, offset, filter)
 
-    fun tags(limit: Int?, offset: Long?, search: List<String>?) = dao.getTags(limit, offset, search)
+  fun tags(limit: Int?, offset: Long?, search: List<String>?) = dao.getTags(limit, offset, search)
 
-    fun articlesWithNoScreenshots() = dao.getArticlesWithNoScreenshots()
+  fun articlesWithNoScreenshots() = dao.getArticlesWithNoScreenshots()
 }

@@ -34,11 +34,11 @@ import java.util.concurrent.Executors
 @Configuration
 class DevFeedAsyncConfiguration {
 
-    @Value("\${executor.thread-pool.size}")
-    private lateinit var numberOfThreadsInPool: String
+  @Value("\${executor.thread-pool.size}")
+  private lateinit var numberOfThreadsInPool: String
 
-    @Bean(name = ["devFeedExecutorService"], destroyMethod = "shutdownNow")
-    fun devFeedExecutorService(): ExecutorService =
-            Executors.newFixedThreadPool(numberOfThreadsInPool.toInt(),
-                    BasicThreadFactory.Builder().namingPattern("dev-feed-%d").build())
+  @Bean(name = ["devFeedExecutorService"], destroyMethod = "shutdownNow")
+  fun devFeedExecutorService(): ExecutorService =
+    Executors.newFixedThreadPool(numberOfThreadsInPool.toInt(),
+      BasicThreadFactory.Builder().namingPattern("dev-feed-%d").build())
 }

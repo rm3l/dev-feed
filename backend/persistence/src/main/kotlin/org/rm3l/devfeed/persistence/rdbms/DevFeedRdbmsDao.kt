@@ -19,7 +19,7 @@
 //LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 //OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 //SOFTWARE.
-package org.rm3l.devfeed.dal
+package org.rm3l.devfeed.persistence.rdbms
 
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.zaxxer.hikari.HikariConfig
@@ -47,20 +47,14 @@ import org.rm3l.devfeed.common.contract.Article
 import org.rm3l.devfeed.common.contract.ArticleParsed
 import org.rm3l.devfeed.common.contract.Screenshot
 import org.rm3l.devfeed.common.utils.asSupportedTimestamp
-import org.rm3l.devfeed.graphql.ArticleFilter
+import org.rm3l.devfeed.persistence.ArticleFilter
+import org.rm3l.devfeed.persistence.DevFeedDao
 import org.slf4j.LoggerFactory
-import org.springframework.beans.factory.annotation.Autowired
-import org.springframework.beans.factory.annotation.Value
-import org.springframework.boot.actuate.health.Health
-import org.springframework.boot.actuate.health.HealthIndicator
-import org.springframework.http.converter.json.Jackson2ObjectMapperBuilder
-import org.springframework.stereotype.Component
 import java.net.URL
 import java.sql.Connection
 import java.util.UUID
-import javax.annotation.PostConstruct
 
-object Articles : Table(name = "articles") {
+private object Articles : Table(name = "articles") {
   val id = varchar(name = "id", length = 36).index()
   val timestamp = long(name = "timestamp")
   val title = text(name = "title").index()
@@ -75,19 +69,19 @@ object Articles : Table(name = "articles") {
   override val primaryKey = PrimaryKey(id, name = "article_id_pk")
 }
 
-object Tags : Table(name = "tags") {
+private object Tags : Table(name = "tags") {
   val name = varchar(name = "name", length = 380).index()
   override val primaryKey = PrimaryKey(name, name = "tag_name_pk")
 }
 
-object ArticlesTags : Table(name = "articles_tags") {
+private object ArticlesTags : Table(name = "articles_tags") {
   val id = varchar(name = "id", length = 36).index()
   val articleId = varchar("article_id", length = 36).index()
   val tagName = varchar("tag_name", length = 380).index()
   override val primaryKey = PrimaryKey(id, name = "article_tags_id_pk")
 }
 
-object ArticlesParsed : Table(name = "articles_parsed") {
+private object ArticlesParsed : Table(name = "articles_parsed") {
   val id = varchar(name = "id", length = 36).index()
   val articleLink = varchar(name = "article_link", length = 380).index()
   val title = text(name = "title").nullable()
@@ -103,38 +97,44 @@ object ArticlesParsed : Table(name = "articles_parsed") {
 
 private const val DEFAULT_OFFSET = 0L
 
-@Component
-class DevFeedDao : HealthIndicator {
+class DevFeedRdbmsDao(
+  private val datasourceUrl: String,
+  private val datasourceDriver: String,
+  private val datasourceUser: String,
+  private val datasourcePassword: String,
+  private val datasourcePoolSize: Int = 1,
+  private val objectMapper: ObjectMapper = ObjectMapper()
+): DevFeedDao {
 
-  @Value("\${datasource.url}")
-  private lateinit var datasourceUrl: String
+//@Component
+//class DevFeedRdbmsDao : HealthIndicator {
 
-  @Value("\${datasource.driver}")
-  private lateinit var datasourceDriver: String
-
-  @Value("\${datasource.user}")
-  private lateinit var datasourceUser: String
-
-  @Value("\${datasource.password}")
-  private lateinit var datasourcePassword: String
-
-  @Value("\${datasource.poolSize}")
-  private lateinit var datasourcePoolSize: String
-
-  @Autowired
-  private lateinit var jackson2ObjectMapperBuilder: Jackson2ObjectMapperBuilder
-
-  private lateinit var objectMapper: ObjectMapper
+//  @Value("\${datasource.url}")
+//  private lateinit var datasourceUrl: String
+//
+//  @Value("\${datasource.driver}")
+//  private lateinit var datasourceDriver: String
+//
+//  @Value("\${datasource.user}")
+//  private lateinit var datasourceUser: String
+//
+//  @Value("\${datasource.password}")
+//  private lateinit var datasourcePassword: String
+//
+//  @Value("\${datasource.poolSize}")
+//  private lateinit var datasourcePoolSize: String
+//
+//  @Autowired
+//  private lateinit var jackson2ObjectMapperBuilder: Jackson2ObjectMapperBuilder
+//
+//  private lateinit var objectMapper: ObjectMapper
 
   companion object {
     @JvmStatic
     private val logger = LoggerFactory.getLogger(DevFeedDao::class.java)
   }
 
-  @PostConstruct
-  fun init() {
-    this.objectMapper = jackson2ObjectMapperBuilder.build()
-
+  init {
     logger.info("Database located at: '$datasourceUrl'. Driver is $datasourceDriver")
 
     Database.connect(HikariDataSource(HikariConfig().apply {
@@ -160,7 +160,7 @@ class DevFeedDao : HealthIndicator {
     }
   }
 
-  fun existArticlesByTitleAndUrl(title: String, url: String): Boolean {
+  override fun existArticlesByTitleAndUrl(title: String, url: String): Boolean {
     var result = false
     transaction {
       result = !Articles.select { Articles.title.eq(title) and Articles.link.eq(url) }.empty()
@@ -168,7 +168,7 @@ class DevFeedDao : HealthIndicator {
     return result
   }
 
-  fun existArticlesByUrl(url: String): Boolean {
+  override fun existArticlesByUrl(url: String): Boolean {
     var result = false
     transaction {
       result = !Articles.select { Articles.link.eq(url) }.empty()
@@ -176,7 +176,7 @@ class DevFeedDao : HealthIndicator {
     return result
   }
 
-  fun deleteByTitleAndUrl(title: String, url: String): Int {
+  override fun deleteByTitleAndUrl(title: String, url: String): Int {
     var result = 0
     transaction {
       result = Articles.deleteWhere { Articles.title.eq(title) and Articles.link.eq(url) }
@@ -184,7 +184,7 @@ class DevFeedDao : HealthIndicator {
     return result
   }
 
-  fun existArticleParsed(url: String): Boolean {
+  override fun existArticleParsed(url: String): Boolean {
     var result = false
     transaction {
       result = !ArticlesParsed.select { ArticlesParsed.articleLink.eq(url) }.empty()
@@ -192,7 +192,7 @@ class DevFeedDao : HealthIndicator {
     return result
   }
 
-  fun existTagByName(name: String): Boolean {
+  override fun existTagByName(name: String): Boolean {
     var result = false
     transaction {
       result = !Tags.select { Tags.name.eq(name) }.empty()
@@ -200,7 +200,7 @@ class DevFeedDao : HealthIndicator {
     return result
   }
 
-  fun findArticleById(articleId: String): Article? {
+  override fun findArticleById(articleId: String): Article? {
     var result: Article? = null
     transaction {
       result = Articles.select { Articles.id.eq(articleId) }
@@ -246,7 +246,7 @@ class DevFeedDao : HealthIndicator {
     return result
   }
 
-  fun findArticleByUrl(url: String): Article? {
+  override fun findArticleByUrl(url: String): Article? {
     var result: Article? = null
     transaction {
       result = Articles.select { Articles.link.eq(url) }
@@ -292,7 +292,7 @@ class DevFeedDao : HealthIndicator {
     return result
   }
 
-  fun insertArticle(article: Article): String {
+  override fun insertArticle(article: Article): String {
 
     var articleIdentifier: String? = null
     transaction {
@@ -357,7 +357,7 @@ class DevFeedDao : HealthIndicator {
       "Could not retrieve identifier for <${article.title},${article.url}>")
   }
 
-  fun shouldRequestScreenshot(title: String, url: String): Boolean {
+  override fun shouldRequestScreenshot(title: String, url: String): Boolean {
     var result = false
     transaction {
       result = Articles
@@ -367,7 +367,7 @@ class DevFeedDao : HealthIndicator {
     return result
   }
 
-  fun shouldRequestScreenshot(articleId: String): Boolean {
+  override fun shouldRequestScreenshot(articleId: String): Boolean {
     var result = false
     transaction {
       result = Articles
@@ -377,7 +377,7 @@ class DevFeedDao : HealthIndicator {
     return result
   }
 
-  fun updateArticleScreenshotData(article: Article) {
+  override fun updateArticleScreenshotData(article: Article) {
     transaction {
       Articles.update({ Articles.id eq article.id!! }) {
         it[screenshotData] = article.screenshot?.data
@@ -388,7 +388,7 @@ class DevFeedDao : HealthIndicator {
     }
   }
 
-  fun allButRecentArticles(limit: Int? = null, offset: Long? = null, filter: ArticleFilter? = null): Collection<Article> {
+  override fun allButRecentArticles(limit: Int?, offset: Long?, filter: ArticleFilter?): Collection<Article> {
     val result = mutableListOf<Article>()
     transaction {
       Articles.slice(Articles.timestamp)
@@ -480,7 +480,7 @@ class DevFeedDao : HealthIndicator {
     return result
   }
 
-  fun getArticlesWithNoScreenshots(): Collection<Article> {
+  override fun getArticlesWithNoScreenshots(): Collection<Article> {
     val result = mutableListOf<Article>()
     transaction {
       result.addAll(Articles
@@ -520,7 +520,7 @@ class DevFeedDao : HealthIndicator {
     return result.toList()
   }
 
-  fun getArticles(limit: Int? = null, offset: Long? = null, filter: ArticleFilter? = null): Collection<Article> {
+  override fun getArticles(limit: Int?, offset: Long?, filter: ArticleFilter?): Collection<Article> {
     val result = mutableListOf<Article>()
     transaction {
       val query: Query
@@ -599,7 +599,7 @@ class DevFeedDao : HealthIndicator {
     return result.toList()
   }
 
-  fun getArticlesDates(limit: Int? = null, offset: Long? = null): Set<Long> {
+  override fun getArticlesDates(limit: Int?, offset: Long?): Set<Long> {
     val result = mutableSetOf<Long>()
     transaction {
       val query = Articles.slice(Articles.timestamp).selectAll()
@@ -611,7 +611,7 @@ class DevFeedDao : HealthIndicator {
     return result.toSet()
   }
 
-  fun getRecentArticles(limit: Int? = null, offset: Long? = null): Collection<Article> {
+  override fun getRecentArticles(limit: Int?, offset: Long?): Collection<Article> {
     logger.trace("getRecentArticles")
     val result = mutableListOf<Article>()
     transaction {
@@ -672,7 +672,8 @@ class DevFeedDao : HealthIndicator {
     return result.toList()
   }
 
-  fun getTags(limit: Int? = null, offset: Long? = null, search: Collection<String>?): Collection<String> {
+  override fun getTags(limit: Int?, offset: Long?, search: Collection<String>?):
+  Collection<String> {
     val result = mutableSetOf<String>()
     transaction {
       val tagNameSlice = Tags.slice(Tags.name)
@@ -692,16 +693,11 @@ class DevFeedDao : HealthIndicator {
     return result.toSet()
   }
 
-  override fun health(): Health {
-    return try {
-      //Just attempt to read from the database
-      transaction {
-        Tags.slice(Tags.name).selectAll().limit(1)
-      }
-      Health.up().build()
-    } catch (exception: Exception) {
-      Health.down(exception).build()
+  @Throws(Exception::class)
+  override fun checkHealth() {
+    //Just attempt to read from the database
+    transaction {
+      Tags.slice(Tags.name).selectAll().limit(1)
     }
   }
-
 }

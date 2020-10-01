@@ -22,6 +22,7 @@
 rootProject.name = 'dev-feed-backend'
 include ':api'
 include ':common'
+include ':persistence'
 include ':crawlers'
 include ':crawlers:common'
 include ':crawlers:discoverdev_io'
@@ -30,6 +31,7 @@ include ':crawlers:rm3l_org'
 
 project(':api').projectDir = "$rootDir/api" as File
 project(':common').projectDir = "$rootDir/common" as File
+project(':persistence').projectDir = "$rootDir/persistence" as File
 project(':crawlers:common').projectDir = "$rootDir/crawlers/common" as File
 project(':crawlers:discoverdev_io').projectDir = "$rootDir/crawlers/discoverdev.io" as File
 project(':crawlers:engineeringblogs_xyz').projectDir = "$rootDir/crawlers/engineeringblogs.xyz" as File
@@ -37,6 +39,7 @@ project(':crawlers:rm3l_org').projectDir = "$rootDir/crawlers/rm3l.org" as File
 
 findProject(':api').name = 'dev-feed-api'
 findProject(':common').name = 'dev-feed-common'
+findProject(':persistence').name = 'dev-feed-persistence'
 findProject(':crawlers:common').name = 'dev-feed-crawlers-common'
 findProject(':crawlers:discoverdev_io').name = 'dev-feed-crawler-discoverdev_io'
 findProject(':crawlers:engineeringblogs_xyz').name = 'dev-feed-crawler-engineeringblogs_xyz'

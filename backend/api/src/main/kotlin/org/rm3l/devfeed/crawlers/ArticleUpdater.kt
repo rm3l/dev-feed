@@ -22,33 +22,33 @@
 package org.rm3l.devfeed.crawlers
 
 import org.rm3l.devfeed.common.contract.Article
-import org.rm3l.devfeed.dal.DevFeedDao
+import org.rm3l.devfeed.persistence.DevFeedDao
 import org.slf4j.LoggerFactory
 import java.util.function.Supplier
 
 class ArticleUpdater(private val dao: DevFeedDao,
                      private val article: Article) :
-        Supplier<Unit> {
+  Supplier<Unit> {
 
-    companion object {
-        @JvmStatic
-        private val logger = LoggerFactory.getLogger(ArticleUpdater::class.java)
+  companion object {
+    @JvmStatic
+    private val logger = LoggerFactory.getLogger(ArticleUpdater::class.java)
+  }
+
+  override fun get() {
+    if (logger.isDebugEnabled) {
+      logger.debug(">>> Handling article crawled: $article")
     }
 
-    override fun get() {
-        if (logger.isDebugEnabled) {
-            logger.debug(">>> Handling article crawled: $article")
-        }
-
-        //Check if (title, url) pair already exist in the DB
-        val existArticlesByUrl =
-                dao.existArticlesByUrl(article.url)
-        if (logger.isDebugEnabled) {
-            logger.debug("$existArticlesByUrl = " +
-                    "existArticlesByUrl(${article.title}, ${article.url})")
-        }
-        if (article.id != null && dao.shouldRequestScreenshot(article.title, article.url)) {
-            dao.updateArticleScreenshotData(article)
-        }
+    //Check if (title, url) pair already exist in the DB
+    val existArticlesByUrl =
+      dao.existArticlesByUrl(article.url)
+    if (logger.isDebugEnabled) {
+      logger.debug("$existArticlesByUrl = " +
+        "existArticlesByUrl(${article.title}, ${article.url})")
     }
+    if (article.id != null && dao.shouldRequestScreenshot(article.title, article.url)) {
+      dao.updateArticleScreenshotData(article)
+    }
+  }
 }

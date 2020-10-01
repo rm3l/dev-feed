@@ -4,5 +4,5 @@ import org.rm3l.devfeed.common.contract.Article
 
 interface ArticleScreenshotExtractor {
 
-    fun extractScreenshot(article: Article)
+  fun extractScreenshot(article: Article)
 }
