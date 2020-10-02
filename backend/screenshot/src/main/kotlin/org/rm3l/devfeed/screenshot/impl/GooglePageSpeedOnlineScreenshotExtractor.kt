@@ -1,23 +1,17 @@
-package org.rm3l.devfeed.extractors.screenshot.impl
+package org.rm3l.devfeed.screenshot.impl
 
 import org.json.JSONObject
 import org.rm3l.devfeed.common.contract.Article
 import org.rm3l.devfeed.common.contract.Screenshot
-import org.rm3l.devfeed.extractors.screenshot.ArticleScreenshotExtractor
+import org.rm3l.devfeed.common.screenshot.ArticleScreenshotExtractor
 import org.rm3l.devfeed.persistence.DevFeedDao
 import org.slf4j.LoggerFactory
-import org.springframework.beans.factory.annotation.Value
-import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty
-import org.springframework.stereotype.Service
-import javax.annotation.PostConstruct
 
-/**
- * Remote Website screenshot grabber. Based upon this article:
- * https://shkspr.mobi/blog/2015/11/google-secret-screenshot-api/
- */
-@Service
-@ConditionalOnProperty(name = ["article.screenshot.service"], havingValue = "pagespeedonline", matchIfMissing = false)
-class GooglePageSpeedOnlineScreenshotExtractor(private val dao: DevFeedDao) : ArticleScreenshotExtractor {
+class GooglePageSpeedOnlineScreenshotExtractor(
+  private val dao: DevFeedDao,
+  private val pageSpeedOnlineApiKey: String,
+  private val pageSpeedOnlineTimeoutSeconds: Int = 60
+): ArticleScreenshotExtractor {
 
   companion object {
     private const val GOOGLE_PAGESPEED_URL_FORMAT =
@@ -27,16 +21,9 @@ class GooglePageSpeedOnlineScreenshotExtractor(private val dao: DevFeedDao) : Ar
     private val logger = LoggerFactory.getLogger(GooglePageSpeedOnlineScreenshotExtractor::class.java)
   }
 
-  @Value("\${pagespeedonline.api.key}")
-  private lateinit var pageSpeedOnlineApiKey: String
-
-  @Value("\${pagespeedonline.api.timeoutSeconds}")
-  private lateinit var pageSpeedOnlineTimeoutSeconds: String
-
   private var googlePageSpeedOnlineApiUrlFormat: String? = null
 
-  @PostConstruct
-  fun init() {
+  init {
     googlePageSpeedOnlineApiUrlFormat = if (pageSpeedOnlineApiKey.isBlank()) {
       GOOGLE_PAGESPEED_URL_FORMAT
     } else {

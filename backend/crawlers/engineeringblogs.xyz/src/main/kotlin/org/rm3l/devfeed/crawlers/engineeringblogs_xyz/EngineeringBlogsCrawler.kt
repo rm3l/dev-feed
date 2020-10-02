@@ -28,6 +28,7 @@ import com.rometools.rome.io.WireFeedInput
 import com.rometools.rome.io.XmlReader
 import org.rm3l.devfeed.common.contract.Article
 import org.rm3l.devfeed.common.utils.asSupportedTimestamp
+import org.rm3l.devfeed.crawlers.cli.DevFeedCrawlerCliRunner
 import org.rm3l.devfeed.crawlers.common.DEFAULT_THREAD_POOL_SIZE
 import org.rm3l.devfeed.crawlers.common.DevFeedCrawler
 import org.slf4j.LoggerFactory
@@ -42,17 +43,23 @@ import java.util.function.Supplier
 
 class EngineeringBlogsCrawler(
   private val executorService: ExecutorService = Executors.newFixedThreadPool(DEFAULT_THREAD_POOL_SIZE)
-) : DevFeedCrawler {
+) : DevFeedCrawler() {
 
   companion object {
     @JvmStatic
     private val logger = LoggerFactory.getLogger(EngineeringBlogsCrawler::class.java)
 
     private const val OPML_URL = "https://engblogs.s3.amazonaws.com/engblogs.opml"
+
+    @JvmStatic
+    fun main(args: Array<String>) {
+      val cliArgs = buildCliArgs(EngineeringBlogsCrawler::class, args)
+      DevFeedCrawlerCliRunner.main(*cliArgs.toTypedArray())
+    }
   }
 
   @Throws(Exception::class)
-  override fun fetchArticles(): Collection<Article> {
+  override fun call(): Collection<Article> {
     try {
       logger.info(">>> Getting Feed Outlines from : $OPML_URL")
 

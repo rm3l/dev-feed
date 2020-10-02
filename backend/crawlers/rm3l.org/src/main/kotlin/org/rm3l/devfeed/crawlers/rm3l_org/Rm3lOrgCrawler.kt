@@ -25,6 +25,7 @@ import com.rometools.rome.io.SyndFeedInput
 import com.rometools.rome.io.XmlReader
 import org.rm3l.devfeed.common.contract.Article
 import org.rm3l.devfeed.common.utils.asSupportedTimestamp
+import org.rm3l.devfeed.crawlers.cli.DevFeedCrawlerCliRunner
 import org.rm3l.devfeed.crawlers.common.DevFeedCrawler
 import org.slf4j.LoggerFactory
 import java.net.URL
@@ -32,17 +33,23 @@ import java.io.ByteArrayInputStream
 import java.util.concurrent.ExecutionException
 import java.util.concurrent.TimeUnit
 
-class Rm3lOrgCrawler : DevFeedCrawler {
+class Rm3lOrgCrawler : DevFeedCrawler() {
 
   companion object {
     @JvmStatic
     private val logger = LoggerFactory.getLogger(Rm3lOrgCrawler::class.java)
 
     private const val RSS_FEED_URL = "https://rm3l.org/rss/"
+
+    @JvmStatic
+    fun main(args: Array<String>) {
+      val cliArgs = buildCliArgs(Rm3lOrgCrawler::class, args)
+      DevFeedCrawlerCliRunner.main(*cliArgs.toTypedArray())
+    }
   }
 
   @Throws(Exception::class)
-  override fun fetchArticles(): Collection<Article> {
+  override fun call(): Collection<Article> {
     try {
       logger.info(">>> Getting Articles from : $RSS_FEED_URL")
 
@@ -83,3 +90,4 @@ class Rm3lOrgCrawler : DevFeedCrawler {
     }
   }
 }
+

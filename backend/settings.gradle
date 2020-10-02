@@ -23,8 +23,11 @@ rootProject.name = 'dev-feed-backend'
 include ':api'
 include ':common'
 include ':persistence'
+include ':screenshot'
+include ':article-parser'
 include ':crawlers'
 include ':crawlers:common'
+include ':crawlers:cli'
 include ':crawlers:discoverdev_io'
 include ':crawlers:engineeringblogs_xyz'
 include ':crawlers:rm3l_org'
@@ -32,7 +35,10 @@ include ':crawlers:rm3l_org'
 project(':api').projectDir = "$rootDir/api" as File
 project(':common').projectDir = "$rootDir/common" as File
 project(':persistence').projectDir = "$rootDir/persistence" as File
+project(':screenshot').projectDir = "$rootDir/screenshot" as File
+project(':article-parser').projectDir = "$rootDir/article-parser" as File
 project(':crawlers:common').projectDir = "$rootDir/crawlers/common" as File
+project(':crawlers:cli').projectDir = "$rootDir/crawlers/cli" as File
 project(':crawlers:discoverdev_io').projectDir = "$rootDir/crawlers/discoverdev.io" as File
 project(':crawlers:engineeringblogs_xyz').projectDir = "$rootDir/crawlers/engineeringblogs.xyz" as File
 project(':crawlers:rm3l_org').projectDir = "$rootDir/crawlers/rm3l.org" as File
@@ -40,7 +46,10 @@ project(':crawlers:rm3l_org').projectDir = "$rootDir/crawlers/rm3l.org" as File
 findProject(':api').name = 'dev-feed-api'
 findProject(':common').name = 'dev-feed-common'
 findProject(':persistence').name = 'dev-feed-persistence'
+findProject(':screenshot').name = 'dev-feed-screenshot'
+findProject(':article-parser').name = 'dev-feed-article-parser'
 findProject(':crawlers:common').name = 'dev-feed-crawlers-common'
+findProject(':crawlers:cli').name = 'dev-feed-crawlers-cli'
 findProject(':crawlers:discoverdev_io').name = 'dev-feed-crawler-discoverdev_io'
 findProject(':crawlers:engineeringblogs_xyz').name = 'dev-feed-crawler-engineeringblogs_xyz'
 findProject(':crawlers:rm3l_org').name = 'dev-feed-crawler-rm3l_org'

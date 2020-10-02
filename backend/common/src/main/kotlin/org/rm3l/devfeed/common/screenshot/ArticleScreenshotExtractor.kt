@@ -1,4 +1,4 @@
-package org.rm3l.devfeed.extractors.screenshot
+package org.rm3l.devfeed.common.screenshot
 
 import org.rm3l.devfeed.common.contract.Article
 

@@ -1,7 +1,7 @@
 package org.rm3l.devfeed.config
 
 import org.rm3l.devfeed.persistence.DevFeedDao
-import org.rm3l.devfeed.persistence.rdbms.DevFeedRdbmsDao
+import org.rm3l.devfeed.persistence.impl.rdbms.DevFeedRdbmsDao
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.context.annotation.Bean

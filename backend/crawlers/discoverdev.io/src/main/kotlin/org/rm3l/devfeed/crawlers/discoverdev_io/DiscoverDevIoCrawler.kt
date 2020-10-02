@@ -24,6 +24,7 @@ package org.rm3l.devfeed.crawlers.discoverdev_io
 import org.jsoup.Jsoup
 import org.rm3l.devfeed.common.contract.Article
 import org.rm3l.devfeed.common.utils.asSupportedTimestamp
+import org.rm3l.devfeed.crawlers.cli.DevFeedCrawlerCliRunner
 import org.rm3l.devfeed.crawlers.common.DEFAULT_THREAD_POOL_SIZE
 import org.rm3l.devfeed.crawlers.common.DevFeedCrawler
 import org.slf4j.LoggerFactory
@@ -40,15 +41,21 @@ private const val USER_AGENT = "org.rm3l.devfeed"
 
 class DiscoverDevIoCrawler(
   private val executorService: ExecutorService = Executors.newFixedThreadPool(DEFAULT_THREAD_POOL_SIZE)
-) : DevFeedCrawler {
+) : DevFeedCrawler() {
 
   companion object {
     @JvmStatic
     private val logger = LoggerFactory.getLogger(DiscoverDevIoCrawler::class.java)
+
+    @JvmStatic
+    fun main(args: Array<String>) {
+      val cliArgs = buildCliArgs(DiscoverDevIoCrawler::class, args)
+      DevFeedCrawlerCliRunner.main(*cliArgs.toTypedArray())
+    }
   }
 
   @Throws(Exception::class)
-  override fun fetchArticles(): Collection<Article> {
+  override fun call(): Collection<Article> {
     try {
       logger.info(">>> Crawling website: $BACKEND_ARCHIVE_URL")
 

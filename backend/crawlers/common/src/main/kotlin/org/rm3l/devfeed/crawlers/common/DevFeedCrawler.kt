@@ -22,11 +22,30 @@
 package org.rm3l.devfeed.crawlers.common
 
 import org.rm3l.devfeed.common.contract.Article
+import java.util.concurrent.Callable
+import kotlin.reflect.KClass
 
 const val DEFAULT_THREAD_POOL_SIZE = 10
 
-interface DevFeedCrawler {
+abstract class DevFeedCrawler: Callable<Collection<Article>> {
 
-  @Throws(Exception::class)
-  fun fetchArticles(): Collection<Article>
+  companion object {
+
+    @JvmStatic
+    fun buildCliArgs(crawlerType: KClass<out DevFeedCrawler>, args: Array<String>): List<String> {
+      if (args.isEmpty()) {
+        throw IllegalArgumentException("Please specify a subcommand, e.g.: rdbms")
+      }
+      val argsList = args.toMutableList()
+      val crawlerOption = "--crawler=${crawlerType.qualifiedName}"
+      if (args.size == 1) {
+        argsList.add(crawlerOption)
+      } else {
+        argsList.add(1, crawlerOption)
+      }
+      return argsList
+    }
+
+  }
+
 }

@@ -1,0 +1,5 @@
+description = 'Article Screenshot extractors'
+
+dependencies {
+    implementation project(':dev-feed-persistence')
+}

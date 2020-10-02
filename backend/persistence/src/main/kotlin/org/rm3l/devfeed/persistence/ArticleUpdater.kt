@@ -21,19 +21,33 @@
 //SOFTWARE.
 package org.rm3l.devfeed.persistence
 
-data class ArticleFilter(
-        val from: String? = null,
-        val to: String? = null,
-        val search: String? = null,
-        val tags: List<String>? = null,
-        val titles: List<String>? = null,
-        val urls: List<String>? = null,
-        val domains: List<String>? = null
-)
+import org.rm3l.devfeed.common.contract.Article
+import org.slf4j.LoggerFactory
+import java.util.function.Supplier
 
-data class ArticleInput(
-        val date: String,
-        val description: String,
-        val url: String,
-        val tags: List<String>? = null
-)
+class ArticleUpdater(private val dao: DevFeedDao,
+                     private val article: Article) :
+  Supplier<Unit> {
+
+  companion object {
+    @JvmStatic
+    private val logger = LoggerFactory.getLogger(ArticleUpdater::class.java)
+  }
+
+  override fun get() {
+    if (logger.isDebugEnabled) {
+      logger.debug(">>> Handling article crawled: $article")
+    }
+
+    //Check if (title, url) pair already exist in the DB
+    val existArticlesByUrl =
+      dao.existArticlesByUrl(article.url)
+    if (logger.isDebugEnabled) {
+      logger.debug("$existArticlesByUrl = " +
+        "existArticlesByUrl(${article.title}, ${article.url})")
+    }
+    if (article.id != null && dao.shouldRequestScreenshot(article.title, article.url)) {
+      dao.updateArticleScreenshotData(article)
+    }
+  }
+}

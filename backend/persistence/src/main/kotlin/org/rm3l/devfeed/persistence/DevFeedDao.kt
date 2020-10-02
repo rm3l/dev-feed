@@ -1,6 +1,7 @@
 package org.rm3l.devfeed.persistence
 
 import org.rm3l.devfeed.common.contract.Article
+import org.rm3l.devfeed.common.contract.ArticleFilter
 
 interface DevFeedDao {
   fun existArticlesByTitleAndUrl(title: String, url: String): Boolean

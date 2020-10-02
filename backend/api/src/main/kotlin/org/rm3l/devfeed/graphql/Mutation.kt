@@ -23,7 +23,7 @@ package org.rm3l.devfeed.graphql
 
 import graphql.kickstart.tools.GraphQLMutationResolver
 import org.rm3l.devfeed.common.contract.Article
-import org.rm3l.devfeed.persistence.ArticleInput
+import org.rm3l.devfeed.common.contract.ArticleInput
 import org.rm3l.devfeed.persistence.DevFeedDao
 import org.springframework.stereotype.Component
 

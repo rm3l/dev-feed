@@ -15,6 +15,6 @@ description = 'EngineeringBlogs.xyz crawler'
 
 dependencies {
     api project(':crawlers:dev-feed-crawlers-common')
-    implementation project(':dev-feed-persistence')
+    implementation project(':crawlers:dev-feed-crawlers-cli')
 }
 

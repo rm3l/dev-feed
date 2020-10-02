@@ -1,0 +1,9 @@
+description = 'Command Line Interface (CLI) for DevFeed crawlers'
+
+dependencies {
+    api project(':crawlers:dev-feed-crawlers-common')
+    implementation project(':dev-feed-persistence')
+    implementation project(':dev-feed-screenshot')
+    implementation 'com.fasterxml.jackson.core:jackson-databind:2.11.2'
+    implementation("info.picocli:picocli:${picocliVersion}")
+}

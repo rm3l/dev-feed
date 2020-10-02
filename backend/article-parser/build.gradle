@@ -1,0 +1,5 @@
+description = 'Article Parser'
+
+dependencies {
+    implementation project(':dev-feed-persistence')
+}

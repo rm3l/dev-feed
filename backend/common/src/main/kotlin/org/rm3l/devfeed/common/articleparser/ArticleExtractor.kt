@@ -1,4 +1,4 @@
-package org.rm3l.devfeed.extractors.article
+package org.rm3l.devfeed.common.articleparser
 
 import org.rm3l.devfeed.common.contract.Article
 

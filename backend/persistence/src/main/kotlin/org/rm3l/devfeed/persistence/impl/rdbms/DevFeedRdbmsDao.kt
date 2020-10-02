@@ -19,7 +19,7 @@
 //LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 //OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 //SOFTWARE.
-package org.rm3l.devfeed.persistence.rdbms
+package org.rm3l.devfeed.persistence.impl.rdbms
 
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.zaxxer.hikari.HikariConfig
@@ -44,10 +44,10 @@ import org.jetbrains.exposed.sql.transactions.TransactionManager
 import org.jetbrains.exposed.sql.transactions.transaction
 import org.jetbrains.exposed.sql.update
 import org.rm3l.devfeed.common.contract.Article
+import org.rm3l.devfeed.common.contract.ArticleFilter
 import org.rm3l.devfeed.common.contract.ArticleParsed
 import org.rm3l.devfeed.common.contract.Screenshot
 import org.rm3l.devfeed.common.utils.asSupportedTimestamp
-import org.rm3l.devfeed.persistence.ArticleFilter
 import org.rm3l.devfeed.persistence.DevFeedDao
 import org.slf4j.LoggerFactory
 import java.net.URL
@@ -536,9 +536,12 @@ class DevFeedRdbmsDao(
               .or(Articles.description like searchPattern).or(Articles.link like searchPattern)
               .or(Articles.hostname like searchPattern))
             else Articles.title.isNotNull())
-            .and(if (filter.titles != null) Articles.title.inList(filter.titles) else Articles.title.isNotNull())
-            .and(if (filter.urls != null) Articles.link.inList(filter.urls) else Articles.link.isNotNull())
-            .and(if (filter.domains != null) Articles.hostname.inList(filter.domains) else Articles.hostname.isNotNull())
+            .and(if (filter.titles != null) Articles.title.inList(filter.titles!!) else Articles
+              .title.isNotNull())
+            .and(if (filter.urls != null) Articles.link.inList(filter.urls!!) else Articles.link
+              .isNotNull())
+            .and(if (filter.domains != null) Articles.hostname.inList(filter.domains!!) else
+              Articles.hostname.isNotNull())
         }
         if (filter.tags != null) {
           tagsResolvedFromSearch = getTags(search = filter.tags)

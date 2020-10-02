@@ -22,7 +22,7 @@
 package org.rm3l.devfeed.graphql
 
 import graphql.kickstart.tools.GraphQLQueryResolver
-import org.rm3l.devfeed.persistence.ArticleFilter
+import org.rm3l.devfeed.common.contract.ArticleFilter
 import org.rm3l.devfeed.persistence.DevFeedDao
 import org.springframework.stereotype.Component
 
