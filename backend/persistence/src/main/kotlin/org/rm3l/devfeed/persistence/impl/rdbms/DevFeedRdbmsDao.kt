@@ -106,28 +106,7 @@ class DevFeedRdbmsDao(
   private val objectMapper: ObjectMapper = ObjectMapper()
 ): DevFeedDao {
 
-//@Component
-//class DevFeedRdbmsDao : HealthIndicator {
-
-//  @Value("\${datasource.url}")
-//  private lateinit var datasourceUrl: String
-//
-//  @Value("\${datasource.driver}")
-//  private lateinit var datasourceDriver: String
-//
-//  @Value("\${datasource.user}")
-//  private lateinit var datasourceUser: String
-//
-//  @Value("\${datasource.password}")
-//  private lateinit var datasourcePassword: String
-//
-//  @Value("\${datasource.poolSize}")
-//  private lateinit var datasourcePoolSize: String
-//
-//  @Autowired
-//  private lateinit var jackson2ObjectMapperBuilder: Jackson2ObjectMapperBuilder
-//
-//  private lateinit var objectMapper: ObjectMapper
+  private var datasource: HikariDataSource? = null
 
   companion object {
     @JvmStatic
@@ -137,13 +116,14 @@ class DevFeedRdbmsDao(
   init {
     logger.info("Database located at: '$datasourceUrl'. Driver is $datasourceDriver")
 
-    Database.connect(HikariDataSource(HikariConfig().apply {
+    datasource = HikariDataSource(HikariConfig().apply {
       jdbcUrl = datasourceUrl
       driverClassName = datasourceDriver
       username = datasourceUser
       password = datasourcePassword
       maximumPoolSize = datasourcePoolSize.toInt()
-    }))
+    })
+    Database.connect(datasource!!)
 
     //Adjust Transaction isolation levels, as queries may not succeed in certain circumstances.
     //See https://github.com/JetBrains/Exposed/wiki/FAQ
@@ -702,5 +682,9 @@ class DevFeedRdbmsDao(
     transaction {
       Tags.slice(Tags.name).selectAll().limit(1)
     }
+  }
+
+  override fun close() {
+    datasource?.close()
   }
 }

@@ -34,6 +34,7 @@ import java.util.concurrent.ExecutorService
 import java.util.concurrent.Executors
 import java.util.concurrent.TimeUnit
 import java.util.function.Supplier
+import kotlin.system.exitProcess
 
 private const val BACKEND_BASE_URL = "https://www.discoverdev.io"
 private const val BACKEND_ARCHIVE_URL = "$BACKEND_BASE_URL/archive"
@@ -46,12 +47,6 @@ class DiscoverDevIoCrawler(
   companion object {
     @JvmStatic
     private val logger = LoggerFactory.getLogger(DiscoverDevIoCrawler::class.java)
-
-    @JvmStatic
-    fun main(args: Array<String>) {
-      val cliArgs = buildCliArgs(DiscoverDevIoCrawler::class, args)
-      DevFeedCrawlerCliRunner.main(*cliArgs.toTypedArray())
-    }
   }
 
   @Throws(Exception::class)
@@ -129,3 +124,10 @@ private class DiscoverDevIoCrawlerArchiveFetcherFutureSupplier(private val date:
     }
   }
 }
+
+fun main(args: Array<String>) {
+  val cliArgs = DevFeedCrawler.buildCliArgs(DiscoverDevIoCrawler::class, args)
+  DevFeedCrawlerCliRunner.main(*cliArgs.toTypedArray())
+  exitProcess(0)
+}
+

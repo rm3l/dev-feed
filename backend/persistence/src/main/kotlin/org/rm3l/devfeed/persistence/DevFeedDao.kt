@@ -2,8 +2,9 @@ package org.rm3l.devfeed.persistence
 
 import org.rm3l.devfeed.common.contract.Article
 import org.rm3l.devfeed.common.contract.ArticleFilter
+import java.io.Closeable
 
-interface DevFeedDao {
+interface DevFeedDao : Closeable {
   fun existArticlesByTitleAndUrl(title: String, url: String): Boolean
   fun existArticlesByUrl(url: String): Boolean
   fun deleteByTitleAndUrl(title: String, url: String): Int

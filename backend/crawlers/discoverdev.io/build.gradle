@@ -6,14 +6,30 @@ buildscript {
     }
     dependencies {
         classpath "gradle.plugin.com.google.cloud.tools:jib-gradle-plugin:2.5.0"
+        classpath 'com.github.jengelman.gradle.plugins:shadow:6.0.0'
     }
 }
 
+apply plugin: 'application'
+apply plugin: 'com.github.johnrengelman.shadow'
 apply plugin: "com.google.cloud.tools.jib"
 
 description = 'DiscoverDev.io crawler'
 
+application {
+    mainClassName = "org.rm3l.devfeed.crawlers.discoverdev_io.DiscoverDevIoCrawlerKt"
+}
+
 dependencies {
     api project(':crawlers:dev-feed-crawlers-common')
     implementation project(':crawlers:dev-feed-crawlers-cli')
+}
+
+shadowJar {
+    classifier = 'executable-jar'
+}
+
+tasks.withType(AbstractArchiveTask) {
+    preserveFileTimestamps = false
+    reproducibleFileOrder = true
 }

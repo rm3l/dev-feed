@@ -32,6 +32,7 @@ import java.net.URL
 import java.io.ByteArrayInputStream
 import java.util.concurrent.ExecutionException
 import java.util.concurrent.TimeUnit
+import kotlin.system.exitProcess
 
 class Rm3lOrgCrawler : DevFeedCrawler() {
 
@@ -40,12 +41,6 @@ class Rm3lOrgCrawler : DevFeedCrawler() {
     private val logger = LoggerFactory.getLogger(Rm3lOrgCrawler::class.java)
 
     private const val RSS_FEED_URL = "https://rm3l.org/rss/"
-
-    @JvmStatic
-    fun main(args: Array<String>) {
-      val cliArgs = buildCliArgs(Rm3lOrgCrawler::class, args)
-      DevFeedCrawlerCliRunner.main(*cliArgs.toTypedArray())
-    }
   }
 
   @Throws(Exception::class)
@@ -89,5 +84,11 @@ class Rm3lOrgCrawler : DevFeedCrawler() {
       throw e
     }
   }
+}
+
+fun main(args: Array<String>) {
+  val cliArgs = DevFeedCrawler.buildCliArgs(Rm3lOrgCrawler::class, args)
+  DevFeedCrawlerCliRunner.main(*cliArgs.toTypedArray())
+  exitProcess(0)
 }
 

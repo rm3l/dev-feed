@@ -40,6 +40,7 @@ import java.util.concurrent.ExecutorService
 import java.util.concurrent.Executors
 import java.util.concurrent.TimeUnit
 import java.util.function.Supplier
+import kotlin.system.exitProcess
 
 class EngineeringBlogsCrawler(
   private val executorService: ExecutorService = Executors.newFixedThreadPool(DEFAULT_THREAD_POOL_SIZE)
@@ -50,12 +51,6 @@ class EngineeringBlogsCrawler(
     private val logger = LoggerFactory.getLogger(EngineeringBlogsCrawler::class.java)
 
     private const val OPML_URL = "https://engblogs.s3.amazonaws.com/engblogs.opml"
-
-    @JvmStatic
-    fun main(args: Array<String>) {
-      val cliArgs = buildCliArgs(EngineeringBlogsCrawler::class, args)
-      DevFeedCrawlerCliRunner.main(*cliArgs.toTypedArray())
-    }
   }
 
   @Throws(Exception::class)
@@ -136,4 +131,10 @@ private class EngineeringBlogsCrawlerArchiveFetcherFutureSupplier(private val ou
       return emptyList()
     }
   }
+}
+
+fun main(args: Array<String>) {
+  val cliArgs = DevFeedCrawler.buildCliArgs(EngineeringBlogsCrawler::class, args)
+  DevFeedCrawlerCliRunner.main(*cliArgs.toTypedArray())
+  exitProcess(0)
 }

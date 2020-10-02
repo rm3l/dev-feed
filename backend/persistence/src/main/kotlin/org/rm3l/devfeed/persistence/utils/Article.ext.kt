@@ -19,8 +19,10 @@ fun Collection<Article>?.handleAndPersistIfNeeded(dao: DevFeedDao,
                                                   synchronous: Boolean = true):
   Collection<CompletableFuture<Unit>> {
   val futures = this
+    ?.asSequence()
     ?.map { article ->
       CompletableFuture.supplyAsync({
+//        println("Inserting article: $article")
         article.tags = article.tags?.filterNotNull() ?: emptyList()
         if (!dao.existArticlesByUrl(article.url)) {
           val identifier = dao.insertArticle(article)
@@ -38,6 +40,7 @@ fun Collection<Article>?.handleAndPersistIfNeeded(dao: DevFeedDao,
     ?.map { article ->
       if (articleScreenshotExtractor != null && article.screenshot == null) {
         CompletableFuture.supplyAsync({
+//          println("Extracting screenshot for article, if any: $article")
           articleScreenshotExtractor.extractScreenshot(article)
           article
         },
@@ -50,6 +53,7 @@ fun Collection<Article>?.handleAndPersistIfNeeded(dao: DevFeedDao,
     ?.map { article ->
       if (articleParser != null && article.parsed == null) {
         CompletableFuture.supplyAsync({
+//          println("Extract article data: $article")
           articleParser.extractArticleData(article)
           article
         }, executorService
@@ -60,8 +64,10 @@ fun Collection<Article>?.handleAndPersistIfNeeded(dao: DevFeedDao,
     }
     ?.map { it.join() }
     ?.map {
-      CompletableFuture.supplyAsync(
-        ArticleUpdater(dao, it), executorService)
+      CompletableFuture.supplyAsync({
+//        println("Updating article as needed: $it")
+        ArticleUpdater(dao, it).get()
+      }, executorService)
         .exceptionally { exception ->
           logger.warn("Could not insert article for $it", exception)
         }
@@ -69,7 +75,9 @@ fun Collection<Article>?.handleAndPersistIfNeeded(dao: DevFeedDao,
     ?.toList() ?: listOf()
 
   if (synchronous) {
+//    println("Handling synchronous call...")
     CompletableFuture.allOf(*futures.toTypedArray()).get() //Wait for all of them to finish
+//    println("...done handling synchronous call!")
   }
 
   return futures

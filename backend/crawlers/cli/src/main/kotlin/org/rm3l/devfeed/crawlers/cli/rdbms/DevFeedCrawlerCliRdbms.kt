@@ -11,7 +11,7 @@ import java.util.concurrent.Executors
 
 @CommandLine.Command(name = "rdbms",
   description = ["Fetch and persist articles in a relational data store"])
-class DevFeedCrawlerCliRdbms: Runnable {
+class DevFeedCrawlerCliRdbms : Runnable {
 
   @CommandLine.Option(names = ["-c", "--crawler"],
     description = ["the crawler canonical class name"])
@@ -51,22 +51,23 @@ class DevFeedCrawlerCliRdbms: Runnable {
       crawlerType.getConstructor().newInstance()
     }
 
-    val dao = DevFeedRdbmsDao(datasourceUrl = datasourceUrl,
+    DevFeedRdbmsDao(datasourceUrl = datasourceUrl,
       datasourceDriver = datasourceDriver,
       datasourceUser = datasourceUser,
-      datasourcePassword = datasourcePassword)
+      datasourcePassword = datasourcePassword).use { dao ->
+      val articles = crawler?.call()
+      println("Fetched ${articles?.size} articles using $crawlerType")
 
-    val articles = crawler?.call()
-    println("Fetched ${articles?.size} articles using $crawlerType")
-
-    articles.handleAndPersistIfNeeded(dao = dao,
-      executorService = executorService,
-      articleScreenshotExtractor =
-      if (screenshotPageSpeedOnlineKey.isNullOrBlank())
-        null
-      else GooglePageSpeedOnlineScreenshotExtractor(
-        dao = dao,
-        pageSpeedOnlineApiKey = screenshotPageSpeedOnlineKey!!),
-      synchronous = true)
+      articles.handleAndPersistIfNeeded(dao = dao,
+        executorService = executorService,
+        articleScreenshotExtractor =
+        if (screenshotPageSpeedOnlineKey.isNullOrBlank())
+          null
+        else GooglePageSpeedOnlineScreenshotExtractor(
+          dao = dao,
+          pageSpeedOnlineApiKey = screenshotPageSpeedOnlineKey!!,
+          pageSpeedOnlineTimeoutSeconds = 10),
+        synchronous = true)
+    }
   }
 }
