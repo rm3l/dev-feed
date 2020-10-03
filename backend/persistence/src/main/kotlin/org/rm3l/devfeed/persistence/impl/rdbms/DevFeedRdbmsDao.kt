@@ -108,7 +108,24 @@ class DevFeedRdbmsDao(
   private val objectMapper: ObjectMapper = ObjectMapper()
 ): DevFeedDao {
 
-  private var datasource: HikariDataSource? = null
+  private val datasource: HikariDataSource by lazy {
+    logger.info("Database located at: '$datasourceUrl'. Driver is $datasourceDriver")
+
+    val ds = HikariDataSource(HikariConfig().apply {
+      jdbcUrl = datasourceUrl
+      driverClassName = datasourceDriver
+      username = datasourceUser
+      password = datasourcePassword
+      maximumPoolSize = datasourcePoolSize.toInt()
+    })
+    Database.connect(ds)
+
+    transaction {
+      createMissingTablesAndColumns(Articles, Tags, ArticlesTags, ArticlesParsed)
+    }
+
+    ds
+  }
 
   companion object {
     @JvmStatic
@@ -116,17 +133,6 @@ class DevFeedRdbmsDao(
   }
 
   init {
-    logger.info("Database located at: '$datasourceUrl'. Driver is $datasourceDriver")
-
-    datasource = HikariDataSource(HikariConfig().apply {
-      jdbcUrl = datasourceUrl
-      driverClassName = datasourceDriver
-      username = datasourceUser
-      password = datasourcePassword
-      maximumPoolSize = datasourcePoolSize.toInt()
-    })
-    Database.connect(datasource!!)
-
     //Adjust Transaction isolation levels, as queries may not succeed in certain circumstances.
     //See https://github.com/JetBrains/Exposed/wiki/FAQ
     if ("org.sqlite.JDBC" == datasourceDriver) {
@@ -136,13 +142,12 @@ class DevFeedRdbmsDao(
       // Or Connection.TRANSACTION_SERIALIZABLE
       TransactionManager.manager.defaultIsolationLevel = Connection.TRANSACTION_READ_COMMITTED
     }
-
-    transaction {
-      createMissingTablesAndColumns(Articles, Tags, ArticlesTags, ArticlesParsed)
-    }
   }
 
   override fun existArticlesByTitleAndUrl(title: String, url: String): Boolean {
+    if (datasource.isClosed) {
+      throw java.lang.IllegalStateException("Datasource is closed")
+    }
     var result = false
     transaction {
       result = !Articles.select { Articles.title.eq(title) and Articles.link.eq(url) }.empty()
@@ -151,6 +156,9 @@ class DevFeedRdbmsDao(
   }
 
   override fun existArticlesByUrl(url: String): Boolean {
+    if (datasource.isClosed) {
+      throw java.lang.IllegalStateException("Datasource is closed")
+    }
     var result = false
     transaction {
       result = !Articles.select { Articles.link.eq(url) }.empty()
@@ -159,6 +167,9 @@ class DevFeedRdbmsDao(
   }
 
   override fun deleteByTitleAndUrl(title: String, url: String): Int {
+    if (datasource.isClosed) {
+      throw java.lang.IllegalStateException("Datasource is closed")
+    }
     var result = 0
     transaction {
       result = Articles.deleteWhere { Articles.title.eq(title) and Articles.link.eq(url) }
@@ -167,6 +178,9 @@ class DevFeedRdbmsDao(
   }
 
   override fun existArticleParsed(url: String): Boolean {
+    if (datasource.isClosed) {
+      throw java.lang.IllegalStateException("Datasource is closed")
+    }
     var result = false
     transaction {
       result = !ArticlesParsed.select { ArticlesParsed.articleLink.eq(url) }.empty()
@@ -175,6 +189,9 @@ class DevFeedRdbmsDao(
   }
 
   override fun existTagByName(name: String): Boolean {
+    if (datasource.isClosed) {
+      throw java.lang.IllegalStateException("Datasource is closed")
+    }
     var result = false
     transaction {
       result = !Tags.select { Tags.name.eq(name) }.empty()
@@ -183,6 +200,9 @@ class DevFeedRdbmsDao(
   }
 
   override fun findArticleById(articleId: String): Article? {
+    if (datasource.isClosed) {
+      throw java.lang.IllegalStateException("Datasource is closed")
+    }
     var result: Article? = null
     transaction {
       result = Articles.select { Articles.id.eq(articleId) }
@@ -229,6 +249,9 @@ class DevFeedRdbmsDao(
   }
 
   override fun findArticleByUrl(url: String): Article? {
+    if (datasource.isClosed) {
+      throw java.lang.IllegalStateException("Datasource is closed")
+    }
     var result: Article? = null
     transaction {
       result = Articles.select { Articles.link.eq(url) }
@@ -275,7 +298,9 @@ class DevFeedRdbmsDao(
   }
 
   override fun insertArticle(article: Article): String {
-
+    if (datasource.isClosed) {
+      throw java.lang.IllegalStateException("Datasource is closed")
+    }
     var articleIdentifier: String? = null
     transaction {
       articleIdentifier = Articles.insert {
@@ -340,6 +365,9 @@ class DevFeedRdbmsDao(
   }
 
   override fun shouldRequestScreenshot(title: String, url: String): Boolean {
+    if (datasource.isClosed) {
+      throw java.lang.IllegalStateException("Datasource is closed")
+    }
     var result = false
     transaction {
       result = Articles
@@ -350,6 +378,9 @@ class DevFeedRdbmsDao(
   }
 
   override fun shouldRequestScreenshot(articleId: String): Boolean {
+    if (datasource.isClosed) {
+      throw java.lang.IllegalStateException("Datasource is closed")
+    }
     var result = false
     transaction {
       result = Articles
@@ -360,6 +391,9 @@ class DevFeedRdbmsDao(
   }
 
   override fun updateArticleScreenshotData(article: Article) {
+    if (datasource.isClosed) {
+      throw java.lang.IllegalStateException("Datasource is closed")
+    }
     transaction {
       Articles.update({ Articles.id eq article.id!! }) {
         it[screenshotData] = article.screenshot?.data
@@ -371,6 +405,9 @@ class DevFeedRdbmsDao(
   }
 
   override fun allButRecentArticles(limit: Int?, offset: Long?, filter: ArticleFilter?): Collection<Article> {
+    if (datasource.isClosed) {
+      throw java.lang.IllegalStateException("Datasource is closed")
+    }
     val result = mutableListOf<Article>()
     transaction {
       Articles.slice(Articles.timestamp)
@@ -463,6 +500,9 @@ class DevFeedRdbmsDao(
   }
 
   override fun getArticlesWithNoScreenshots(): Collection<Article> {
+    if (datasource.isClosed) {
+      throw java.lang.IllegalStateException("Datasource is closed")
+    }
     val result = mutableListOf<Article>()
     transaction {
       result.addAll(Articles
@@ -503,6 +543,9 @@ class DevFeedRdbmsDao(
   }
 
   override fun getArticles(limit: Int?, offset: Long?, filter: ArticleFilter?): Collection<Article> {
+    if (datasource.isClosed) {
+      throw java.lang.IllegalStateException("Datasource is closed")
+    }
     val result = mutableListOf<Article>()
     transaction {
       val query: Query
@@ -585,6 +628,9 @@ class DevFeedRdbmsDao(
   }
 
   override fun getArticlesDates(limit: Int?, offset: Long?): Set<Long> {
+    if (datasource.isClosed) {
+      throw java.lang.IllegalStateException("Datasource is closed")
+    }
     val result = mutableSetOf<Long>()
     transaction {
       val query = Articles.slice(Articles.timestamp).selectAll()
@@ -598,6 +644,9 @@ class DevFeedRdbmsDao(
 
   override fun getRecentArticles(limit: Int?, offset: Long?): Collection<Article> {
     logger.trace("getRecentArticles")
+    if (datasource.isClosed) {
+      throw java.lang.IllegalStateException("Datasource is closed")
+    }
     val result = mutableListOf<Article>()
     transaction {
       Articles.slice(Articles.timestamp).selectAll()
@@ -659,6 +708,9 @@ class DevFeedRdbmsDao(
 
   override fun getTags(limit: Int?, offset: Long?, search: Collection<String>?):
   Collection<String> {
+    if (datasource.isClosed) {
+      throw java.lang.IllegalStateException("Datasource is closed")
+    }
     val result = mutableSetOf<String>()
     transaction {
       val tagNameSlice = Tags.slice(Tags.name)
@@ -680,6 +732,9 @@ class DevFeedRdbmsDao(
 
   @Throws(Exception::class)
   override fun checkHealth() {
+    if (datasource.isClosed) {
+      throw java.lang.IllegalStateException("Datasource is closed")
+    }
     //Just attempt to read from the database
     transaction {
       Tags.slice(Tags.name).selectAll().limit(1)
@@ -687,6 +742,6 @@ class DevFeedRdbmsDao(
   }
 
   override fun close() {
-    datasource?.close()
+    datasource.close()
   }
 }

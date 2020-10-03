@@ -35,7 +35,7 @@ import org.springframework.http.converter.json.Jackson2ObjectMapperBuilder
 @Configuration
 class DevFeedDaoConfiguration {
 
-  @Bean
+  @Bean(destroyMethod = "close")
   fun devFeedDao(
     @Value("\${datasource.url}") datasourceUrl: String,
     @Value("\${datasource.driver}") datasourceDriver: String,
