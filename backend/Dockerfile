@@ -26,18 +26,21 @@ FROM adoptopenjdk:14-jdk-openj9 AS builder
 WORKDIR /dev-feed-backend
 
 COPY gradle /dev-feed-backend/gradle
-COPY src /dev-feed-backend/src
+COPY api /dev-feed-backend/api
+COPY common /dev-feed-backend/common
+COPY crawlers /dev-feed-backend/crawlers
 COPY build.gradle /dev-feed-backend/build.gradle
 COPY gradlew /dev-feed-backend/gradlew
 COPY gradlew.bat /dev-feed-backend/gradlew.bat
+COPY settings.gradle /dev-feed-backend/settings.gradle
 
 ENV GRADLE_OPTS="-Dorg.gradle.daemon=false"
 
-RUN ./gradlew build --stacktrace
+RUN ./gradlew build --info
 
 FROM adoptopenjdk:14-jdk-openj9
 
-COPY --from=builder /dev-feed-backend/build/libs/dev-feed-backend-0.10.5.jar /app.jar
+COPY --from=builder /dev-feed-backend/api/build/libs/dev-feed-api-0.10.5.jar /app.jar
 
 # /graphql and /graphiql endpoints
 EXPOSE 8080

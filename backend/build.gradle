@@ -1,118 +1,98 @@
-//The MIT License (MIT)
-//
-//Copyright (c) 2019 Armel Soro
-//
-//Permission is hereby granted, free of charge, to any person obtaining a copy
-//of this software and associated documentation files (the "Software"), to deal
-//in the Software without restriction, including without limitation the rights
-//to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-//copies of the Software, and to permit persons to whom the Software is
-//furnished to do so, subject to the following conditions:
-//
-//The above copyright notice and this permission notice shall be included in all
-//copies or substantial portions of the Software.
-//
-//THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-//IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-//FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-//AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-//LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-//OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
-//SOFTWARE.
-//
-
-plugins {
-    id 'org.jetbrains.kotlin.jvm' version '1.4.10'
-    id "org.jetbrains.kotlin.plugin.spring" version "1.4.10"
-    id 'org.springframework.boot' version '2.3.4.RELEASE'
-    id 'com.google.cloud.tools.jib' version '2.5.0'
+/*
+ * The MIT License (MIT)
+ *
+ * Copyright (c) 2020 Armel Soro
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in all
+ * copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
+ */
+buildscript {
+    repositories {
+        maven {
+            url "https://plugins.gradle.org/m2/"
+        }
+    }
+    dependencies {
+        classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:1.4.10"
+        classpath "org.jetbrains.kotlin:kotlin-allopen:1.4.10"
+    }
 }
-
-group = 'org.rm3l'
-version = '0.10.5'
-sourceCompatibility = 14
-targetCompatibility = 11
 
 ext {
     exposedVersion = '0.27.1'
     graphqlSpringBootStarterVersion = '7.1.0'
+    picocliVersion = '4.5.1'
     romeVersion = '1.15.0'
     springBootVersion = '2.3.4.RELEASE'
 }
 
-compileKotlin {
-    kotlinOptions {
-        languageVersion = "1.4"
-        freeCompilerArgs = ["-Xjsr305=strict", "-Xopt-in=kotlin.RequiresOptIn"]
-        jvmTarget = JavaVersion.VERSION_11.majorVersion
-    }
-}
-compileTestKotlin {
-    kotlinOptions {
-        languageVersion = "1.4"
-        freeCompilerArgs = ["-Xjsr305=strict", "-Xopt-in=kotlin.RequiresOptIn"]
-        jvmTarget = JavaVersion.VERSION_11.majorVersion
-    }
-}
+subprojects {
 
-repositories {
-    jcenter()
-    mavenCentral()
-    maven { url "https://jitpack.io" }
-}
+    apply plugin: "org.jetbrains.kotlin.jvm"
 
-dependencies {
-    implementation 'org.springframework.boot:spring-boot-starter-actuator'
-    implementation('org.springframework.boot:spring-boot-starter-web')
+    group = 'org.rm3l'
+    version = '0.10.5'
+    sourceCompatibility = 14
+    targetCompatibility = 11
 
-    implementation('com.fasterxml.jackson.module:jackson-module-kotlin')
-
-    implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk8"
-    implementation "org.jetbrains.kotlin:kotlin-reflect"
-    implementation('org.jetbrains.kotlinx:kotlinx-coroutines-core:1.3.9-native-mt-2')
-    //Constrained by graphql-java-tools
-
-    implementation("org.jsoup:jsoup:1.13.1")
-
-    implementation("org.jetbrains.exposed:exposed-dao:${exposedVersion}")
-    implementation("org.jetbrains.exposed:exposed-jdbc:${exposedVersion}")
-
-    implementation 'com.zaxxer:HikariCP:3.4.5'
-
-    //JDBC Drivers
-    implementation 'org.xerial:sqlite-jdbc:3.32.3.2'
-    implementation 'com.h2database:h2:1.4.200'
-    implementation 'org.postgresql:postgresql:42.2.16'
-    implementation 'org.mariadb.jdbc:mariadb-java-client:2.7.0'
-
-    // GraphQL and GraphiQL
-    implementation "com.graphql-java-kickstart:graphql-spring-boot-starter:${graphqlSpringBootStarterVersion}"
-    implementation "com.graphql-java-kickstart:graphiql-spring-boot-starter:${graphqlSpringBootStarterVersion}"
-
-    implementation 'khttp:khttp:1.0.0'
-
-    implementation('com.github.chimbori:crux:2.2.0')
-
-    testImplementation "org.springframework.boot:spring-boot-starter-test:${springBootVersion}"
-
-    implementation "com.rometools:rome-opml:${romeVersion}"
-}
-
-jib {
-    to {
-        image = "${project.group}/dev-feed-api"
-    }
-    from {
-        image = 'gcr.io/distroless/java:11'
-    }
-    container {
-        labels = [
-                "maintainer": "Armel Soro <armel@rm3l.org>"
-        ]
-        jvmFlags = ['-Djava.security.egd=file:/dev/./urandom']
-        ports = ['8080', '8081']
-        format = 'OCI'
+    repositories {
+        jcenter()
+        mavenCentral()
+        maven { url "https://jitpack.io" }
     }
 
-}
+    compileKotlin {
+        kotlinOptions {
+            languageVersion = "1.4"
+            freeCompilerArgs = ["-Xjsr305=strict", "-Xopt-in=kotlin.RequiresOptIn"]
+            jvmTarget = JavaVersion.VERSION_11.majorVersion
+        }
+    }
+    compileTestKotlin {
+        kotlinOptions {
+            languageVersion = "1.4"
+            freeCompilerArgs = ["-Xjsr305=strict", "-Xopt-in=kotlin.RequiresOptIn"]
+            jvmTarget = JavaVersion.VERSION_11.majorVersion
+        }
+    }
 
+    dependencies {
+
+        implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk8"
+        implementation "org.jetbrains.kotlin:kotlin-reflect"
+
+        implementation("org.jsoup:jsoup:1.13.1")
+
+        implementation("org.jetbrains.exposed:exposed-dao:${exposedVersion}")
+        implementation("org.jetbrains.exposed:exposed-jdbc:${exposedVersion}")
+
+        implementation 'com.zaxxer:HikariCP:3.4.5'
+
+        //JDBC Drivers
+        implementation 'org.xerial:sqlite-jdbc:3.32.3.2'
+        implementation 'com.h2database:h2:1.4.200'
+        implementation 'org.postgresql:postgresql:42.2.16'
+        implementation 'org.mariadb.jdbc:mariadb-java-client:2.7.0'
+
+        implementation 'khttp:khttp:1.0.0'
+
+        implementation('com.github.chimbori:crux:2.2.0')
+
+        implementation "com.rometools:rome-opml:${romeVersion}"
+    }
+}
