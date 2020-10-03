@@ -78,10 +78,44 @@ jobs:
         id: refvar
         run: echo "::set-output name=gitRefName::${GITHUB_REF#refs/*/}"
 
-      - name: Push Docker image (tag)
+      - name: Push API Docker image (tag)
         if: startsWith(github.ref, 'refs/tags/')
-        run: ./backend/gradlew -p ./backend jib -Djib.to.image="registry.hub.docker.com/rm3l/dev-feed:${{ steps.refvar.outputs.gitRefName }}" -Djib.to.auth.username="${{ secrets.DOCKER_HUB_USERNAME }}" -Djib.to.auth.password="${{ secrets.DOCKER_HUB_PASSWORD }}"
+        run: ./backend/gradlew -p ./backend :dev-feed-api:jib -Djib.to.image="registry.hub.docker.com/rm3l/dev-feed-api:${{ steps.refvar.outputs.gitRefName }}" -Djib.to.auth.username="${{ secrets.DOCKER_HUB_USERNAME }}" -Djib.to.auth.password="${{ secrets.DOCKER_HUB_PASSWORD }}"
 
-      - name: Push latest Docker image (master)
+      - name: Push latest API Docker image (master)
         if: github.ref == 'refs/heads/master'
-        run: ./backend/gradlew -p ./backend jib -Djib.to.image="registry.hub.docker.com/rm3l/dev-feed:latest" -Djib.to.auth.username="${{ secrets.DOCKER_HUB_USERNAME }}" -Djib.to.auth.password="${{ secrets.DOCKER_HUB_PASSWORD }}"
+        run: ./backend/gradlew -p ./backend :dev-feed-api:jib -Djib.to.image="registry.hub.docker.com/rm3l/dev-feed-api:latest" -Djib.to.auth.username="${{ secrets.DOCKER_HUB_USERNAME }}" -Djib.to.auth.password="${{ secrets.DOCKER_HUB_PASSWORD }}"
+
+      - name: Push discoverdev.io crawler Docker image (tag)
+        if: startsWith(github.ref, 'refs/tags/')
+        run: ./backend/gradlew -p ./backend :crawlers:dev-feed-crawler-discoverdev_io:jib -Djib.to.image="registry.hub.docker.com/rm3l/dev-feed-crawler-discoverdev_io:${{ steps.refvar.outputs.gitRefName }}" -Djib.to.auth.username="${{ secrets.DOCKER_HUB_USERNAME }}" -Djib.to.auth.password="${{ secrets.DOCKER_HUB_PASSWORD }}"
+
+      - name: Push latest discoverdev.io Docker image (master)
+        if: github.ref == 'refs/heads/master'
+        run: ./backend/gradlew -p ./backend :crawlers:dev-feed-crawler-discoverdev_io:jib -Djib.to.image="registry.hub.docker.com/rm3l/dev-feed-crawler-discoverdev_io:latest" -Djib.to.auth.username="${{ secrets.DOCKER_HUB_USERNAME }}" -Djib.to.auth.password="${{ secrets.DOCKER_HUB_PASSWORD }}"
+
+      - name: Push engineeringblogs.xyz crawler Docker image (tag)
+        if: startsWith(github.ref, 'refs/tags/')
+        run: ./backend/gradlew -p ./backend :crawlers:dev-feed-crawler-engineeringblogs_xyz:jib -Djib.to.image="registry.hub.docker.com/rm3l/dev-feed-crawler-engineeringblogs_xyz:${{ steps.refvar.outputs.gitRefName }}" -Djib.to.auth.username="${{ secrets.DOCKER_HUB_USERNAME }}" -Djib.to.auth.password="${{ secrets.DOCKER_HUB_PASSWORD }}"
+
+      - name: Push latest engineeringblogs.xyz Docker image (master)
+        if: github.ref == 'refs/heads/master'
+        run: ./backend/gradlew -p ./backend :crawlers:dev-feed-crawler-engineeringblogs_xyz:jib -Djib.to.image="registry.hub.docker.com/rm3l/dev-feed-crawler-engineeringblogs_xyz:latest" -Djib.to.auth.username="${{ secrets.DOCKER_HUB_USERNAME }}" -Djib.to.auth.password="${{ secrets.DOCKER_HUB_PASSWORD }}"
+
+      - name: Push rm3l.org crawler Docker image (tag)
+        if: startsWith(github.ref, 'refs/tags/')
+        run: ./backend/gradlew -p ./backend :crawlers:dev-feed-crawler-rm3l_org:jib -Djib.to.image="registry.hub.docker.com/rm3l/dev-feed-crawler-rm3l_org:${{ steps.refvar.outputs.gitRefName }}" -Djib.to.auth.username="${{ secrets.DOCKER_HUB_USERNAME }}" -Djib.to.auth.password="${{ secrets.DOCKER_HUB_PASSWORD }}"
+
+      - name: Push latest rm3l.org Docker image (master)
+        if: github.ref == 'refs/heads/master'
+        run: ./backend/gradlew -p ./backend :crawlers:dev-feed-crawler-rm3l_org:jib -Djib.to.image="registry.hub.docker.com/rm3l/dev-feed-crawler-rm3l_org:latest" -Djib.to.auth.username="${{ secrets.DOCKER_HUB_USERNAME }}" -Djib.to.auth.password="${{ secrets.DOCKER_HUB_PASSWORD }}"
+
+# Legacy image is kept for backward compatibility, and will get removed in a near future
+      - name: Push API Docker legacy image (tag)
+        if: startsWith(github.ref, 'refs/tags/')
+        run: ./backend/gradlew -p ./backend :dev-feed-api:jib -Djib.to.image="registry.hub.docker.com/rm3l/dev-feed:${{ steps.refvar.outputs.gitRefName }}" -Djib.to.auth.username="${{ secrets.DOCKER_HUB_USERNAME }}" -Djib.to.auth.password="${{ secrets.DOCKER_HUB_PASSWORD }}"
+
+      - name: Push latest API legacy Docker image (master)
+        if: github.ref == 'refs/heads/master'
+        run: ./backend/gradlew -p ./backend :dev-feed-api:jib -Djib.to.image="registry.hub.docker.com/rm3l/dev-feed:latest" -Djib.to.auth.username="${{ secrets.DOCKER_HUB_USERNAME }}" -Djib.to.auth.password="${{ secrets.DOCKER_HUB_PASSWORD }}"
+
