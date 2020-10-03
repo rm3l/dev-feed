@@ -26,5 +26,5 @@ description = 'DevFeed Persistence APIs'
 
 dependencies {
     api project(':dev-feed-common')
-    implementation 'com.fasterxml.jackson.core:jackson-databind:2.11.2'
+    implementation 'com.fasterxml.jackson.core:jackson-databind:2.11.3'
 }
