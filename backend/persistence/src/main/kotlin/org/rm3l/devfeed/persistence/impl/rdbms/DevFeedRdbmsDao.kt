@@ -59,7 +59,7 @@ import java.util.UUID
 private object Articles : Table(name = "articles") {
   val id = varchar(name = "id", length = 36).index()
   val timestamp = long(name = "timestamp")
-  val title = text(name = "title").index()
+  val title = text(name = "title")
   val description = text(name = "description").nullable()
   val link = varchar(name = "link", length = 380).index()
   val hostname = text(name = "hostname").nullable()
