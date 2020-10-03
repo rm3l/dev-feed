@@ -5,7 +5,7 @@ buildscript {
         }
     }
     dependencies {
-        classpath "gradle.plugin.com.google.cloud.tools:jib-gradle-plugin:2.5.0"
+        classpath "gradle.plugin.com.google.cloud.tools:jib-gradle-plugin:2.5.1"
         classpath 'com.github.jengelman.gradle.plugins:shadow:6.0.0'
     }
 }
@@ -32,4 +32,20 @@ shadowJar {
 tasks.withType(AbstractArchiveTask) {
     preserveFileTimestamps = false
     reproducibleFileOrder = true
+}
+
+jib {
+    to {
+        image = "${project.group}/${project.name}"
+    }
+    from {
+        image = 'gcr.io/distroless/java:11'
+    }
+    container {
+        labels = [
+                "maintainer": "Armel Soro <armel@rm3l.org>"
+        ]
+        jvmFlags = ['-Djava.security.egd=file:/dev/./urandom']
+        format = 'OCI'
+    }
 }
