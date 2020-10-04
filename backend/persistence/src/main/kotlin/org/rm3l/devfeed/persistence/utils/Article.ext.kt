@@ -46,14 +46,14 @@ fun Collection<Article>?.handleAndPersistIfNeeded(dao: DevFeedDao,
     ?.asSequence()
     ?.map { article ->
       CompletableFuture.supplyAsync({
-//        println("Inserting article: $article")
         article.tags = article.tags?.filterNotNull() ?: emptyList()
-        if (!dao.existArticlesByUrl(article.url)) {
+        var articleOnFile = dao.findArticleByUrl(article.url)
+        if (articleOnFile == null) {
+          println("Inserting new article: ${article.url}")
           val identifier = dao.insertArticle(article)
-          dao.findArticleById(identifier)
-        } else {
-          dao.findArticleByUrl(article.url)
+          articleOnFile = dao.findArticleById(identifier)
         }
+        articleOnFile
       },
         executorService)
         .exceptionally {
@@ -64,7 +64,7 @@ fun Collection<Article>?.handleAndPersistIfNeeded(dao: DevFeedDao,
     ?.map { article ->
       if (articleScreenshotExtractor != null && article.screenshot == null) {
         CompletableFuture.supplyAsync({
-//          println("Extracting screenshot for article, if any: $article")
+          println("Extracting screenshot for article, if any: ${article.url}")
           articleScreenshotExtractor.extractScreenshot(article)
           article
         },
@@ -77,7 +77,7 @@ fun Collection<Article>?.handleAndPersistIfNeeded(dao: DevFeedDao,
     ?.map { article ->
       if (articleParser != null && article.parsed == null) {
         CompletableFuture.supplyAsync({
-//          println("Extract article data: $article")
+          println("Extract article data: ${article.url}")
           articleParser.extractArticleData(article)
           article
         }, executorService
@@ -89,7 +89,7 @@ fun Collection<Article>?.handleAndPersistIfNeeded(dao: DevFeedDao,
     ?.map { it.join() }
     ?.map {
       CompletableFuture.supplyAsync({
-//        println("Updating article as needed: $it")
+        println("Updating article as needed: ${it.url}")
         ArticleUpdater(dao, it).get()
       }, executorService)
         .exceptionally { exception ->

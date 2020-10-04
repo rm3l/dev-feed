@@ -41,13 +41,6 @@ class ArticleUpdater(private val dao: DevFeedDao,
       logger.debug(">>> Handling article crawled: $article")
     }
 
-    //Check if (title, url) pair already exist in the DB
-    val existArticlesByUrl =
-      dao.existArticlesByUrl(article.url)
-    if (logger.isDebugEnabled) {
-      logger.debug("$existArticlesByUrl = " +
-        "existArticlesByUrl(${article.title}, ${article.url})")
-    }
     if (article.id != null && dao.shouldRequestScreenshot(article.title, article.url)) {
       dao.updateArticleScreenshotData(article)
     }

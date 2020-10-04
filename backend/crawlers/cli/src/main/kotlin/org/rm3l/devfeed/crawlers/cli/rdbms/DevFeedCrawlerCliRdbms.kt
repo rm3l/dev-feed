@@ -79,7 +79,7 @@ class DevFeedCrawlerCliRdbms : Runnable {
       datasourceDriver = datasourceDriver,
       datasourceUser = datasourceUser,
       datasourcePassword = datasourcePassword).use { dao ->
-      val articles = crawler?.call()
+      val articles = crawler.call()
       println("Fetched ${articles?.size} articles using $crawlerType")
 
       articles.handleAndPersistIfNeeded(dao = dao,
