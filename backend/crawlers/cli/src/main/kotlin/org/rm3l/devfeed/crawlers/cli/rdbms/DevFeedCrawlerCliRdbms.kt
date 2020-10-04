@@ -66,6 +66,10 @@ class DevFeedCrawlerCliRdbms : Runnable {
     description = ["the PageSpeed Online API Key for screenshot extraction"])
   private var screenshotPageSpeedOnlineKey: String? = null
 
+  @CommandLine.Option(names = ["-m", "--article-max-age-days"],
+    description = ["articles older than this max age will not be persisted"])
+  private var articleMaxAgeDays: Long? = null
+
   override fun run() {
     val executorService = Executors.newFixedThreadPool(threadPoolSize.toInt())
     val crawler = try {
@@ -84,6 +88,7 @@ class DevFeedCrawlerCliRdbms : Runnable {
 
       articles.handleAndPersistIfNeeded(dao = dao,
         executorService = executorService,
+        maxAgeDays = articleMaxAgeDays,
         articleScreenshotExtractor =
         if (screenshotPageSpeedOnlineKey.isNullOrBlank())
           null

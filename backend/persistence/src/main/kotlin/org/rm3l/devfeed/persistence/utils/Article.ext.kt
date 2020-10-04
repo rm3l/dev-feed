@@ -31,8 +31,12 @@ import org.rm3l.devfeed.persistence.ArticleUpdater
 import org.rm3l.devfeed.persistence.DevFeedDao
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
+import java.time.Duration
+import java.time.Instant
 import java.util.concurrent.CompletableFuture
 import java.util.concurrent.ExecutorService
+import java.util.concurrent.TimeUnit
+import kotlin.math.abs
 
 val logger: Logger = LoggerFactory.getLogger("handleArticles")
 
@@ -40,16 +44,35 @@ fun Collection<Article>?.handleAndPersistIfNeeded(dao: DevFeedDao,
                                                   executorService: ExecutorService,
                                                   articleScreenshotExtractor: ArticleScreenshotExtractor? = null,
                                                   articleParser: ArticleExtractor? = null,
+                                                  maxAgeDays: Long? = null,
                                                   synchronous: Boolean = true):
   Collection<CompletableFuture<Unit>> {
+
+  val start = System.nanoTime()
+
   val futures = this
     ?.asSequence()
+    ?.filter { article ->
+      if (maxAgeDays == null || maxAgeDays <= 0) {
+        true
+      } else {
+        if (abs(Duration.between(Instant.ofEpochMilli(System.currentTimeMillis()),
+            Instant.ofEpochMilli(article.timestamp)).toDays()) <= maxAgeDays) {
+          true
+        } else {
+          logger.debug(
+            "Skipped Article ${article.url} because it is older than $maxAgeDays days: {}",
+            article.timestamp)
+          false
+        }
+      }
+    }
     ?.map { article ->
       CompletableFuture.supplyAsync({
         article.tags = article.tags?.filterNotNull() ?: emptyList()
         var articleOnFile = dao.findArticleByUrl(article.url)
         if (articleOnFile == null) {
-          println("Inserting new article: ${article.url}")
+          logger.info("Inserting new article: ${article.url}")
           val identifier = dao.insertArticle(article)
           articleOnFile = dao.findArticleById(identifier)
         }
@@ -64,7 +87,7 @@ fun Collection<Article>?.handleAndPersistIfNeeded(dao: DevFeedDao,
     ?.map { article ->
       if (articleScreenshotExtractor != null && article.screenshot == null) {
         CompletableFuture.supplyAsync({
-          println("Extracting screenshot for article, if any: ${article.url}")
+          logger.info("Extracting screenshot for article, if any: ${article.url}")
           articleScreenshotExtractor.extractScreenshot(article)
           article
         },
@@ -77,7 +100,7 @@ fun Collection<Article>?.handleAndPersistIfNeeded(dao: DevFeedDao,
     ?.map { article ->
       if (articleParser != null && article.parsed == null) {
         CompletableFuture.supplyAsync({
-          println("Extract article data: ${article.url}")
+          logger.info("Extract article data: ${article.url}")
           articleParser.extractArticleData(article)
           article
         }, executorService
@@ -89,7 +112,7 @@ fun Collection<Article>?.handleAndPersistIfNeeded(dao: DevFeedDao,
     ?.map { it.join() }
     ?.map {
       CompletableFuture.supplyAsync({
-        println("Updating article as needed: ${it.url}")
+        logger.info("Updating article as needed: ${it.url}")
         ArticleUpdater(dao, it).get()
       }, executorService)
         .exceptionally { exception ->
@@ -99,10 +122,14 @@ fun Collection<Article>?.handleAndPersistIfNeeded(dao: DevFeedDao,
     ?.toList() ?: listOf()
 
   if (synchronous) {
-//    println("Handling synchronous call...")
     CompletableFuture.allOf(*futures.toTypedArray()).get() //Wait for all of them to finish
-//    println("...done handling synchronous call!")
   }
+
+  val duration = System.nanoTime() - start
+
+  logger.info("Done handling ${this?.size ?: 0} article(s) in {} minutes ({} ms)",
+    TimeUnit.NANOSECONDS.toMinutes(duration),
+    TimeUnit.NANOSECONDS.toMillis(duration))
 
   return futures
 }

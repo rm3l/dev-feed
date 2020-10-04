@@ -63,6 +63,9 @@ class DevFeedFetcherService(private val dao: DevFeedDao,
   @Value("\${crawlers.task.fetch-articles}")
   private lateinit var fetchArtcicles: String
 
+  @Value("\${crawlers.task.fetch-articles.max-age-days}")
+  private lateinit var articlesMaxAgeDays: String
+
   private var crawlersExecutor: ExecutorService? = null
 
   private val remoteWebsiteCrawlingSucceeded = AtomicBoolean(false)
@@ -107,7 +110,8 @@ class DevFeedFetcherService(private val dao: DevFeedDao,
             logger.debug("Crawling from $crawler...")
             val articles = crawler.call()
             articles.handleAndPersistIfNeeded(
-              dao, devFeedExecutorService, articleScreenshotExtractor, articleExtractor)
+              dao, devFeedExecutorService, articleScreenshotExtractor, articleExtractor,
+              maxAgeDays = if (articlesMaxAgeDays.isBlank()) null else articlesMaxAgeDays.toLong())
             logger.debug("... Done crawling from $crawler : ${articles.size} articles!")
           }, crawlersExecutor!!)
         }.forEach { it.join() }
