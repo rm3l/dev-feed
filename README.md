@@ -44,10 +44,10 @@ git clone https://github.com/rm3l/dev-feed && cd dev-feed
 ./backend/gradlew -p ./backend build --stacktrace
 ```
 
-3. Run the Backend
+3. Run the Backend GraphQL API
 
 ```sh
-java -jar backend/build/libs/dev-feed-backend-0.4.1.jar
+java -jar backend/api/build/libs/dev-feed-api-1.2.0.jar
 ```
 
 You can then access the GraphiQL browser by heading to http://localhost:8080/graphiql
