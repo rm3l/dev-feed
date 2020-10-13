@@ -29,31 +29,31 @@ dependencies:
 
   # The following adds the Cupertino Icons font to your application.
   # Use with the CupertinoIcons class for iOS style icons.
-  cupertino_icons: "^0.1.2"
+  cupertino_icons: "^1.0.0"
   transparent_image: "^1.0.0"
 
 #  flutter_redux: "^0.5.3"
 
-  package_info: "^0.4.0"
+  package_info: "^0.4.3"
 
 #  tuple: "^1.0.2""
 
   flutter_custom_tabs: "^0.6.0"
-  shared_preferences: "^0.5.2"
+  shared_preferences: "^0.5.12"
 #  mocha: "^0.0.2"
 
-  flutter_calendar: "^0.0.8"
+  flutter_calendar: "^0.0.9"
 
-  fluro: "^1.4.0"
+  fluro: "^1.6.3"
   pigment: "^1.0.3"
 
-  app_review: "^1.0.0"
+  app_review: "^2.0.1"
 
 dev_dependencies:
   flutter_test:
     sdk: flutter
 
-  flutter_launcher_icons: "^0.7.0"
+  flutter_launcher_icons: "^0.8.1"
 
 # https://pub.dartlang.org/packages/flutter_launcher_icons
 #
