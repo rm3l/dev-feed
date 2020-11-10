@@ -48,6 +48,9 @@ dependencies:
   pigment: "^1.0.3"
 
   app_review: "^2.0.1"
+  dio: ^3.0.10
+  dio_http_cache: ^0.2.11
+  # alice: ^0.1.5
 
 dev_dependencies:
   flutter_test:

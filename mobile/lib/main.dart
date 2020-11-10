@@ -34,7 +34,6 @@ import 'package:dev_feed/ui/tags.dart';
 import 'package:fluro/fluro.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-//import 'package:logging/logging.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 import 'package:app_review/app_review.dart';
@@ -42,6 +41,8 @@ import 'package:app_review/app_review.dart';
 const contactEmailAddress = "apps+dev_feed@rm3l.org";
 
 enum AppBarMenuItem { ABOUT, SEND_FEEDBACK, RATING }
+
+// final alice = Alice(showNotification: true, darkTheme: true);
 
 void main() => Heroku();
 
@@ -52,12 +53,6 @@ class DevFeedApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-//    Logger.root // Optional
-//      ..level = Level.ALL
-//      ..onRecord.listen((rec) {
-//        print('${rec.level.name}: ${rec.time}: ${rec.message}');
-//      });
-
     return MaterialApp(
       title: 'Dev Feed',
       theme: ThemeData(
