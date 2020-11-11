@@ -33,8 +33,8 @@ class TagsClient {
 
   TagsClient._internal();
 
-  Future<List<String>> _getTags(String graphqlQuery, String queryKey) async {
-    var map = await issueGraphQLQuery(graphqlQuery);
+  Future<List<String>> _getTags(String graphqlQuery, String queryKey, {bool withCache = true}) async {
+    var map = await issueGraphQLQuery(graphqlQuery, withCache: withCache);
     final dataMap = map["data"];
     var tagsList = dataMap[queryKey];
     if (tagsList == null) {
@@ -49,7 +49,7 @@ class TagsClient {
     return result;
   }
 
-  Future<List<String>> getTags({int limit, int offset, String search}) async {
+  Future<List<String>> getTags({int limit, int offset, String search, bool withCache = true}) async {
     String query = "query { \n "
         " tags";
     if (limit != null ||
@@ -74,6 +74,6 @@ class TagsClient {
     query += "\n"
         "}";
 
-    return _getTags(query, "tags");
+    return _getTags(query, "tags", withCache: withCache);
   }
 }

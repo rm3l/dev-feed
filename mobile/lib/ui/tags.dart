@@ -63,10 +63,10 @@ class TagsState extends State<Tags> {
     return tagsFiltered;
   }
 
-  Future<Null> _fetchTags() async {
+  Future<Null> _fetchTags({bool withCache = true}) async {
     try {
       final tagsClient = tagsApi.TagsClient();
-      final allTags = await tagsClient.getTags();
+      final allTags = await tagsClient.getTags(withCache: withCache);
       final tagsFiltered = _searchInTags(allTags, _search);
       setState(() {
         _initialDisplay = false;
@@ -106,7 +106,7 @@ class TagsState extends State<Tags> {
       //No error, but no article fetched
       return RefreshIndicator(
           key: _refreshIndicatorKey,
-          onRefresh: _fetchTags,
+          onRefresh: () => _fetchTags(withCache: false),
           child: ListView(
             children: <Widget>[
               Container(
@@ -124,7 +124,7 @@ class TagsState extends State<Tags> {
     }
     return RefreshIndicator(
         key: _refreshIndicatorKey,
-        onRefresh: _fetchTags,
+        onRefresh: () => _fetchTags(withCache: false),
         child: Container(
           child: Column(
             children: <Widget>[

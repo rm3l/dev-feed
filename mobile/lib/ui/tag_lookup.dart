@@ -65,11 +65,11 @@ class _TagLookupHomeState extends State<_TagLookupHome> {
   bool _searchInputVisible = false;
   Exception _errorOnLoad;
 
-  Future<Null> _fetchArticles() async {
+  Future<Null> _fetchArticles({bool withCache = true}) async {
     try {
       final articlesClient = ArticlesClient();
       final recentArticles = await articlesClient.getAllArticles(
-          filter: ArticleFilter(tags: [widget._tag]));
+          filter: ArticleFilter(tags: [widget._tag]), withCache: withCache);
       final prefs = await SharedPreferences.getInstance();
       final favorites = prefs.getStringList("favs") ?? [];
       for (var article in recentArticles) {
@@ -105,7 +105,7 @@ class _TagLookupHomeState extends State<_TagLookupHome> {
     }
     return RefreshIndicator(
         key: _refreshIndicatorKey,
-        onRefresh: _fetchArticles,
+        onRefresh: () => _fetchArticles(withCache: false),
         child: Container(
           child: Column(
             children: <Widget>[

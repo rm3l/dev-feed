@@ -233,7 +233,6 @@ class ArticleFilter {
 }
 
 class ArticlesClient {
-//  LoadingCache<String,List<Article>> _recentArticlesCache;
 
   static final ArticlesClient _singleton = ArticlesClient._internal();
 
@@ -242,21 +241,7 @@ class ArticlesClient {
     return _singleton;
   }
 
-  ArticlesClient._internal() {
-//    _recentArticlesCache = LoadingCache<String,List<Article>>(
-//        _retrieveData,
-//        maximumSize: 1,
-//        expiresAfterWrite: const Duration(days: 1)
-//    );
-  }
-
-//  Future<List<Article>> _retrieveData(final String key) {
-//    if (key == "recentArticles") {
-//      return _fetchRecentArticles();
-//    } else {
-//      throw UnsupportedError("operation not supported: $key");
-//    }
-//  }
+  ArticlesClient._internal();
 
   static List<Article> searchInArticles(
       List<Article> allArticles, String search) {
@@ -286,8 +271,8 @@ class ArticlesClient {
   }
 
   Future<List<Article>> _getArticles(
-      String graphqlQuery, String queryKey) async {
-    var map = await issueGraphQLQuery(graphqlQuery);
+      String graphqlQuery, String queryKey, {bool withCache = true}) async {
+    var map = await issueGraphQLQuery(graphqlQuery, withCache: withCache);
     final dataMap = map["data"];
     var recentArticlesList = dataMap[queryKey];
     if (recentArticlesList == null) {
@@ -300,7 +285,7 @@ class ArticlesClient {
     return result;
   }
 
-  Future<List<Article>> getRecentArticles() async {
+  Future<List<Article>> getRecentArticles({bool withCache = true}) async {
     final String query = "query { \n "
         " recentArticles { \n "
         "   id \n "
@@ -323,11 +308,11 @@ class ArticlesClient {
         "   } \n "
         " } \n "
         "}";
-    return _getArticles(query, "recentArticles");
+    return _getArticles(query, "recentArticles", withCache: withCache);
   }
 
   Future<List<Article>> getFavoriteArticles(
-      List<Article> articlesToLookup) async {
+      List<Article> articlesToLookup, {bool withCache = true}) async {
     final urls =
         articlesToLookup.map((article) => "\"${article.url}\"").join(",");
     final String query = "query { \n "
@@ -353,10 +338,10 @@ class ArticlesClient {
         "   } \n "
         " } \n "
         "}";
-    return _getArticles(query, "articles");
+    return _getArticles(query, "articles", withCache: withCache);
   }
 
-  Future<List<Article>> getAllButRecentArticles() async {
+  Future<List<Article>> getAllButRecentArticles({bool withCache = true}) async {
     final String query = "query { \n "
         " allButRecentArticles { \n "
         "   id \n "
@@ -379,10 +364,10 @@ class ArticlesClient {
         "   } \n "
         " } \n "
         "}";
-    return _getArticles(query, "allButRecentArticles");
+    return _getArticles(query, "allButRecentArticles", withCache: withCache);
   }
 
-  Future<List<Article>> getArticlesForDate(String date) async {
+  Future<List<Article>> getArticlesForDate(String date, {bool withCache = true}) async {
     final String query = "query { \n "
         " articles(filter: {from: \"$date\", to: \"$date\"}) { \n "
         "   id \n "
@@ -405,10 +390,10 @@ class ArticlesClient {
         "   } \n "
         " } \n "
         "}";
-    return _getArticles(query, "articles");
+    return _getArticles(query, "articles", withCache: withCache);
   }
 
-  Future<List<Article>> getAllArticles({ArticleFilter filter}) async {
+  Future<List<Article>> getAllArticles({ArticleFilter filter, bool withCache = true}) async {
     final filterElements = <String>[];
     if (filter != null) {
       if (filter.from != null) {
@@ -457,6 +442,6 @@ class ArticlesClient {
         "   } \n "
         " } \n "
         "}";
-    return _getArticles(query, "articles");
+    return _getArticles(query, "articles", withCache: withCache);
   }
 }

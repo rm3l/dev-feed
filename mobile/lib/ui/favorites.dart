@@ -50,7 +50,7 @@ class FavoriteNewsState extends State<FavoriteNews> {
   bool _searchInputVisible = false;
   Exception _errorOnLoad;
 
-  Future<Null> _fetchArticles() async {
+  Future<Null> _fetchArticles({bool withCache = true}) async {
     try {
       final articlesClient = ArticlesClient();
       final prefs = await SharedPreferences.getInstance();
@@ -62,7 +62,7 @@ class FavoriteNewsState extends State<FavoriteNews> {
             .add(Article(map['title'].toString(), map['url'].toString()));
       }
       final favoriteArticles =
-          await articlesClient.getFavoriteArticles(articlesToLookup);
+          await articlesClient.getFavoriteArticles(articlesToLookup, withCache: withCache);
       for (var article in favoriteArticles) {
         article.starred = true;
       }
@@ -109,7 +109,7 @@ class FavoriteNewsState extends State<FavoriteNews> {
       //No error, but no article fetched
       return RefreshIndicator(
           key: _refreshIndicatorKey,
-          onRefresh: _fetchArticles,
+          onRefresh: () => _fetchArticles(withCache: false),
           child: ListView(
             children: <Widget>[
               Container(
@@ -128,7 +128,7 @@ class FavoriteNewsState extends State<FavoriteNews> {
 
     return RefreshIndicator(
         key: _refreshIndicatorKey,
-        onRefresh: _fetchArticles,
+        onRefresh:() => _fetchArticles(withCache: false),
         child: Container(
           child: Column(
             children: <Widget>[

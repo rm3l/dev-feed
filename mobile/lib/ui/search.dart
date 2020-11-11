@@ -45,7 +45,7 @@ class _SearchState extends State<Search> {
   String _search;
   Exception _errorOnLoad;
 
-  Future<Null> _fetchArticles() async {
+  Future<Null> _fetchArticles({bool withCache = true}) async {
     try {
       if (_search == null || _search.isEmpty) {
         setState(() {
@@ -56,7 +56,7 @@ class _SearchState extends State<Search> {
       } else {
         final articlesClient = ArticlesClient();
         final recentArticles = await articlesClient.getAllArticles(
-            filter: ArticleFilter(search: _search));
+            filter: ArticleFilter(search: _search), withCache: withCache);
         final prefs = await SharedPreferences.getInstance();
         final favorites = prefs.getStringList("favs") ?? [];
         for (var article in recentArticles) {
@@ -82,7 +82,7 @@ class _SearchState extends State<Search> {
   Widget build(BuildContext context) {
     return RefreshIndicator(
         key: _refreshIndicatorKey,
-        onRefresh: _fetchArticles,
+        onRefresh: () => _fetchArticles(withCache: false),
         child: Container(
           child: Column(
             children: <Widget>[

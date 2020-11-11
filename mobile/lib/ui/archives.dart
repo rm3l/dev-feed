@@ -45,16 +45,16 @@ class ArticleArchivesState extends State<ArticleArchives> {
   DateTime _currentDate = DateTime.now();
   Exception _errorOnLoad;
 
-  Future<Null> _onRefresh() async => _fetchArticles(_currentDate);
+  Future<Null> _onRefresh({bool withCache = true}) async => _fetchArticles(_currentDate, withCache: withCache);
 
-  Future<Null> _fetchArticles(DateTime date) async {
+  Future<Null> _fetchArticles(DateTime date, {bool withCache = true}) async {
     final articlesClient = ArticlesClient();
     try {
       final dateSlug = "${date.year.toString()}-"
           "${date.month.toString().padLeft(2, '0')}-"
           "${date.day.toString().padLeft(2, '0')}";
       final filteredArticles =
-          await articlesClient.getArticlesForDate(dateSlug);
+          await articlesClient.getArticlesForDate(dateSlug, withCache: withCache);
       final prefs = await SharedPreferences.getInstance();
       final favorites = prefs.getStringList("favs") ?? [];
       for (var article in filteredArticles) {
@@ -94,7 +94,7 @@ class ArticleArchivesState extends State<ArticleArchives> {
 
     return RefreshIndicator(
       key: _refreshIndicatorKey,
-      onRefresh: _onRefresh,
+      onRefresh: () => _onRefresh(withCache: false),
       child: Container(
         child: Column(
           children: <Widget>[

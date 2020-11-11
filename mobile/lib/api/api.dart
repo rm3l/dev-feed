@@ -29,9 +29,10 @@ import 'package:flutter/material.dart';
 
 class _Api {
   static Dio _httpClient;
+  static DioCacheManager _dioCacheManager;
 
   static Dio _getHttpClient() {
-    if (_httpClient == null) {
+    if (_httpClient == null || _dioCacheManager == null) {
       _httpClient = Dio(BaseOptions(
         baseUrl: Env.value.baseUrl,
         connectTimeout: 30000,
@@ -61,8 +62,8 @@ class _Api {
         // Do something with response error
         return e; //continue
       }));
-      _httpClient.interceptors.add(
-          DioCacheManager(CacheConfig(baseUrl: Env.value.baseUrl)).interceptor);
+      _dioCacheManager = DioCacheManager(CacheConfig(baseUrl: Env.value.baseUrl));
+      _httpClient.interceptors.add(_dioCacheManager.interceptor);
     }
     return _httpClient;
   }
@@ -87,7 +88,8 @@ Example of query
  */
 Future<Map<String, dynamic>> issueGraphQLQuery(String query,
     {String operationName = "",
-    Map<String, dynamic> variables = const {}}) async {
+    Map<String, dynamic> variables = const {},
+    bool withCache = true}) async {
   Map<String, dynamic> jsonBody = {
     "query": query,
     "operationName": operationName,
@@ -96,6 +98,10 @@ Future<Map<String, dynamic>> issueGraphQLQuery(String query,
 
   final String requestBody = json.encode(jsonBody);
 
+  if (withCache != null && !withCache) {
+    await _Api._dioCacheManager.deleteByPrimaryKeyAndSubKey('/graphql', requestMethod: 'POST', data: requestBody);
+  }
+
   return _Api._getHttpClient()
       .post<Map<String, dynamic>>('/graphql',
           data: requestBody,
@@ -103,23 +109,4 @@ Future<Map<String, dynamic>> issueGraphQLQuery(String query,
             Duration(hours: 1),
           ))
       .then((value) => value.data);
-
-  // HttpClientRequest request = await _httpClient.postUrl(_apiEndpoint)
-  //   ..headers.add(HttpHeaders.acceptHeader, ContentType.json)
-  //   ..headers.add(HttpHeaders.userAgentHeader, 'org.rm3l.dev_feed')
-  //   ..headers.contentType = ContentType.json
-  //   ..headers.contentLength = requestBody.length
-  //   ..headers.chunkedTransferEncoding = false;
-
-  // request.write(requestBody);
-  // // HttpClientResponse response = await request.close();
-  // if (response.headers.contentType.toString() != ContentType.json.toString()) {
-  //   throw UnsupportedError('Server returned an unsupported content type: '
-  //       '${response.headers.contentType} from ${request.uri}');
-  // }
-  // if (response.statusCode != HttpStatus.ok) {
-  //   throw StateError(
-  //       'Server responded with error: ${response.statusCode} ${response.reasonPhrase}');
-  // }
-  // return json.decode(await response.transform(utf8.decoder).join());
 }

@@ -49,10 +49,10 @@ class LatestNewsState extends State<LatestNews> {
   bool _searchInputVisible = false;
   Exception _errorOnLoad;
 
-  Future<Null> _fetchArticles() async {
+  Future<Null> _fetchArticles({bool withCache = true}) async {
     try {
       final articlesClient = ArticlesClient();
-      final recentArticles = await articlesClient.getRecentArticles();
+      final recentArticles = await articlesClient.getRecentArticles(withCache: withCache);
       final prefs = await SharedPreferences.getInstance();
       final favorites = prefs.getStringList("favs") ?? [];
       for (var article in recentArticles) {
@@ -102,7 +102,7 @@ class LatestNewsState extends State<LatestNews> {
       //No error, but no article fetched
       return RefreshIndicator(
           key: _refreshIndicatorKey,
-          onRefresh: _fetchArticles,
+          onRefresh: () => _fetchArticles(withCache: false),
           child: ListView(
             children: <Widget>[
               Container(
@@ -121,7 +121,7 @@ class LatestNewsState extends State<LatestNews> {
 
     return RefreshIndicator(
         key: _refreshIndicatorKey,
-        onRefresh: _fetchArticles,
+        onRefresh: () => _fetchArticles(withCache: false),
         child: Container(
           child: Column(
             children: <Widget>[
