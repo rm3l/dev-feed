@@ -22,17 +22,17 @@
  * SOFTWARE.
  */
 
-package org.rm3l.devfeed.config
+package org.rm3l.devfeed.filters
 
+import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Value
-import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty
-import org.springframework.context.annotation.Bean
-import org.springframework.context.annotation.Configuration
+import org.springframework.stereotype.Component
 import org.springframework.web.filter.CommonsRequestLoggingFilter
+import javax.annotation.PostConstruct
 import javax.servlet.http.HttpServletRequest
 
-@Configuration
-class DevFeedApiConfiguration {
+@Component
+class DevFeedApiCommonsRequestLoggingFilter : CommonsRequestLoggingFilter() {
 
   @Value("\${api.request-logging.client-info}")
   private lateinit var requestLoggingClientInfo: String
@@ -52,24 +52,25 @@ class DevFeedApiConfiguration {
   @Value("\${api.request-logging.message-prefix}")
   private lateinit var requestLoggingMessagePrefix: String
 
-  @Bean
-  @ConditionalOnProperty(
-    name = ["api.request-logging.enabled"],
-    havingValue = "true",
-    matchIfMissing = true
-  )
-  fun requestLoggingFilter() = DevFeedApiCommonsRequestLoggingFilter().apply {
-    setIncludeClientInfo(requestLoggingClientInfo.toBoolean())
-    setIncludeQueryString(requestLoggingQueryString.toBoolean())
-    setIncludeHeaders(requestLoggingHeaders.toBoolean())
-    setIncludePayload(requestLoggingPayload.toBoolean())
-    setMaxPayloadLength(requestLoggingMaxPayloadLength.toInt())
-    setAfterMessagePrefix(requestLoggingMessagePrefix)
+  companion object {
+    private val logger = LoggerFactory.getLogger(DevFeedApiCommonsRequestLoggingFilter::class.java)
   }
-}
 
-class DevFeedApiCommonsRequestLoggingFilter : CommonsRequestLoggingFilter() {
-  override fun shouldLog(request: HttpServletRequest): Boolean {
-    return true
+  @PostConstruct
+  fun init() {
+    isIncludeClientInfo = requestLoggingClientInfo.toBoolean()
+    isIncludeQueryString = requestLoggingQueryString.toBoolean()
+    isIncludeHeaders = requestLoggingHeaders.toBoolean()
+    isIncludePayload = requestLoggingPayload.toBoolean()
+    maxPayloadLength = requestLoggingMaxPayloadLength.toInt()
+    this.setAfterMessagePrefix(requestLoggingMessagePrefix)
   }
+
+  override fun shouldLog(request: HttpServletRequest) = true
+
+  override fun beforeRequest(request: HttpServletRequest, message: String) =
+    DevFeedApiCommonsRequestLoggingFilter.logger.info(message.replace("\\n", "\n"))
+
+  override fun afterRequest(request: HttpServletRequest, message: String) =
+    DevFeedApiCommonsRequestLoggingFilter.logger.info(message.replace("\\n", "\n"))
 }
