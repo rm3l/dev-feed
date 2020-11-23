@@ -28,7 +28,7 @@ buildscript {
         }
     }
     dependencies {
-        classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:1.4.10"
+        classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:1.4.20"
         classpath "org.jetbrains.kotlin:kotlin-allopen:1.4.20"
     }
 }
