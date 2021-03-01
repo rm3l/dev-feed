@@ -30,7 +30,7 @@ buildscript {
     }
     dependencies {
         classpath "org.springframework.boot:spring-boot-gradle-plugin:2.4.3"
-        classpath "gradle.plugin.com.google.cloud.tools:jib-gradle-plugin:2.7.1"
+        classpath "gradle.plugin.com.google.cloud.tools:jib-gradle-plugin:2.8.0"
     }
 }
 
