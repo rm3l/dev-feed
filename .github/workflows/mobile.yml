@@ -17,8 +17,8 @@ jobs:
         java-version: '15'
     - uses: subosito/flutter-action@v1
       with:
-        channel: 'stable'
-        #flutter-version: '1.17.1'
+        # channel: 'stable'
+        flutter-version: '1.22.6'
     - name: Get Flutter packages
       run: |
         cd mobile
