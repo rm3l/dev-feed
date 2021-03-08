@@ -28,6 +28,6 @@ dependencies {
     api project(':crawlers:dev-feed-crawlers-common')
     implementation project(':dev-feed-persistence')
     implementation project(':dev-feed-screenshot')
-    implementation 'com.fasterxml.jackson.core:jackson-databind:2.12.1'
+    implementation 'com.fasterxml.jackson.core:jackson-databind:2.12.2'
     implementation("info.picocli:picocli:${picocliVersion}")
 }
