@@ -41,7 +41,6 @@ subprojects {
     version = '1.9.0'
 
     repositories {
-        jcenter()
         mavenCentral()
         maven { url "https://jitpack.io" }
     }
