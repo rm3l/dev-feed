@@ -24,7 +24,14 @@
 
 package org.rm3l.devfeed.screenshot.impl
 
-import org.json.JSONObject
+import io.ktor.client.HttpClient
+import io.ktor.client.engine.apache.Apache
+import io.ktor.client.features.json.JacksonSerializer
+import io.ktor.client.features.json.JsonFeature
+import io.ktor.client.request.accept
+import io.ktor.client.request.get
+import io.ktor.http.ContentType
+import kotlinx.coroutines.runBlocking
 import org.rm3l.devfeed.common.contract.Article
 import org.rm3l.devfeed.common.contract.Screenshot
 import org.rm3l.devfeed.common.screenshot.ArticleScreenshotExtractor
@@ -62,27 +69,42 @@ class GooglePageSpeedOnlineScreenshotExtractor(
     try {
       // Check if (title, url) pair already exist in the DB
       if (dao.shouldRequestScreenshot(article.title, article.url)) {
-        val getRequest = khttp.get(url, timeout = pageSpeedOnlineTimeoutSeconds.toDouble())
-        if (getRequest.statusCode in 200..399) {
-          val screenshotJsonObject: JSONObject? =
-              getRequest
-                  .jsonObject
-                  .optJSONObject("lighthouseResult")
-                  .optJSONObject("audits")
-                  .optJSONObject("final-screenshot")
-                  .optJSONObject("details")
-          // Weird, but for reasons best known to Google, / is replaced with _, and +
-          // is replaced with -
-          val base64ImageData =
-              screenshotJsonObject?.optString("data")?.replace("_", "/")?.replace("-", "+")
-          val mimeType = screenshotJsonObject?.optString("mime_type")
-          val height = screenshotJsonObject?.optInt("height")
-          val width = screenshotJsonObject?.optInt("width")
-          if (!base64ImageData.isNullOrBlank()) {
-            article.screenshot =
-                Screenshot(
-                    data = base64ImageData, mimeType = mimeType, width = width, height = height)
+        val client = HttpClient(Apache) {
+          engine {
+            followRedirects = true
+            connectTimeout = pageSpeedOnlineTimeoutSeconds
+            socketTimeout = pageSpeedOnlineTimeoutSeconds
           }
+          install(JsonFeature) {
+            serializer = JacksonSerializer()
+          }
+        }
+        val getRequest =
+          runBlocking {
+            client.get<Map<String, Any>>(url) {
+              accept(ContentType.Application.Json)
+            }
+          }
+
+        @Suppress("UNCHECKED_CAST")
+        val screenshotJsonObject: Map<String, Any?>? =
+          (((getRequest.get("lighthouseResult") as Map<String, Any?>?)
+            ?.get("audits") as Map<String, Any?>?)
+            ?.get("final-screenshot") as Map<String, Any?>?)
+            ?.get("details") as Map<String, Any?>?
+        //Weird, but for reasons best known to Google, / is replaced with _, and +
+        // is replaced with -
+        val base64ImageData = (screenshotJsonObject?.get("data") as String?)
+          ?.replace("_", "/")
+          ?.replace("-", "+")
+        val mimeType = screenshotJsonObject?.get("mime_type") as String?
+        val height = screenshotJsonObject?.get("height") as Int?
+        val width = screenshotJsonObject?.get("width") as Int?
+        if (!base64ImageData.isNullOrBlank()) {
+          article.screenshot = Screenshot(data = base64ImageData,
+            mimeType = mimeType,
+            width = width,
+            height = height)
         }
       }
     } catch (e: Exception) {
