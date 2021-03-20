@@ -37,8 +37,8 @@ subprojects {
 
     group = 'org.rm3l'
     version = '1.7.1'
-    sourceCompatibility = 14
-    targetCompatibility = 11
+    sourceCompatibility = 15
+    targetCompatibility = 15
 
     repositories {
         jcenter()
@@ -50,14 +50,14 @@ subprojects {
         kotlinOptions {
             languageVersion = "1.4"
             freeCompilerArgs = ["-Xjsr305=strict", "-Xopt-in=kotlin.RequiresOptIn"]
-            jvmTarget = JavaVersion.VERSION_11.majorVersion
+            jvmTarget = JavaVersion.VERSION_15.majorVersion
         }
     }
     compileTestKotlin {
         kotlinOptions {
             languageVersion = "1.4"
             freeCompilerArgs = ["-Xjsr305=strict", "-Xopt-in=kotlin.RequiresOptIn"]
-            jvmTarget = JavaVersion.VERSION_11.majorVersion
+            jvmTarget = JavaVersion.VERSION_15.majorVersion
         }
     }
 
