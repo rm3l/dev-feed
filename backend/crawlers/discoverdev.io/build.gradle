@@ -54,7 +54,7 @@ jib {
         image = "${project.group}/${project.name}"
     }
     from {
-        image = 'gcr.io/distroless/java:11'
+        image = 'openjdk:16-alpine'
     }
     container {
         labels = [
