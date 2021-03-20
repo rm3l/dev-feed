@@ -61,6 +61,13 @@ subprojects {
         }
     }
 
+    test {
+        useJUnitPlatform()
+        testLogging {
+            events "passed", "skipped", "failed"
+        }
+    }
+
     dependencies {
 
         implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk8"
@@ -86,5 +93,8 @@ subprojects {
         implementation('com.github.chimbori:crux:2.2.0')
 
         implementation "com.rometools:rome-opml:1.15.0"
+
+        testImplementation(platform('org.junit:junit-bom:5.7.1'))
+        testImplementation('org.junit.jupiter:junit-jupiter')
     }
 }

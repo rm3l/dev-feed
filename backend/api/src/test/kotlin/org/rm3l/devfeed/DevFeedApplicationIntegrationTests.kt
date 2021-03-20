@@ -42,6 +42,7 @@ class DevFeedApplicationIntegrationTests {
             Executors.newSingleThreadExecutor()
 
     @Test
-    fun contextLoads() = logger.info("Hooray! Application Context successfully loaded.")
+    fun `test Application Context loads`() =
+        logger.info("Hooray! Application Context successfully loaded.")
 
 }
