@@ -24,6 +24,12 @@
 
 package org.rm3l.devfeed.persistence.utils
 
+import java.time.Duration
+import java.time.Instant
+import java.util.concurrent.CompletableFuture
+import java.util.concurrent.ExecutorService
+import java.util.concurrent.TimeUnit
+import kotlin.math.abs
 import org.rm3l.devfeed.common.articleparser.ArticleExtractor
 import org.rm3l.devfeed.common.contract.Article
 import org.rm3l.devfeed.common.screenshot.ArticleScreenshotExtractor
@@ -31,105 +37,111 @@ import org.rm3l.devfeed.persistence.ArticleUpdater
 import org.rm3l.devfeed.persistence.DevFeedDao
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
-import java.time.Duration
-import java.time.Instant
-import java.util.concurrent.CompletableFuture
-import java.util.concurrent.ExecutorService
-import java.util.concurrent.TimeUnit
-import kotlin.math.abs
 
 val logger: Logger = LoggerFactory.getLogger("handleArticles")
 
-fun Collection<Article>?.handleAndPersistIfNeeded(dao: DevFeedDao,
-                                                  executorService: ExecutorService,
-                                                  articleScreenshotExtractor: ArticleScreenshotExtractor? = null,
-                                                  articleParser: ArticleExtractor? = null,
-                                                  maxAgeDays: Long? = null,
-                                                  synchronous: Boolean = true):
-  Collection<CompletableFuture<Unit>> {
+fun Collection<Article>?.handleAndPersistIfNeeded(
+    dao: DevFeedDao,
+    executorService: ExecutorService,
+    articleScreenshotExtractor: ArticleScreenshotExtractor? = null,
+    articleParser: ArticleExtractor? = null,
+    maxAgeDays: Long? = null,
+    synchronous: Boolean = true
+): Collection<CompletableFuture<Unit>> {
 
   val start = System.nanoTime()
 
-  val futures = this
-    ?.asSequence()
-    ?.filter { article ->
-      if (maxAgeDays == null || maxAgeDays <= 0) {
-        true
-      } else {
-        if (abs(Duration.between(Instant.ofEpochMilli(System.currentTimeMillis()),
-            Instant.ofEpochMilli(article.timestamp)).toDays()) <= maxAgeDays) {
-          true
-        } else {
-          logger.debug(
-            "Skipped Article ${article.url} because it is older than $maxAgeDays days: {}",
-            article.timestamp)
-          false
-        }
-      }
-    }
-    ?.map { article ->
-      CompletableFuture.supplyAsync({
-        article.tags = article.tags?.filterNotNull() ?: emptyList()
-        var articleOnFile = dao.findArticleByUrl(article.url)
-        if (articleOnFile == null) {
-          logger.info("Inserting new article: ${article.url}")
-          val identifier = dao.insertArticle(article)
-          articleOnFile = dao.findArticleById(identifier)
-        }
-        articleOnFile
-      },
-        executorService)
-        .exceptionally {
-          logger.warn("Could not insert article for $article", it)
-          null
-        }
-    }?.mapNotNull { it.join() }
-    ?.map { article ->
-      if (articleScreenshotExtractor != null && article.screenshot == null) {
-        CompletableFuture.supplyAsync({
-          logger.info("Extracting screenshot for article, if any: ${article.url}")
-          articleScreenshotExtractor.extractScreenshot(article)
-          article
-        },
-          executorService)
-      } else {
-        CompletableFuture.completedFuture(article)
-      }
-    }
-    ?.map { it.join() }
-    ?.map { article ->
-      if (articleParser != null && article.parsed == null) {
-        CompletableFuture.supplyAsync({
-          logger.info("Extract article data: ${article.url}")
-          articleParser.extractArticleData(article)
-          article
-        }, executorService
-        )
-      } else {
-        CompletableFuture.completedFuture(article)
-      }
-    }
-    ?.map { it.join() }
-    ?.map {
-      CompletableFuture.supplyAsync({
-        logger.info("Updating article as needed: ${it.url}")
-        ArticleUpdater(dao, it).get()
-      }, executorService)
-        .exceptionally { exception ->
-          logger.warn("Could not insert article for $it", exception)
-        }
-    }
-    ?.toList() ?: listOf()
+  val futures =
+      this?.asSequence()
+          ?.filter { article ->
+            if (maxAgeDays == null || maxAgeDays <= 0) {
+              true
+            } else {
+              if (abs(
+                  Duration.between(
+                          Instant.ofEpochMilli(System.currentTimeMillis()),
+                          Instant.ofEpochMilli(article.timestamp))
+                      .toDays()) <= maxAgeDays) {
+                true
+              } else {
+                logger.debug(
+                    "Skipped Article ${article.url} because it is older than $maxAgeDays days: {}",
+                    article.timestamp)
+                false
+              }
+            }
+          }
+          ?.map { article ->
+            CompletableFuture.supplyAsync(
+                    {
+                      article.tags = article.tags?.filterNotNull() ?: emptyList()
+                      var articleOnFile = dao.findArticleByUrl(article.url)
+                      if (articleOnFile == null) {
+                        logger.info("Inserting new article: ${article.url}")
+                        val identifier = dao.insertArticle(article)
+                        articleOnFile = dao.findArticleById(identifier)
+                      }
+                      articleOnFile
+                    },
+                    executorService)
+                .exceptionally {
+                  logger.warn("Could not insert article for $article", it)
+                  null
+                }
+          }
+          ?.mapNotNull { it.join() }
+          ?.map { article ->
+            if (articleScreenshotExtractor != null && article.screenshot == null) {
+              CompletableFuture.supplyAsync(
+                  {
+                    logger.info("Extracting screenshot for article, if any: ${article.url}")
+                    articleScreenshotExtractor.extractScreenshot(article)
+                    article
+                  },
+                  executorService)
+            } else {
+              CompletableFuture.completedFuture(article)
+            }
+          }
+          ?.map { it.join() }
+          ?.map { article ->
+            if (articleParser != null && article.parsed == null) {
+              CompletableFuture.supplyAsync(
+                  {
+                    logger.info("Extract article data: ${article.url}")
+                    articleParser.extractArticleData(article)
+                    article
+                  },
+                  executorService)
+            } else {
+              CompletableFuture.completedFuture(article)
+            }
+          }
+          ?.map { it.join() }
+          ?.map {
+            CompletableFuture.supplyAsync(
+                    {
+                      logger.info("Updating article as needed: ${it.url}")
+                      ArticleUpdater(dao, it).get()
+                    },
+                    executorService)
+                .exceptionally { exception ->
+                  logger.warn("Could not insert article for $it", exception)
+                }
+          }
+          ?.toList()
+          ?: listOf()
 
   if (synchronous) {
-    CompletableFuture.allOf(*futures.toTypedArray()).get() //Wait for all of them to finish
+    CompletableFuture.allOf(*futures.toTypedArray()).get() // Wait for all of them to finish
   }
 
   val duration = System.nanoTime() - start
 
-  logger.info("Done handling ${this?.size ?: 0} article(s) in {} minutes ({} ms)",
-    TimeUnit.NANOSECONDS.toMinutes(duration),
-    TimeUnit.NANOSECONDS.toMillis(duration))
+  logger.info(
+      "Done handling ${this?.size ?: 0} article(s) in {} minutes ({} ms)",
+      TimeUnit.NANOSECONDS.toMinutes(duration),
+      TimeUnit.NANOSECONDS.toMillis(duration))
 
   return futures
 }

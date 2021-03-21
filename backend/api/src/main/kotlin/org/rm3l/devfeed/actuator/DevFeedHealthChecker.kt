@@ -30,12 +30,12 @@ import org.springframework.boot.actuate.health.HealthIndicator
 import org.springframework.stereotype.Service
 
 @Service
-class DevFeedHealthChecker(private val dao: DevFeedDao): HealthIndicator {
+class DevFeedHealthChecker(private val dao: DevFeedDao) : HealthIndicator {
 
   override fun health(): Health =
-    if (dao.getRecentArticles(limit = 1).isNotEmpty()) {
-      Health.up().build()
-    } else {
-      Health.down().build()
-    }
+      if (dao.getRecentArticles(limit = 1).isNotEmpty()) {
+        Health.up().build()
+      } else {
+        Health.down().build()
+      }
 }

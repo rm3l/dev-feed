@@ -23,17 +23,14 @@
  */
 package org.rm3l.devfeed.persistence
 
+import java.util.function.Supplier
 import org.rm3l.devfeed.common.contract.Article
 import org.slf4j.LoggerFactory
-import java.util.function.Supplier
 
-class ArticleUpdater(private val dao: DevFeedDao,
-                     private val article: Article) :
-  Supplier<Unit> {
+class ArticleUpdater(private val dao: DevFeedDao, private val article: Article) : Supplier<Unit> {
 
   companion object {
-    @JvmStatic
-    private val logger = LoggerFactory.getLogger(ArticleUpdater::class.java)
+    @JvmStatic private val logger = LoggerFactory.getLogger(ArticleUpdater::class.java)
   }
 
   override fun get() {

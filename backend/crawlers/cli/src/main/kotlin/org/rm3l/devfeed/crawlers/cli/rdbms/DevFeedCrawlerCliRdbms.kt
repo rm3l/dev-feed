@@ -24,79 +24,83 @@
 
 package org.rm3l.devfeed.crawlers.cli.rdbms
 
+import java.util.concurrent.ExecutorService
+import java.util.concurrent.Executors
 import org.rm3l.devfeed.crawlers.common.DEFAULT_THREAD_POOL_SIZE
 import org.rm3l.devfeed.crawlers.common.DevFeedCrawler
 import org.rm3l.devfeed.persistence.impl.rdbms.DevFeedRdbmsDao
 import org.rm3l.devfeed.persistence.utils.handleAndPersistIfNeeded
 import org.rm3l.devfeed.screenshot.impl.GooglePageSpeedOnlineScreenshotExtractor
 import picocli.CommandLine
-import java.util.concurrent.ExecutorService
-import java.util.concurrent.Executors
 
-@CommandLine.Command(name = "rdbms",
-  description = ["Fetch and persist articles in a relational data store"])
+@CommandLine.Command(
+    name = "rdbms", description = ["Fetch and persist articles in a relational data store"])
 class DevFeedCrawlerCliRdbms : Runnable {
 
-  @CommandLine.Option(names = ["-c", "--crawler"],
-    description = ["the crawler canonical class name"])
+  @CommandLine.Option(
+      names = ["-c", "--crawler"], description = ["the crawler canonical class name"])
   private lateinit var crawlerType: Class<DevFeedCrawler>
 
-  @CommandLine.Option(names = ["-t", "--thread-pool-size"],
-    description = [
-      "the thread pool size for fetching articles (default: \${DEFAULT-VALUE})"])
+  @CommandLine.Option(
+      names = ["-t", "--thread-pool-size"],
+      description = ["the thread pool size for fetching articles (default: \${DEFAULT-VALUE})"])
   private var threadPoolSize: String = "$DEFAULT_THREAD_POOL_SIZE"
 
-  @CommandLine.Option(names = ["-j", "--datasource-jdbc-url"],
-    description = ["the JDBC URL"])
+  @CommandLine.Option(names = ["-j", "--datasource-jdbc-url"], description = ["the JDBC URL"])
   private lateinit var datasourceUrl: String
 
-  @CommandLine.Option(names = ["-d", "--datasource-jdbc-driver"],
-    description = ["the JDBC URL"])
+  @CommandLine.Option(names = ["-d", "--datasource-jdbc-driver"], description = ["the JDBC URL"])
   private lateinit var datasourceDriver: String
 
-  @CommandLine.Option(names = ["-u", "--datasource-user"],
-    description = ["the datasource username"])
+  @CommandLine.Option(
+      names = ["-u", "--datasource-user"], description = ["the datasource username"])
   private lateinit var datasourceUser: String
 
-  @CommandLine.Option(names = ["-p", "--datasource-password"],
-    description = ["the datasource password"])
+  @CommandLine.Option(
+      names = ["-p", "--datasource-password"], description = ["the datasource password"])
   private lateinit var datasourcePassword: String
 
-  @CommandLine.Option(names = ["-s", "--screenshot-parser-pagespeed-online-key"],
-    description = ["the PageSpeed Online API Key for screenshot extraction"])
+  @CommandLine.Option(
+      names = ["-s", "--screenshot-parser-pagespeed-online-key"],
+      description = ["the PageSpeed Online API Key for screenshot extraction"])
   private var screenshotPageSpeedOnlineKey: String? = null
 
-  @CommandLine.Option(names = ["-m", "--article-max-age-days"],
-    description = ["articles older than this max age will not be persisted"])
+  @CommandLine.Option(
+      names = ["-m", "--article-max-age-days"],
+      description = ["articles older than this max age will not be persisted"])
   private var articleMaxAgeDays: Long? = null
 
   override fun run() {
     val executorService = Executors.newFixedThreadPool(threadPoolSize.toInt())
-    val crawler = try {
-      crawlerType.getConstructor(ExecutorService::class.java).newInstance(executorService)
-    } catch (nsme: NoSuchMethodException) {
-      //Default to default constructor, if any
-      crawlerType.getConstructor().newInstance()
-    }
+    val crawler =
+        try {
+          crawlerType.getConstructor(ExecutorService::class.java).newInstance(executorService)
+        } catch (nsme: NoSuchMethodException) {
+          // Default to default constructor, if any
+          crawlerType.getConstructor().newInstance()
+        }
 
-    DevFeedRdbmsDao(datasourceUrl = datasourceUrl,
-      datasourceDriver = datasourceDriver,
-      datasourceUser = datasourceUser,
-      datasourcePassword = datasourcePassword).use { dao ->
-      val articles = crawler.call()
-      println("Fetched ${articles?.size} articles using $crawlerType")
+    DevFeedRdbmsDao(
+            datasourceUrl = datasourceUrl,
+            datasourceDriver = datasourceDriver,
+            datasourceUser = datasourceUser,
+            datasourcePassword = datasourcePassword)
+        .use { dao ->
+          val articles = crawler.call()
+          println("Fetched ${articles?.size} articles using $crawlerType")
 
-      articles.handleAndPersistIfNeeded(dao = dao,
-        executorService = executorService,
-        maxAgeDays = articleMaxAgeDays,
-        articleScreenshotExtractor =
-        if (screenshotPageSpeedOnlineKey.isNullOrBlank())
-          null
-        else GooglePageSpeedOnlineScreenshotExtractor(
-          dao = dao,
-          pageSpeedOnlineApiKey = screenshotPageSpeedOnlineKey!!,
-          pageSpeedOnlineTimeoutSeconds = 10),
-        synchronous = true)
-    }
+          articles.handleAndPersistIfNeeded(
+              dao = dao,
+              executorService = executorService,
+              maxAgeDays = articleMaxAgeDays,
+              articleScreenshotExtractor =
+                  if (screenshotPageSpeedOnlineKey.isNullOrBlank()) null
+                  else
+                      GooglePageSpeedOnlineScreenshotExtractor(
+                          dao = dao,
+                          pageSpeedOnlineApiKey = screenshotPageSpeedOnlineKey!!,
+                          pageSpeedOnlineTimeoutSeconds = 10),
+              synchronous = true)
+        }
   }
 }

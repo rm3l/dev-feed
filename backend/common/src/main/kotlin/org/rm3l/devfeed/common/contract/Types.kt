@@ -25,46 +25,51 @@ package org.rm3l.devfeed.common.contract
 
 import java.net.URL
 
-data class Article(val id: String? = null,
-                   val timestamp: Long = System.currentTimeMillis(),
-                   val title: String,
-                   val description: String? = null,
-                   val url: String,
-                   val domain: String = URL(url).host,
-                   var tags: Collection<String?>? = setOf(),
-                   var screenshot: Screenshot? = null,
-                   var parsed: ArticleParsed? = null,
-                   var source: String? = null)
+data class Article(
+    val id: String? = null,
+    val timestamp: Long = System.currentTimeMillis(),
+    val title: String,
+    val description: String? = null,
+    val url: String,
+    val domain: String = URL(url).host,
+    var tags: Collection<String?>? = setOf(),
+    var screenshot: Screenshot? = null,
+    var parsed: ArticleParsed? = null,
+    var source: String? = null
+)
 
-data class Screenshot(val data: String? = null,
-                      val height: Int? = null,
-                      val width: Int? = null,
-                      val mimeType: String? = null)
+data class Screenshot(
+    val data: String? = null,
+    val height: Int? = null,
+    val width: Int? = null,
+    val mimeType: String? = null
+)
 
-data class ArticleParsed(val url: String,
-                         val title: String? = null,
-                         val author: String? = null,
-                         val published: String? = null, //TODO Use DateTime
-                         val image: String? = null,
-                         val videos: Collection<String?>? = null,
-                         val keywords: Collection<String?>? = null,
-                         val description: String? = null,
-                         val body: String)
+data class ArticleParsed(
+    val url: String,
+    val title: String? = null,
+    val author: String? = null,
+    val published: String? = null, // TODO Use DateTime
+    val image: String? = null,
+    val videos: Collection<String?>? = null,
+    val keywords: Collection<String?>? = null,
+    val description: String? = null,
+    val body: String
+)
 
 data class ArticleFilter(
-  val from: String? = null,
-  val to: String? = null,
-  val search: String? = null,
-  val tags: List<String>? = null,
-  val titles: List<String>? = null,
-  val urls: List<String>? = null,
-  val domains: List<String>? = null
+    val from: String? = null,
+    val to: String? = null,
+    val search: String? = null,
+    val tags: List<String>? = null,
+    val titles: List<String>? = null,
+    val urls: List<String>? = null,
+    val domains: List<String>? = null
 )
 
 data class ArticleInput(
-  val date: String,
-  val description: String,
-  val url: String,
-  val tags: List<String>? = null
+    val date: String,
+    val description: String,
+    val url: String,
+    val tags: List<String>? = null
 )
-

@@ -24,12 +24,12 @@
 
 package org.rm3l.devfeed.filters
 
+import javax.annotation.PostConstruct
+import javax.servlet.http.HttpServletRequest
 import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.stereotype.Component
 import org.springframework.web.filter.CommonsRequestLoggingFilter
-import javax.annotation.PostConstruct
-import javax.servlet.http.HttpServletRequest
 
 @Component
 class DevFeedApiCommonsRequestLoggingFilter : CommonsRequestLoggingFilter() {
@@ -40,11 +40,9 @@ class DevFeedApiCommonsRequestLoggingFilter : CommonsRequestLoggingFilter() {
   @Value("\${api.request-logging.query-string}")
   private lateinit var requestLoggingQueryString: String
 
-  @Value("\${api.request-logging.headers}")
-  private lateinit var requestLoggingHeaders: String
+  @Value("\${api.request-logging.headers}") private lateinit var requestLoggingHeaders: String
 
-  @Value("\${api.request-logging.payload}")
-  private lateinit var requestLoggingPayload: String
+  @Value("\${api.request-logging.payload}") private lateinit var requestLoggingPayload: String
 
   @Value("\${api.request-logging.max-payload-length}")
   private lateinit var requestLoggingMaxPayloadLength: String
@@ -69,8 +67,8 @@ class DevFeedApiCommonsRequestLoggingFilter : CommonsRequestLoggingFilter() {
   override fun shouldLog(request: HttpServletRequest) = true
 
   override fun beforeRequest(request: HttpServletRequest, message: String) =
-    DevFeedApiCommonsRequestLoggingFilter.logger.info(message.replace("\\n", "\n"))
+      DevFeedApiCommonsRequestLoggingFilter.logger.info(message.replace("\\n", "\n"))
 
   override fun afterRequest(request: HttpServletRequest, message: String) =
-    DevFeedApiCommonsRequestLoggingFilter.logger.info(message.replace("\\n", "\n"))
+      DevFeedApiCommonsRequestLoggingFilter.logger.info(message.replace("\\n", "\n"))
 }

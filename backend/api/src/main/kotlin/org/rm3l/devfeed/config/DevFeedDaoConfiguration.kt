@@ -37,17 +37,18 @@ class DevFeedDaoConfiguration {
 
   @Bean(destroyMethod = "close")
   fun devFeedDao(
-    @Value("\${datasource.url}") datasourceUrl: String,
-    @Value("\${datasource.driver}") datasourceDriver: String,
-    @Value("\${datasource.user}") datasourceUser: String,
-    @Value("\${datasource.password}") datasourcePassword: String,
-    @Value("\${datasource.poolSize}") datasourcePoolSize: String,
-    @Autowired jackson2ObjectMapperBuilder: Jackson2ObjectMapperBuilder
-  ): DevFeedDao = DevFeedRdbmsDao(
-    datasourceUrl = datasourceUrl,
-    datasourceDriver = datasourceDriver,
-    datasourceUser = datasourceUser,
-    datasourcePassword = datasourcePassword,
-    datasourcePoolSize = datasourcePoolSize.toInt(),
-    objectMapper = jackson2ObjectMapperBuilder.build())
+      @Value("\${datasource.url}") datasourceUrl: String,
+      @Value("\${datasource.driver}") datasourceDriver: String,
+      @Value("\${datasource.user}") datasourceUser: String,
+      @Value("\${datasource.password}") datasourcePassword: String,
+      @Value("\${datasource.poolSize}") datasourcePoolSize: String,
+      @Autowired jackson2ObjectMapperBuilder: Jackson2ObjectMapperBuilder
+  ): DevFeedDao =
+      DevFeedRdbmsDao(
+          datasourceUrl = datasourceUrl,
+          datasourceDriver = datasourceDriver,
+          datasourceUser = datasourceUser,
+          datasourcePassword = datasourcePassword,
+          datasourcePoolSize = datasourcePoolSize.toInt(),
+          objectMapper = jackson2ObjectMapperBuilder.build())
 }

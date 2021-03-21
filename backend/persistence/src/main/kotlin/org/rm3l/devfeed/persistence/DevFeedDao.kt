@@ -24,9 +24,9 @@
 
 package org.rm3l.devfeed.persistence
 
+import java.io.Closeable
 import org.rm3l.devfeed.common.contract.Article
 import org.rm3l.devfeed.common.contract.ArticleFilter
-import java.io.Closeable
 
 interface DevFeedDao : Closeable {
   fun existArticlesByTitleAndUrl(title: String, url: String): Boolean
@@ -41,12 +41,23 @@ interface DevFeedDao : Closeable {
   fun shouldRequestScreenshot(articleId: String): Boolean
   fun updateArticleScreenshotData(article: Article)
   fun getArticlesWithNoScreenshots(): Collection<Article>
-  fun allButRecentArticles(limit: Int? = null, offset: Long? = null, filter: ArticleFilter? = null): Collection<Article>
-  fun getArticles(limit: Int? = null, offset: Long? = null, filter: ArticleFilter? = null): Collection<Article>
+  fun allButRecentArticles(
+      limit: Int? = null,
+      offset: Long? = null,
+      filter: ArticleFilter? = null
+  ): Collection<Article>
+  fun getArticles(
+      limit: Int? = null,
+      offset: Long? = null,
+      filter: ArticleFilter? = null
+  ): Collection<Article>
   fun getArticlesDates(limit: Int? = null, offset: Long? = null): Set<Long>
   fun getRecentArticles(limit: Int? = null, offset: Long? = null): Collection<Article>
-  fun getTags(limit: Int? = null, offset: Long? = null, search: Collection<String>?): Collection<String>
+  fun getTags(
+      limit: Int? = null,
+      offset: Long? = null,
+      search: Collection<String>?
+  ): Collection<String>
 
-  @Throws(Exception::class)
-  fun checkHealth()
+  @Throws(Exception::class) fun checkHealth()
 }

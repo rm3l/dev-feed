@@ -30,21 +30,23 @@ import org.springframework.context.annotation.PropertySource
 import org.springframework.context.annotation.PropertySources
 import org.springframework.scheduling.annotation.EnableScheduling
 
-/**
- * Entry-point
- */
+/** Entry-point */
 @SpringBootApplication
 @EnableConfigurationProperties
-@PropertySources(value = [
-    //The order matters here. If a same property key is found in many files, the last one wins.
-    PropertySource(value = ["classpath:service.properties"]),
-    PropertySource(value = ["file:/etc/dev-feed/backend.properties"], ignoreResourceNotFound = true),
-    PropertySource(value = ["file:\${user.home}/.dev-feed/backend.properties"], ignoreResourceNotFound = true)]
-)
+@PropertySources(
+    value =
+        [
+            // The order matters here. If a same property key is found in many files, the last one
+            // wins.
+            PropertySource(value = ["classpath:service.properties"]),
+            PropertySource(
+                value = ["file:/etc/dev-feed/backend.properties"], ignoreResourceNotFound = true),
+            PropertySource(
+                value = ["file:\${user.home}/.dev-feed/backend.properties"],
+                ignoreResourceNotFound = true)])
 @EnableScheduling
 class DevFeedApplication
 
 fun main(args: Array<String>) {
-    SpringApplication.run(DevFeedApplication::class.java, *args)
+  SpringApplication.run(DevFeedApplication::class.java, *args)
 }
-

@@ -36,9 +36,13 @@ import org.springframework.context.annotation.Configuration
 class DevFeedArticleParserConfiguration {
 
   @Bean
-  @ConditionalOnProperty(name = ["article.extraction.service"], havingValue = "document-parser-api_lateral_io", matchIfMissing = false)
+  @ConditionalOnProperty(
+      name = ["article.extraction.service"],
+      havingValue = "document-parser-api_lateral_io",
+      matchIfMissing = false)
   fun documentParserApiArticleParser(
-    @Value("\${article.extraction.service.document-parser-api_lateral_io.subscription-key}")
-    documentParserApiKey: String,
-    @Autowired dao: DevFeedDao) = DocumentParserApiArticleExtractor(dao, documentParserApiKey)
+      @Value("\${article.extraction.service.document-parser-api_lateral_io.subscription-key}")
+      documentParserApiKey: String,
+      @Autowired dao: DevFeedDao
+  ) = DocumentParserApiArticleExtractor(dao, documentParserApiKey)
 }

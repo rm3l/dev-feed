@@ -23,26 +23,24 @@
  */
 package org.rm3l.devfeed
 
+import java.util.concurrent.ExecutorService
+import java.util.concurrent.Executors
 import org.junit.jupiter.api.Test
 import org.slf4j.LoggerFactory
 import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.context.annotation.Bean
 import org.springframework.test.context.ActiveProfiles
-import java.util.concurrent.ExecutorService
-import java.util.concurrent.Executors
 
 @SpringBootTest
 @ActiveProfiles(value = ["test"])
 class DevFeedApplicationIntegrationTests {
 
-    private val logger = LoggerFactory.getLogger(DevFeedApplicationIntegrationTests::class.java)
+  private val logger = LoggerFactory.getLogger(DevFeedApplicationIntegrationTests::class.java)
 
-    @Bean(name = ["devFeedExecutorService"], destroyMethod = "shutdownNow")
-    fun devFeedExecutorService(): ExecutorService =
-            Executors.newSingleThreadExecutor()
+  @Bean(name = ["devFeedExecutorService"], destroyMethod = "shutdownNow")
+  fun devFeedExecutorService(): ExecutorService = Executors.newSingleThreadExecutor()
 
-    @Test
-    fun `test Application Context loads`() =
-        logger.info("Hooray! Application Context successfully loaded.")
-
+  @Test
+  fun `test Application Context loads`() =
+      logger.info("Hooray! Application Context successfully loaded.")
 }

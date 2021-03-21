@@ -26,6 +26,9 @@ package org.rm3l.devfeed.persistence.impl.rdbms
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.zaxxer.hikari.HikariConfig
 import com.zaxxer.hikari.HikariDataSource
+import java.net.URL
+import java.sql.Connection
+import java.util.UUID
 import org.jetbrains.exposed.sql.Database
 import org.jetbrains.exposed.sql.Op
 import org.jetbrains.exposed.sql.Query
@@ -52,9 +55,6 @@ import org.rm3l.devfeed.common.contract.Screenshot
 import org.rm3l.devfeed.common.utils.asSupportedTimestamp
 import org.rm3l.devfeed.persistence.DevFeedDao
 import org.slf4j.LoggerFactory
-import java.net.URL
-import java.sql.Connection
-import java.util.UUID
 
 private object Articles : Table(name = "articles") {
   val id = varchar(name = "id", length = 36).index()
@@ -88,7 +88,7 @@ private object ArticlesParsed : Table(name = "articles_parsed") {
   val articleLink = varchar(name = "article_link", length = 380).index()
   val title = text(name = "title").nullable()
   val author = text(name = "author").nullable()
-  val published = text(name = "published").nullable() //TODO Use DateTime
+  val published = text(name = "published").nullable() // TODO Use DateTime
   val image = text(name = "image").nullable()
   val videos = text(name = "videos").nullable()
   val keywords = text(name = "keywords").nullable()
@@ -100,41 +100,40 @@ private object ArticlesParsed : Table(name = "articles_parsed") {
 private const val DEFAULT_OFFSET = 0L
 
 class DevFeedRdbmsDao(
-  private val datasourceUrl: String,
-  private val datasourceDriver: String,
-  private val datasourceUser: String,
-  private val datasourcePassword: String,
-  private val datasourcePoolSize: Int = 1,
-  private val objectMapper: ObjectMapper = ObjectMapper()
-): DevFeedDao {
+    private val datasourceUrl: String,
+    private val datasourceDriver: String,
+    private val datasourceUser: String,
+    private val datasourcePassword: String,
+    private val datasourcePoolSize: Int = 1,
+    private val objectMapper: ObjectMapper = ObjectMapper()
+) : DevFeedDao {
 
   private val datasource: HikariDataSource by lazy {
     logger.info("Database located at: '$datasourceUrl'. Driver is $datasourceDriver")
 
-    val ds = HikariDataSource(HikariConfig().apply {
-      jdbcUrl = datasourceUrl
-      driverClassName = datasourceDriver
-      username = datasourceUser
-      password = datasourcePassword
-      maximumPoolSize = datasourcePoolSize.toInt()
-    })
+    val ds =
+        HikariDataSource(
+            HikariConfig().apply {
+              jdbcUrl = datasourceUrl
+              driverClassName = datasourceDriver
+              username = datasourceUser
+              password = datasourcePassword
+              maximumPoolSize = datasourcePoolSize.toInt()
+            })
     Database.connect(ds)
 
-    transaction {
-      createMissingTablesAndColumns(Articles, Tags, ArticlesTags, ArticlesParsed)
-    }
+    transaction { createMissingTablesAndColumns(Articles, Tags, ArticlesTags, ArticlesParsed) }
 
     ds
   }
 
   companion object {
-    @JvmStatic
-    private val logger = LoggerFactory.getLogger(DevFeedDao::class.java)
+    @JvmStatic private val logger = LoggerFactory.getLogger(DevFeedDao::class.java)
   }
 
   init {
-    //Adjust Transaction isolation levels, as queries may not succeed in certain circumstances.
-    //See https://github.com/JetBrains/Exposed/wiki/FAQ
+    // Adjust Transaction isolation levels, as queries may not succeed in certain circumstances.
+    // See https://github.com/JetBrains/Exposed/wiki/FAQ
     if ("org.sqlite.JDBC" == datasourceDriver) {
       // Or Connection.TRANSACTION_READ_UNCOMMITTED
       TransactionManager.manager.defaultIsolationLevel = Connection.TRANSACTION_SERIALIZABLE
@@ -160,9 +159,7 @@ class DevFeedRdbmsDao(
       throw java.lang.IllegalStateException("Datasource is closed")
     }
     var result = false
-    transaction {
-      result = !Articles.select { Articles.link.eq(url) }.empty()
-    }
+    transaction { result = !Articles.select { Articles.link.eq(url) }.empty() }
     return result
   }
 
@@ -182,9 +179,7 @@ class DevFeedRdbmsDao(
       throw java.lang.IllegalStateException("Datasource is closed")
     }
     var result = false
-    transaction {
-      result = !ArticlesParsed.select { ArticlesParsed.articleLink.eq(url) }.empty()
-    }
+    transaction { result = !ArticlesParsed.select { ArticlesParsed.articleLink.eq(url) }.empty() }
     return result
   }
 
@@ -193,9 +188,7 @@ class DevFeedRdbmsDao(
       throw java.lang.IllegalStateException("Datasource is closed")
     }
     var result = false
-    transaction {
-      result = !Tags.select { Tags.name.eq(name) }.empty()
-    }
+    transaction { result = !Tags.select { Tags.name.eq(name) }.empty() }
     return result
   }
 
@@ -205,45 +198,58 @@ class DevFeedRdbmsDao(
     }
     var result: Article? = null
     transaction {
-      result = Articles.select { Articles.id.eq(articleId) }
-        .limit(1)
-        .map { articleResultRow ->
-          val article = Article(id = articleResultRow[Articles.id],
-            source = articleResultRow[Articles.articleSource],
-            title = articleResultRow[Articles.title],
-            url = articleResultRow[Articles.link],
-            domain = articleResultRow[Articles.hostname]
-              ?: URL(articleResultRow[Articles.link]).host,
-            timestamp = articleResultRow[Articles.timestamp],
-            screenshot = Screenshot(
-              data = articleResultRow[Articles.screenshotData],
-              mimeType = articleResultRow[Articles.screenshotMimeType],
-              width = articleResultRow[Articles.screenshotWidth],
-              height = articleResultRow[Articles.screenshotHeight]
-            ),
-            parsed = ArticlesParsed.select { ArticlesParsed.articleLink.eq(articleResultRow[Articles.link]) }
-              .map {
-                ArticleParsed(
-                  url = articleResultRow[Articles.link],
-                  title = it[ArticlesParsed.title],
-                  description = it[ArticlesParsed.description],
-                  body = it[ArticlesParsed.body],
-                  author = it[ArticlesParsed.author],
-                  image = if (it[ArticlesParsed.image].isNullOrBlank()) null else it[ArticlesParsed.image],
-                  published = it[ArticlesParsed.published]
-                  //TODO Fix videos and keywords
-//                                                        videos = objectMapper.readValue(it[ArticlesParsed.videos]?:"", ArrayList::class.java)
-                )
-              }.firstOrNull())
-          val tags = ArticlesTags.slice(ArticlesTags.tagName)
-            .select { ArticlesTags.articleId.eq(articleResultRow[Articles.id]) }
-            .map { it[ArticlesTags.tagName] }
-            .filter { it.length >= 2 }
-            .toSet()
-          article.tags = tags
-          article
-        }
-        .firstOrNull()
+      result =
+          Articles.select { Articles.id.eq(articleId) }
+              .limit(1)
+              .map { articleResultRow ->
+                val article =
+                    Article(
+                        id = articleResultRow[Articles.id],
+                        source = articleResultRow[Articles.articleSource],
+                        title = articleResultRow[Articles.title],
+                        url = articleResultRow[Articles.link],
+                        domain = articleResultRow[Articles.hostname]
+                                ?: URL(articleResultRow[Articles.link]).host,
+                        timestamp = articleResultRow[Articles.timestamp],
+                        screenshot =
+                            Screenshot(
+                                data = articleResultRow[Articles.screenshotData],
+                                mimeType = articleResultRow[Articles.screenshotMimeType],
+                                width = articleResultRow[Articles.screenshotWidth],
+                                height = articleResultRow[Articles.screenshotHeight]),
+                        parsed =
+                            ArticlesParsed.select {
+                                  ArticlesParsed.articleLink.eq(articleResultRow[Articles.link])
+                                }
+                                .map {
+                                  ArticleParsed(
+                                      url = articleResultRow[Articles.link],
+                                      title = it[ArticlesParsed.title],
+                                      description = it[ArticlesParsed.description],
+                                      body = it[ArticlesParsed.body],
+                                      author = it[ArticlesParsed.author],
+                                      image =
+                                          if (it[ArticlesParsed.image].isNullOrBlank()) null
+                                          else it[ArticlesParsed.image],
+                                      published = it[ArticlesParsed.published]
+                                      // TODO Fix videos and keywords
+                                      //
+                                      // videos =
+                                      // objectMapper.readValue(it[ArticlesParsed.videos]?:"",
+                                      // ArrayList::class.java)
+                                      )
+                                }
+                                .firstOrNull())
+                val tags =
+                    ArticlesTags.slice(ArticlesTags.tagName)
+                        .select { ArticlesTags.articleId.eq(articleResultRow[Articles.id]) }
+                        .map { it[ArticlesTags.tagName] }
+                        .filter { it.length >= 2 }
+                        .toSet()
+                article.tags = tags
+                article
+              }
+              .firstOrNull()
     }
     return result
   }
@@ -254,45 +260,58 @@ class DevFeedRdbmsDao(
     }
     var result: Article? = null
     transaction {
-      result = Articles.select { Articles.link.eq(url) }
-        .limit(1)
-        .map { articleResultRow ->
-          val article = Article(id = articleResultRow[Articles.id],
-            source = articleResultRow[Articles.articleSource],
-            title = articleResultRow[Articles.title],
-            url = articleResultRow[Articles.link],
-            domain = articleResultRow[Articles.hostname]
-              ?: URL(articleResultRow[Articles.link]).host,
-            timestamp = articleResultRow[Articles.timestamp],
-            screenshot = Screenshot(
-              data = articleResultRow[Articles.screenshotData],
-              mimeType = articleResultRow[Articles.screenshotMimeType],
-              width = articleResultRow[Articles.screenshotWidth],
-              height = articleResultRow[Articles.screenshotHeight]
-            ),
-            parsed = ArticlesParsed.select { ArticlesParsed.articleLink.eq(articleResultRow[Articles.link]) }
-              .map {
-                ArticleParsed(
-                  url = articleResultRow[Articles.link],
-                  title = it[ArticlesParsed.title],
-                  description = it[ArticlesParsed.description],
-                  body = it[ArticlesParsed.body],
-                  author = it[ArticlesParsed.author],
-                  image = if (it[ArticlesParsed.image].isNullOrBlank()) null else it[ArticlesParsed.image],
-                  published = it[ArticlesParsed.published]
-                  //TODO Fix videos and keywords
-//                                                        videos = objectMapper.readValue(it[ArticlesParsed.videos]?:"", ArrayList::class.java)
-                )
-              }.firstOrNull())
-          val tags = ArticlesTags.slice(ArticlesTags.tagName)
-            .select { ArticlesTags.articleId.eq(articleResultRow[Articles.id]) }
-            .map { it[ArticlesTags.tagName] }
-            .filter { it.length >= 2 }
-            .toSet()
-          article.tags = tags
-          article
-        }
-        .firstOrNull()
+      result =
+          Articles.select { Articles.link.eq(url) }
+              .limit(1)
+              .map { articleResultRow ->
+                val article =
+                    Article(
+                        id = articleResultRow[Articles.id],
+                        source = articleResultRow[Articles.articleSource],
+                        title = articleResultRow[Articles.title],
+                        url = articleResultRow[Articles.link],
+                        domain = articleResultRow[Articles.hostname]
+                                ?: URL(articleResultRow[Articles.link]).host,
+                        timestamp = articleResultRow[Articles.timestamp],
+                        screenshot =
+                            Screenshot(
+                                data = articleResultRow[Articles.screenshotData],
+                                mimeType = articleResultRow[Articles.screenshotMimeType],
+                                width = articleResultRow[Articles.screenshotWidth],
+                                height = articleResultRow[Articles.screenshotHeight]),
+                        parsed =
+                            ArticlesParsed.select {
+                                  ArticlesParsed.articleLink.eq(articleResultRow[Articles.link])
+                                }
+                                .map {
+                                  ArticleParsed(
+                                      url = articleResultRow[Articles.link],
+                                      title = it[ArticlesParsed.title],
+                                      description = it[ArticlesParsed.description],
+                                      body = it[ArticlesParsed.body],
+                                      author = it[ArticlesParsed.author],
+                                      image =
+                                          if (it[ArticlesParsed.image].isNullOrBlank()) null
+                                          else it[ArticlesParsed.image],
+                                      published = it[ArticlesParsed.published]
+                                      // TODO Fix videos and keywords
+                                      //
+                                      // videos =
+                                      // objectMapper.readValue(it[ArticlesParsed.videos]?:"",
+                                      // ArrayList::class.java)
+                                      )
+                                }
+                                .firstOrNull())
+                val tags =
+                    ArticlesTags.slice(ArticlesTags.tagName)
+                        .select { ArticlesTags.articleId.eq(articleResultRow[Articles.id]) }
+                        .map { it[ArticlesTags.tagName] }
+                        .filter { it.length >= 2 }
+                        .toSet()
+                article.tags = tags
+                article
+              }
+              .firstOrNull()
     }
     return result
   }
@@ -303,23 +322,23 @@ class DevFeedRdbmsDao(
     }
     var articleIdentifier: String? = null
     transaction {
-      articleIdentifier = Articles.insert {
-        it[id] = UUID.randomUUID().toString()
-        it[articleSource] = article.source!!
-        it[timestamp] = article.timestamp
-        it[title] = article.title
-        it[description] =
-          if (article.description?.length ?: 0 > 10_000)
-            article.description?.substring(0 until 10_000)?.plus("...")
-          else
-            article.description
-        it[link] = article.url
-        it[hostname] = article.domain
-        it[screenshotData] = article.screenshot?.data
-        it[screenshotMimeType] = article.screenshot?.mimeType
-        it[screenshotWidth] = article.screenshot?.width
-        it[screenshotHeight] = article.screenshot?.height
-      } get Articles.id
+      articleIdentifier =
+          Articles.insert {
+            it[id] = UUID.randomUUID().toString()
+            it[articleSource] = article.source!!
+            it[timestamp] = article.timestamp
+            it[title] = article.title
+            it[description] =
+                if (article.description?.length ?: 0 > 10_000)
+                    article.description?.substring(0 until 10_000)?.plus("...")
+                else article.description
+            it[link] = article.url
+            it[hostname] = article.domain
+            it[screenshotData] = article.screenshot?.data
+            it[screenshotMimeType] = article.screenshot?.mimeType
+            it[screenshotWidth] = article.screenshot?.width
+            it[screenshotHeight] = article.screenshot?.height
+          } get Articles.id
 
       article.parsed?.let { articleParsed ->
         ArticlesParsed.insert {
@@ -329,39 +348,38 @@ class DevFeedRdbmsDao(
           it[published] = articleParsed.published
           it[image] = articleParsed.image
           it[description] =
-            if (articleParsed.description?.length ?: 0 > 10_000)
-              articleParsed.description?.substring(0 until 10_000)?.plus("...")
-            else
-              articleParsed.description
+              if (articleParsed.description?.length ?: 0 > 10_000)
+                  articleParsed.description?.substring(0 until 10_000)?.plus("...")
+              else articleParsed.description
           it[body] = articleParsed.body
-          it[videos] = objectMapper.writeValueAsString(articleParsed.videos
-            ?: emptyList<String>())
-          it[keywords] = objectMapper.writeValueAsString(articleParsed.keywords
-            ?: emptyList<String>())
+          it[videos] = objectMapper.writeValueAsString(articleParsed.videos ?: emptyList<String>())
+          it[keywords] =
+              objectMapper.writeValueAsString(articleParsed.keywords ?: emptyList<String>())
         }
       }
 
-      article.tags
-        ?.filterNotNull()
-        ?.map { articleTag -> articleTag.toLowerCase().trim().replace("\\s".toRegex(), "-") }
-        ?.map { articleTag -> if (articleTag.startsWith("#")) articleTag else "#$articleTag" }
-        ?.map { articleTag ->
-          if (!existTagByName(articleTag)) {
-            Tags.insert {
-              it[name] = articleTag
+      article
+          .tags
+          ?.filterNotNull()
+          ?.map { articleTag -> articleTag.toLowerCase().trim().replace("\\s".toRegex(), "-") }
+          ?.map { articleTag -> if (articleTag.startsWith("#")) articleTag else "#$articleTag" }
+          ?.map { articleTag ->
+            if (!existTagByName(articleTag)) {
+              Tags.insert { it[name] = articleTag }
+            }
+            articleTag
+          }
+          ?.forEach { tagIdInserted ->
+            ArticlesTags.insert {
+              it[id] = UUID.randomUUID().toString()
+              it[articleId] = articleIdentifier!!
+              it[tagName] = tagIdInserted
             }
           }
-          articleTag
-        }?.forEach { tagIdInserted ->
-          ArticlesTags.insert {
-            it[id] = UUID.randomUUID().toString()
-            it[articleId] = articleIdentifier!!
-            it[tagName] = tagIdInserted
-          }
-        }
     }
-    return articleIdentifier ?: throw IllegalStateException(
-      "Could not retrieve identifier for <${article.title},${article.url}>")
+    return articleIdentifier
+        ?: throw IllegalStateException(
+            "Could not retrieve identifier for <${article.title},${article.url}>")
   }
 
   override fun shouldRequestScreenshot(title: String, url: String): Boolean {
@@ -370,9 +388,14 @@ class DevFeedRdbmsDao(
     }
     var result = false
     transaction {
-      result = Articles
-        .select { Articles.title.eq(title) and Articles.link.eq(url) and Articles.screenshotData.isNotNull() and not(Articles.screenshotData eq "") }
-        .empty()
+      result =
+          Articles.select {
+                Articles.title.eq(title) and
+                    Articles.link.eq(url) and
+                    Articles.screenshotData.isNotNull() and
+                    not(Articles.screenshotData eq "")
+              }
+              .empty()
     }
     return result
   }
@@ -383,9 +406,13 @@ class DevFeedRdbmsDao(
     }
     var result = false
     transaction {
-      result = Articles
-        .select { Articles.id.eq(articleId) and Articles.screenshotData.isNotNull() and not(Articles.screenshotData eq "") }
-        .empty()
+      result =
+          Articles.select {
+                Articles.id.eq(articleId) and
+                    Articles.screenshotData.isNotNull() and
+                    not(Articles.screenshotData eq "")
+              }
+              .empty()
     }
     return result
   }
@@ -404,97 +431,114 @@ class DevFeedRdbmsDao(
     }
   }
 
-  override fun allButRecentArticles(limit: Int?, offset: Long?, filter: ArticleFilter?): Collection<Article> {
+  override fun allButRecentArticles(
+      limit: Int?,
+      offset: Long?,
+      filter: ArticleFilter?
+  ): Collection<Article> {
     if (datasource.isClosed) {
       throw java.lang.IllegalStateException("Datasource is closed")
     }
     val result = mutableListOf<Article>()
     transaction {
       Articles.slice(Articles.timestamp)
-        .selectAll()
-        .orderBy(Articles.timestamp, order = SortOrder.DESC)
-        .withDistinct().limit(1)
-        .map { it[Articles.timestamp] }
-        .firstOrNull()
-        ?.let { lastArticleDate ->
-          val query: Query
-          var whereClause = not(Op.build { Articles.timestamp.eq(lastArticleDate) })
-          var tagsResolvedFromSearch: Collection<String>? = null
-          if (filter != null) {
-            if (filter.from != null) {
-              whereClause = whereClause.and(
-                Articles.timestamp.between(
-                  filter.from.asSupportedTimestamp()!!,
-                  filter.to?.asSupportedTimestamp()
-                    ?: System.currentTimeMillis()))
-            } else if (filter.to != null) {
-              whereClause = whereClause.and(
-                Articles.timestamp.between(System.currentTimeMillis(),
-                  filter.to.asSupportedTimestamp()))
-            }
-            if (filter.search != null) {
-              val searchPattern = "%${filter.search}%"
-              val searchClause = (Articles.title like searchPattern)
-                .or(Articles.description like searchPattern)
-                .or(Articles.link like searchPattern)
-              whereClause = whereClause.and(searchClause)
-            }
-            if (filter.tags != null) {
-              tagsResolvedFromSearch = getTags(search = filter.tags)
-            }
-          }
-          query = Articles.select(whereClause)
-//                      limit?.let { query.limit(it, offset?:DEFAULT_OFFSET) }
-          query.orderBy(Articles.timestamp, order = SortOrder.DESC)
-
-          val list = query
-            .map { articleResultRow ->
-              val article = Article(id = articleResultRow[Articles.id],
-                source = articleResultRow[Articles.articleSource],
-                title = articleResultRow[Articles.title],
-                url = articleResultRow[Articles.link],
-                domain = articleResultRow[Articles.hostname]
-                  ?: URL(articleResultRow[Articles.link]).host,
-                timestamp = articleResultRow[Articles.timestamp],
-                screenshot = Screenshot(
-                  data = articleResultRow[Articles.screenshotData],
-                  mimeType = articleResultRow[Articles.screenshotMimeType],
-                  width = articleResultRow[Articles.screenshotWidth],
-                  height = articleResultRow[Articles.screenshotHeight]
-                ),
-                parsed = ArticlesParsed.select { ArticlesParsed.articleLink.eq(articleResultRow[Articles.link]) }
-                  .map {
-                    ArticleParsed(
-                      url = articleResultRow[Articles.link],
-                      title = it[ArticlesParsed.title],
-                      description = it[ArticlesParsed.description],
-                      body = it[ArticlesParsed.body],
-                      author = it[ArticlesParsed.author],
-                      image = if (it[ArticlesParsed.image].isNullOrBlank()) null else it[ArticlesParsed.image],
-                      published = it[ArticlesParsed.published]
-                      //TODO Fix videos and keywords
-//                                                        videos = objectMapper.readValue(it[ArticlesParsed.videos]?:"", ArrayList::class.java)
-                    )
-                  }.firstOrNull())
-              val tags = ArticlesTags.slice(ArticlesTags.tagName)
-                .select { ArticlesTags.articleId.eq(articleResultRow[Articles.id]) }
-                .map { it[ArticlesTags.tagName] }
-                .filter { it.length >= 2 }
-                .toSet()
-              article to tags
-            }
-            .filter {
-              it.second.any {
-                tagsResolvedFromSearch?.contains(it) ?: true
+          .selectAll()
+          .orderBy(Articles.timestamp, order = SortOrder.DESC)
+          .withDistinct()
+          .limit(1)
+          .map { it[Articles.timestamp] }
+          .firstOrNull()
+          ?.let { lastArticleDate ->
+            val query: Query
+            var whereClause = not(Op.build { Articles.timestamp.eq(lastArticleDate) })
+            var tagsResolvedFromSearch: Collection<String>? = null
+            if (filter != null) {
+              if (filter.from != null) {
+                whereClause =
+                    whereClause.and(
+                        Articles.timestamp.between(
+                            filter.from.asSupportedTimestamp()!!,
+                            filter.to?.asSupportedTimestamp() ?: System.currentTimeMillis()))
+              } else if (filter.to != null) {
+                whereClause =
+                    whereClause.and(
+                        Articles.timestamp.between(
+                            System.currentTimeMillis(), filter.to.asSupportedTimestamp()))
+              }
+              if (filter.search != null) {
+                val searchPattern = "%${filter.search}%"
+                val searchClause =
+                    (Articles.title like searchPattern)
+                        .or(Articles.description like searchPattern)
+                        .or(Articles.link like searchPattern)
+                whereClause = whereClause.and(searchClause)
+              }
+              if (filter.tags != null) {
+                tagsResolvedFromSearch = getTags(search = filter.tags)
               }
             }
-            .map {
-              it.first.tags = it.second
-              it.first
-            }
-            .toList()
-          result.addAll(if (limit != null) list.take(limit) else list)
-        }
+            query = Articles.select(whereClause)
+            //                      limit?.let { query.limit(it, offset?:DEFAULT_OFFSET) }
+            query.orderBy(Articles.timestamp, order = SortOrder.DESC)
+
+            val list =
+                query
+                    .map { articleResultRow ->
+                      val article =
+                          Article(
+                              id = articleResultRow[Articles.id],
+                              source = articleResultRow[Articles.articleSource],
+                              title = articleResultRow[Articles.title],
+                              url = articleResultRow[Articles.link],
+                              domain = articleResultRow[Articles.hostname]
+                                      ?: URL(articleResultRow[Articles.link]).host,
+                              timestamp = articleResultRow[Articles.timestamp],
+                              screenshot =
+                                  Screenshot(
+                                      data = articleResultRow[Articles.screenshotData],
+                                      mimeType = articleResultRow[Articles.screenshotMimeType],
+                                      width = articleResultRow[Articles.screenshotWidth],
+                                      height = articleResultRow[Articles.screenshotHeight]),
+                              parsed =
+                                  ArticlesParsed.select {
+                                        ArticlesParsed.articleLink.eq(
+                                            articleResultRow[Articles.link])
+                                      }
+                                      .map {
+                                        ArticleParsed(
+                                            url = articleResultRow[Articles.link],
+                                            title = it[ArticlesParsed.title],
+                                            description = it[ArticlesParsed.description],
+                                            body = it[ArticlesParsed.body],
+                                            author = it[ArticlesParsed.author],
+                                            image =
+                                                if (it[ArticlesParsed.image].isNullOrBlank()) null
+                                                else it[ArticlesParsed.image],
+                                            published = it[ArticlesParsed.published]
+                                            // TODO Fix videos and keywords
+                                            //
+                                            //  videos =
+                                            // objectMapper.readValue(it[ArticlesParsed.videos]?:"",
+                                            // ArrayList::class.java)
+                                            )
+                                      }
+                                      .firstOrNull())
+                      val tags =
+                          ArticlesTags.slice(ArticlesTags.tagName)
+                              .select { ArticlesTags.articleId.eq(articleResultRow[Articles.id]) }
+                              .map { it[ArticlesTags.tagName] }
+                              .filter { it.length >= 2 }
+                              .toSet()
+                      article to tags
+                    }
+                    .filter { it.second.any { tagsResolvedFromSearch?.contains(it) ?: true } }
+                    .map {
+                      it.first.tags = it.second
+                      it.first
+                    }
+                    .toList()
+            result.addAll(if (limit != null) list.take(limit) else list)
+          }
     }
     return result
   }
@@ -505,44 +549,55 @@ class DevFeedRdbmsDao(
     }
     val result = mutableListOf<Article>()
     transaction {
-      result.addAll(Articles
-        .select { Articles.screenshotData.isNull().or(Articles.screenshotData eq "") }
-        .map { articleResultRow ->
-          Article(id = articleResultRow[Articles.id],
-            source = articleResultRow[Articles.articleSource],
-            title = articleResultRow[Articles.title],
-            url = articleResultRow[Articles.link],
-            domain = articleResultRow[Articles.hostname]
-              ?: URL(articleResultRow[Articles.link]).host,
-            timestamp = articleResultRow[Articles.timestamp],
-            screenshot = Screenshot(
-              data = articleResultRow[Articles.screenshotData],
-              mimeType = articleResultRow[Articles.screenshotMimeType],
-              width = articleResultRow[Articles.screenshotWidth],
-              height = articleResultRow[Articles.screenshotHeight]
-            ),
-            parsed = ArticlesParsed.select { ArticlesParsed.articleLink.eq(articleResultRow[Articles.link]) }
-              .map {
-                ArticleParsed(
-                  url = articleResultRow[Articles.link],
-                  title = it[ArticlesParsed.title],
-                  description = it[ArticlesParsed.description],
-                  body = it[ArticlesParsed.body],
-                  author = it[ArticlesParsed.author],
-                  image = if (it[ArticlesParsed.image].isNullOrBlank()) null else it[ArticlesParsed.image],
-                  published = it[ArticlesParsed.published]
-                  //TODO Fix videos and keywords
-                  // videos = objectMapper.readValue(it[ArticlesParsed.videos]?:"",
-                  //    ArrayList::class.java)
-                )
-              }.firstOrNull())
-        }
-        .toSet())
+      result.addAll(
+          Articles.select { Articles.screenshotData.isNull().or(Articles.screenshotData eq "") }
+              .map { articleResultRow ->
+                Article(
+                    id = articleResultRow[Articles.id],
+                    source = articleResultRow[Articles.articleSource],
+                    title = articleResultRow[Articles.title],
+                    url = articleResultRow[Articles.link],
+                    domain = articleResultRow[Articles.hostname]
+                            ?: URL(articleResultRow[Articles.link]).host,
+                    timestamp = articleResultRow[Articles.timestamp],
+                    screenshot =
+                        Screenshot(
+                            data = articleResultRow[Articles.screenshotData],
+                            mimeType = articleResultRow[Articles.screenshotMimeType],
+                            width = articleResultRow[Articles.screenshotWidth],
+                            height = articleResultRow[Articles.screenshotHeight]),
+                    parsed =
+                        ArticlesParsed.select {
+                              ArticlesParsed.articleLink.eq(articleResultRow[Articles.link])
+                            }
+                            .map {
+                              ArticleParsed(
+                                  url = articleResultRow[Articles.link],
+                                  title = it[ArticlesParsed.title],
+                                  description = it[ArticlesParsed.description],
+                                  body = it[ArticlesParsed.body],
+                                  author = it[ArticlesParsed.author],
+                                  image =
+                                      if (it[ArticlesParsed.image].isNullOrBlank()) null
+                                      else it[ArticlesParsed.image],
+                                  published = it[ArticlesParsed.published]
+                                  // TODO Fix videos and keywords
+                                  // videos = objectMapper.readValue(it[ArticlesParsed.videos]?:"",
+                                  //    ArrayList::class.java)
+                                  )
+                            }
+                            .firstOrNull())
+              }
+              .toSet())
     }
     return result.toList()
   }
 
-  override fun getArticles(limit: Int?, offset: Long?, filter: ArticleFilter?): Collection<Article> {
+  override fun getArticles(
+      limit: Int?,
+      offset: Long?,
+      filter: ArticleFilter?
+  ): Collection<Article> {
     if (datasource.isClosed) {
       throw java.lang.IllegalStateException("Datasource is closed")
     }
@@ -553,75 +608,98 @@ class DevFeedRdbmsDao(
       var tagsResolvedFromSearch: Collection<String>? = null
       if (filter != null) {
         val searchPattern = "%${filter.search}%"
-        whereClause = {
-          Articles.timestamp.between(
-            filter.from?.asSupportedTimestamp() ?: 0L,
-            filter.to?.asSupportedTimestamp() ?: System.currentTimeMillis())
-            .and(if (filter.search != null) (Articles.title.like(searchPattern)
-              .or(Articles.description like searchPattern).or(Articles.link like searchPattern)
-              .or(Articles.hostname like searchPattern))
-            else Articles.title.isNotNull())
-            .and(if (filter.titles != null) Articles.title.inList(filter.titles!!) else Articles
-              .title.isNotNull())
-            .and(if (filter.urls != null) Articles.link.inList(filter.urls!!) else Articles.link
-              .isNotNull())
-            .and(if (filter.domains != null) Articles.hostname.inList(filter.domains!!) else
-              Articles.hostname.isNotNull())
-        }
+        whereClause =
+            {
+              Articles.timestamp
+                  .between(
+                      filter.from?.asSupportedTimestamp() ?: 0L,
+                      filter.to?.asSupportedTimestamp() ?: System.currentTimeMillis())
+                  .and(
+                      if (filter.search != null)
+                          (Articles.title
+                              .like(searchPattern)
+                              .or(Articles.description like searchPattern)
+                              .or(Articles.link like searchPattern)
+                              .or(Articles.hostname like searchPattern))
+                      else Articles.title.isNotNull())
+                  .and(
+                      if (filter.titles != null) Articles.title.inList(filter.titles!!)
+                      else Articles.title.isNotNull())
+                  .and(
+                      if (filter.urls != null) Articles.link.inList(filter.urls!!)
+                      else Articles.link.isNotNull())
+                  .and(
+                      if (filter.domains != null) Articles.hostname.inList(filter.domains!!)
+                      else Articles.hostname.isNotNull())
+            }
         if (filter.tags != null) {
           tagsResolvedFromSearch = getTags(search = filter.tags)
         }
       }
-      query = if (whereClause != null) {
-        Articles.select(whereClause)
-      } else {
-        Articles.selectAll()
-      }
-//            limit?.let { query.limit(it, offset?:DEFAULT_OFFSET) }
+      query =
+          if (whereClause != null) {
+            Articles.select(whereClause)
+          } else {
+            Articles.selectAll()
+          }
+      //            limit?.let { query.limit(it, offset?:DEFAULT_OFFSET) }
       query.orderBy(Articles.timestamp, order = SortOrder.DESC)
 
-      val list = query
-        .map { articleResultRow ->
-          val article = Article(id = articleResultRow[Articles.id],
-            source = articleResultRow[Articles.articleSource],
-            title = articleResultRow[Articles.title],
-            url = articleResultRow[Articles.link],
-            domain = articleResultRow[Articles.hostname]
-              ?: URL(articleResultRow[Articles.link]).host,
-            timestamp = articleResultRow[Articles.timestamp],
-            screenshot = Screenshot(
-              data = articleResultRow[Articles.screenshotData],
-              mimeType = articleResultRow[Articles.screenshotMimeType],
-              width = articleResultRow[Articles.screenshotWidth],
-              height = articleResultRow[Articles.screenshotHeight]
-            ),
-            parsed = ArticlesParsed.select { ArticlesParsed.articleLink.eq(articleResultRow[Articles.link]) }
+      val list =
+          query
+              .map { articleResultRow ->
+                val article =
+                    Article(
+                        id = articleResultRow[Articles.id],
+                        source = articleResultRow[Articles.articleSource],
+                        title = articleResultRow[Articles.title],
+                        url = articleResultRow[Articles.link],
+                        domain = articleResultRow[Articles.hostname]
+                                ?: URL(articleResultRow[Articles.link]).host,
+                        timestamp = articleResultRow[Articles.timestamp],
+                        screenshot =
+                            Screenshot(
+                                data = articleResultRow[Articles.screenshotData],
+                                mimeType = articleResultRow[Articles.screenshotMimeType],
+                                width = articleResultRow[Articles.screenshotWidth],
+                                height = articleResultRow[Articles.screenshotHeight]),
+                        parsed =
+                            ArticlesParsed.select {
+                                  ArticlesParsed.articleLink.eq(articleResultRow[Articles.link])
+                                }
+                                .map {
+                                  ArticleParsed(
+                                      url = articleResultRow[Articles.link],
+                                      title = it[ArticlesParsed.title],
+                                      description = it[ArticlesParsed.description],
+                                      body = it[ArticlesParsed.body],
+                                      author = it[ArticlesParsed.author],
+                                      image =
+                                          if (it[ArticlesParsed.image].isNullOrBlank()) null
+                                          else it[ArticlesParsed.image],
+                                      published = it[ArticlesParsed.published]
+                                      // TODO Fix videos and keywords
+                                      //
+                                      // videos =
+                                      // objectMapper.readValue(it[ArticlesParsed.videos]?:"",
+                                      // ArrayList::class.java)
+                                      )
+                                }
+                                .firstOrNull())
+                val tags =
+                    ArticlesTags.slice(ArticlesTags.tagName)
+                        .select { ArticlesTags.articleId.eq(articleResultRow[Articles.id]) }
+                        .map { it[ArticlesTags.tagName] }
+                        .filter { it.length >= 2 }
+                        .toSet()
+                article to tags
+              }
+              .filter { it.second.any { tagsResolvedFromSearch?.contains(it) ?: true } }
               .map {
-                ArticleParsed(
-                  url = articleResultRow[Articles.link],
-                  title = it[ArticlesParsed.title],
-                  description = it[ArticlesParsed.description],
-                  body = it[ArticlesParsed.body],
-                  author = it[ArticlesParsed.author],
-                  image = if (it[ArticlesParsed.image].isNullOrBlank()) null else it[ArticlesParsed.image],
-                  published = it[ArticlesParsed.published]
-                  //TODO Fix videos and keywords
-//                                                        videos = objectMapper.readValue(it[ArticlesParsed.videos]?:"", ArrayList::class.java)
-                )
-              }.firstOrNull())
-          val tags = ArticlesTags.slice(ArticlesTags.tagName)
-            .select { ArticlesTags.articleId.eq(articleResultRow[Articles.id]) }
-            .map { it[ArticlesTags.tagName] }
-            .filter { it.length >= 2 }
-            .toSet()
-          article to tags
-        }
-        .filter { it.second.any { tagsResolvedFromSearch?.contains(it) ?: true } }
-        .map {
-          it.first.tags = it.second
-          it.first
-        }
-        .toList()
+                it.first.tags = it.second
+                it.first
+              }
+              .toList()
       result.addAll(if (limit != null) list.take(limit) else list)
     }
     return result.toList()
@@ -633,9 +711,11 @@ class DevFeedRdbmsDao(
     }
     val result = mutableSetOf<Long>()
     transaction {
-      val query = Articles.slice(Articles.timestamp).selectAll()
-        .orderBy(Articles.timestamp, order = SortOrder.DESC)
-        .withDistinct()
+      val query =
+          Articles.slice(Articles.timestamp)
+              .selectAll()
+              .orderBy(Articles.timestamp, order = SortOrder.DESC)
+              .withDistinct()
       limit?.let { query.limit(it, offset ?: DEFAULT_OFFSET) }
       result.addAll(query.map { it[Articles.timestamp] }.toSet())
     }
@@ -649,80 +729,99 @@ class DevFeedRdbmsDao(
     }
     val result = mutableListOf<Article>()
     transaction {
-      Articles.slice(Articles.timestamp).selectAll()
-        .orderBy(Articles.timestamp, order = SortOrder.DESC)
-        .limit(1)
-        .withDistinct()
-        .map { it[Articles.timestamp] }
-        .firstOrNull()
-        ?.let {
-          logger.trace("getRecentArticles")
-          val query = Articles.select { Articles.timestamp.eq(it) }
-          limit?.let { query.limit(it, offset ?: DEFAULT_OFFSET) }
-          query.orderBy(Articles.timestamp, order = SortOrder.DESC)
-          result.addAll(query
-            .map { articleResultRow ->
-              val article = Article(id = articleResultRow[Articles.id],
-                source = articleResultRow[Articles.articleSource],
-                title = articleResultRow[Articles.title],
-                url = articleResultRow[Articles.link],
-                domain = articleResultRow[Articles.hostname]
-                  ?: URL(articleResultRow[Articles.link]).host,
-                timestamp = articleResultRow[Articles.timestamp],
-                screenshot = Screenshot(
-                  data = articleResultRow[Articles.screenshotData],
-                  mimeType = articleResultRow[Articles.screenshotMimeType],
-                  width = articleResultRow[Articles.screenshotWidth],
-                  height = articleResultRow[Articles.screenshotHeight]
-                ),
-                parsed = ArticlesParsed.select { ArticlesParsed.articleLink.eq(articleResultRow[Articles.link]) }
-                  .map {
-                    ArticleParsed(
-                      url = articleResultRow[Articles.link],
-                      title = it[ArticlesParsed.title],
-                      description = it[ArticlesParsed.description],
-                      body = it[ArticlesParsed.body],
-                      author = it[ArticlesParsed.author],
-                      image = if (it[ArticlesParsed.image].isNullOrBlank()) null else it[ArticlesParsed.image],
-                      published = it[ArticlesParsed.published]
-                      //TODO Fix videos and keywords
-//                                                        videos = objectMapper.readValue(it[ArticlesParsed.videos]?:"", ArrayList::class.java)
-                    )
-                  }.firstOrNull())
-              val tags = ArticlesTags.slice(ArticlesTags.tagName)
-                .select { ArticlesTags.articleId.eq(articleResultRow[Articles.id]) }
-                .map { it[ArticlesTags.tagName] }
-                .filter { it.length >= 2 }
-                .toSet()
-              article to tags
-            }
-            .map {
-              it.first.tags = it.second
-              it.first
-            }
-            .toList())
-        }
+      Articles.slice(Articles.timestamp)
+          .selectAll()
+          .orderBy(Articles.timestamp, order = SortOrder.DESC)
+          .limit(1)
+          .withDistinct()
+          .map { it[Articles.timestamp] }
+          .firstOrNull()
+          ?.let {
+            logger.trace("getRecentArticles")
+            val query = Articles.select { Articles.timestamp.eq(it) }
+            limit?.let { query.limit(it, offset ?: DEFAULT_OFFSET) }
+            query.orderBy(Articles.timestamp, order = SortOrder.DESC)
+            result.addAll(
+                query
+                    .map { articleResultRow ->
+                      val article =
+                          Article(
+                              id = articleResultRow[Articles.id],
+                              source = articleResultRow[Articles.articleSource],
+                              title = articleResultRow[Articles.title],
+                              url = articleResultRow[Articles.link],
+                              domain = articleResultRow[Articles.hostname]
+                                      ?: URL(articleResultRow[Articles.link]).host,
+                              timestamp = articleResultRow[Articles.timestamp],
+                              screenshot =
+                                  Screenshot(
+                                      data = articleResultRow[Articles.screenshotData],
+                                      mimeType = articleResultRow[Articles.screenshotMimeType],
+                                      width = articleResultRow[Articles.screenshotWidth],
+                                      height = articleResultRow[Articles.screenshotHeight]),
+                              parsed =
+                                  ArticlesParsed.select {
+                                        ArticlesParsed.articleLink.eq(
+                                            articleResultRow[Articles.link])
+                                      }
+                                      .map {
+                                        ArticleParsed(
+                                            url = articleResultRow[Articles.link],
+                                            title = it[ArticlesParsed.title],
+                                            description = it[ArticlesParsed.description],
+                                            body = it[ArticlesParsed.body],
+                                            author = it[ArticlesParsed.author],
+                                            image =
+                                                if (it[ArticlesParsed.image].isNullOrBlank()) null
+                                                else it[ArticlesParsed.image],
+                                            published = it[ArticlesParsed.published]
+                                            // TODO Fix videos and keywords
+                                            //
+                                            //  videos =
+                                            // objectMapper.readValue(it[ArticlesParsed.videos]?:"",
+                                            // ArrayList::class.java)
+                                            )
+                                      }
+                                      .firstOrNull())
+                      val tags =
+                          ArticlesTags.slice(ArticlesTags.tagName)
+                              .select { ArticlesTags.articleId.eq(articleResultRow[Articles.id]) }
+                              .map { it[ArticlesTags.tagName] }
+                              .filter { it.length >= 2 }
+                              .toSet()
+                      article to tags
+                    }
+                    .map {
+                      it.first.tags = it.second
+                      it.first
+                    }
+                    .toList())
+          }
     }
     return result.toList()
   }
 
-  override fun getTags(limit: Int?, offset: Long?, search: Collection<String>?):
-  Collection<String> {
+  override fun getTags(
+      limit: Int?,
+      offset: Long?,
+      search: Collection<String>?
+  ): Collection<String> {
     if (datasource.isClosed) {
       throw java.lang.IllegalStateException("Datasource is closed")
     }
     val result = mutableSetOf<String>()
     transaction {
       val tagNameSlice = Tags.slice(Tags.name)
-      val query = if (search != null && search.isNotEmpty()) {
-        var searchOp: Op<Boolean> = Op.TRUE
-        for (tag in search) {
-          searchOp = searchOp.or(Tags.name.like("%$tag%"))
-        }
-        tagNameSlice.select { searchOp }
-      } else {
-        tagNameSlice.selectAll()
-      }
+      val query =
+          if (search != null && search.isNotEmpty()) {
+            var searchOp: Op<Boolean> = Op.TRUE
+            for (tag in search) {
+              searchOp = searchOp.or(Tags.name.like("%$tag%"))
+            }
+            tagNameSlice.select { searchOp }
+          } else {
+            tagNameSlice.selectAll()
+          }
       query.withDistinct()
       limit?.let { query.limit(it, offset ?: DEFAULT_OFFSET) }
       result.addAll(query.map { it[Tags.name] }.filter { it.length >= 2 }.toSet())
@@ -735,10 +834,8 @@ class DevFeedRdbmsDao(
     if (datasource.isClosed) {
       throw java.lang.IllegalStateException("Datasource is closed")
     }
-    //Just attempt to read from the database
-    transaction {
-      Tags.slice(Tags.name).selectAll().limit(1)
-    }
+    // Just attempt to read from the database
+    transaction { Tags.slice(Tags.name).selectAll().limit(1) }
   }
 
   override fun close() {

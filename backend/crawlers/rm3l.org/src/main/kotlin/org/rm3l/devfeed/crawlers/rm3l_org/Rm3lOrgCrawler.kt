@@ -25,22 +25,21 @@ package org.rm3l.devfeed.crawlers.rm3l_org
 
 import com.rometools.rome.io.SyndFeedInput
 import com.rometools.rome.io.XmlReader
+import java.io.ByteArrayInputStream
+import java.net.URL
+import java.util.concurrent.ExecutionException
+import java.util.concurrent.TimeUnit
+import kotlin.system.exitProcess
 import org.rm3l.devfeed.common.contract.Article
 import org.rm3l.devfeed.common.utils.asSupportedTimestamp
 import org.rm3l.devfeed.crawlers.cli.DevFeedCrawlerCliRunner
 import org.rm3l.devfeed.crawlers.common.DevFeedCrawler
 import org.slf4j.LoggerFactory
-import java.net.URL
-import java.io.ByteArrayInputStream
-import java.util.concurrent.ExecutionException
-import java.util.concurrent.TimeUnit
-import kotlin.system.exitProcess
 
 class Rm3lOrgCrawler : DevFeedCrawler() {
 
   companion object {
-    @JvmStatic
-    private val logger = LoggerFactory.getLogger(Rm3lOrgCrawler::class.java)
+    @JvmStatic private val logger = LoggerFactory.getLogger(Rm3lOrgCrawler::class.java)
 
     private const val RSS_FEED_URL = "https://rm3l.org/rss/"
   }
@@ -52,37 +51,42 @@ class Rm3lOrgCrawler : DevFeedCrawler() {
 
       val start = System.nanoTime()
 
-      val articles = SyndFeedInput()
-        .build(XmlReader(ByteArrayInputStream(URL(RSS_FEED_URL).readText()
-          .replace("https://cms.rm3l.org", "https://rm3l.org", ignoreCase = true)
-          .toByteArray())))
-        .entries
-        .filterNot { it.publishedDate == null && it.updatedDate == null }
-        .map { feedEntry ->
-          Article(
-            source = "https://rm3l.org/",
-            timestamp = (feedEntry.publishedDate ?: feedEntry.updatedDate)
-              .asSupportedTimestamp()!!,
-            title = feedEntry.title,
-            url = feedEntry.link ?: RSS_FEED_URL,
-            description = feedEntry.description?.value,
-            tags = feedEntry.categories?.map { it -> it.name } ?: emptyList()
-
-          )
-        }.toList()
+      val articles =
+          SyndFeedInput()
+              .build(
+                  XmlReader(
+                      ByteArrayInputStream(
+                          URL(RSS_FEED_URL)
+                              .readText()
+                              .replace(
+                                  "https://cms.rm3l.org", "https://rm3l.org", ignoreCase = true)
+                              .toByteArray())))
+              .entries
+              .filterNot { it.publishedDate == null && it.updatedDate == null }
+              .map { feedEntry ->
+                Article(
+                    source = "https://rm3l.org/",
+                    timestamp =
+                        (feedEntry.publishedDate ?: feedEntry.updatedDate).asSupportedTimestamp()!!,
+                    title = feedEntry.title,
+                    url = feedEntry.link ?: RSS_FEED_URL,
+                    description = feedEntry.description?.value,
+                    tags = feedEntry.categories?.map { it -> it.name } ?: emptyList())
+              }
+              .toList()
 
       if (logger.isDebugEnabled) {
         logger.trace("Fetched ${articles.size} articles for $RSS_FEED_URL")
       }
 
-      logger.info("<<< Done handling Feed articles from: $RSS_FEED_URL" +
-        " in ${TimeUnit.NANOSECONDS.toMillis(System.nanoTime() - start)}ms" +
-        " => ${articles.size} articles")
+      logger.info(
+          "<<< Done handling Feed articles from: $RSS_FEED_URL" +
+              " in ${TimeUnit.NANOSECONDS.toMillis(System.nanoTime() - start)}ms" +
+              " => ${articles.size} articles")
       return articles
-
     } catch (e: ExecutionException) {
-      logger.warn("Crawling execution could not complete successfully - " +
-        "will try again later", e)
+      logger.warn(
+          "Crawling execution could not complete successfully - " + "will try again later", e)
       throw e
     }
   }
@@ -93,4 +97,3 @@ fun main(args: Array<String>) {
   DevFeedCrawlerCliRunner.main(*cliArgs.toTypedArray())
   exitProcess(0)
 }
-

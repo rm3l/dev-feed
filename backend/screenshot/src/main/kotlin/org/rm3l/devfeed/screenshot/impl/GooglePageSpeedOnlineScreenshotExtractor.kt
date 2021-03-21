@@ -32,65 +32,65 @@ import org.rm3l.devfeed.persistence.DevFeedDao
 import org.slf4j.LoggerFactory
 
 class GooglePageSpeedOnlineScreenshotExtractor(
-  private val dao: DevFeedDao,
-  private val pageSpeedOnlineApiKey: String,
-  private val pageSpeedOnlineTimeoutSeconds: Int = 60
-): ArticleScreenshotExtractor {
+    private val dao: DevFeedDao,
+    private val pageSpeedOnlineApiKey: String,
+    private val pageSpeedOnlineTimeoutSeconds: Int = 60
+) : ArticleScreenshotExtractor {
 
   companion object {
     private const val GOOGLE_PAGESPEED_URL_FORMAT =
-      "https://www.googleapis.com/pagespeedonline/v5/runPagespeed?url=%s&screenshot=true"
+        "https://www.googleapis.com/pagespeedonline/v5/runPagespeed?url=%s&screenshot=true"
 
     @JvmStatic
-    private val logger = LoggerFactory.getLogger(GooglePageSpeedOnlineScreenshotExtractor::class.java)
+    private val logger =
+        LoggerFactory.getLogger(GooglePageSpeedOnlineScreenshotExtractor::class.java)
   }
 
   private var googlePageSpeedOnlineApiUrlFormat: String? = null
 
   init {
-    googlePageSpeedOnlineApiUrlFormat = if (pageSpeedOnlineApiKey.isBlank()) {
-      GOOGLE_PAGESPEED_URL_FORMAT
-    } else {
-      "${GOOGLE_PAGESPEED_URL_FORMAT}&key=$pageSpeedOnlineApiKey"
-    }
+    googlePageSpeedOnlineApiUrlFormat =
+        if (pageSpeedOnlineApiKey.isBlank()) {
+          GOOGLE_PAGESPEED_URL_FORMAT
+        } else {
+          "${GOOGLE_PAGESPEED_URL_FORMAT}&key=$pageSpeedOnlineApiKey"
+        }
   }
 
   override fun extractScreenshot(article: Article) {
-    val url = googlePageSpeedOnlineApiUrlFormat?.format(article.url)
-      ?: GOOGLE_PAGESPEED_URL_FORMAT
+    val url = googlePageSpeedOnlineApiUrlFormat?.format(article.url) ?: GOOGLE_PAGESPEED_URL_FORMAT
     try {
-      //Check if (title, url) pair already exist in the DB
+      // Check if (title, url) pair already exist in the DB
       if (dao.shouldRequestScreenshot(article.title, article.url)) {
-        val getRequest = khttp.get(url,
-          timeout = pageSpeedOnlineTimeoutSeconds.toDouble())
+        val getRequest = khttp.get(url, timeout = pageSpeedOnlineTimeoutSeconds.toDouble())
         if (getRequest.statusCode in 200..399) {
           val screenshotJsonObject: JSONObject? =
-            getRequest.jsonObject.optJSONObject("lighthouseResult")
-              .optJSONObject("audits")
-              .optJSONObject("final-screenshot")
-              .optJSONObject("details")
-          //Weird, but for reasons best known to Google, / is replaced with _, and +
+              getRequest
+                  .jsonObject
+                  .optJSONObject("lighthouseResult")
+                  .optJSONObject("audits")
+                  .optJSONObject("final-screenshot")
+                  .optJSONObject("details")
+          // Weird, but for reasons best known to Google, / is replaced with _, and +
           // is replaced with -
-          val base64ImageData = screenshotJsonObject?.optString("data")
-            ?.replace("_", "/")
-            ?.replace("-", "+")
+          val base64ImageData =
+              screenshotJsonObject?.optString("data")?.replace("_", "/")?.replace("-", "+")
           val mimeType = screenshotJsonObject?.optString("mime_type")
           val height = screenshotJsonObject?.optInt("height")
           val width = screenshotJsonObject?.optInt("width")
           if (!base64ImageData.isNullOrBlank()) {
-            article.screenshot = Screenshot(data = base64ImageData,
-              mimeType = mimeType,
-              width = width,
-              height = height)
+            article.screenshot =
+                Screenshot(
+                    data = base64ImageData, mimeType = mimeType, width = width, height = height)
           }
         }
       }
     } catch (e: Exception) {
       if (logger.isWarnEnabled) {
         logger.warn(
-          "Could not fetch screenshot data for ${article.url}. " +
-            "Exception message is: '${e.message}' " +
-            "when retrieving data from the following link: $url")
+            "Could not fetch screenshot data for ${article.url}. " +
+                "Exception message is: '${e.message}' " +
+                "when retrieving data from the following link: $url")
       }
       if (logger.isDebugEnabled) {
         logger.debug(e.message, e)

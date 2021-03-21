@@ -23,13 +23,13 @@
  */
 package org.rm3l.devfeed.crawlers.common
 
-import org.rm3l.devfeed.common.contract.Article
 import java.util.concurrent.Callable
 import kotlin.reflect.KClass
+import org.rm3l.devfeed.common.contract.Article
 
 const val DEFAULT_THREAD_POOL_SIZE = 10
 
-abstract class DevFeedCrawler: Callable<Collection<Article>> {
+abstract class DevFeedCrawler : Callable<Collection<Article>> {
 
   companion object {
 
@@ -47,7 +47,5 @@ abstract class DevFeedCrawler: Callable<Collection<Article>> {
       }
       return argsList
     }
-
   }
-
 }

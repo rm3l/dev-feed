@@ -31,13 +31,13 @@ import org.rm3l.devfeed.persistence.DevFeedDao
 import org.slf4j.LoggerFactory
 
 class DocumentParserApiArticleExtractor(
-  private val dao: DevFeedDao,
-  private val documentParserApiKey: String
-): ArticleExtractor {
+    private val dao: DevFeedDao,
+    private val documentParserApiKey: String
+) : ArticleExtractor {
 
   companion object {
     private const val ARTICLE_EXTRACTION_API_URL_FORMAT =
-      "https://document-parser-api.lateral.io/?url=%s"
+        "https://document-parser-api.lateral.io/?url=%s"
 
     @JvmStatic
     private val logger = LoggerFactory.getLogger(DocumentParserApiArticleExtractor::class.java)
@@ -52,25 +52,35 @@ class DocumentParserApiArticleExtractor(
             logger.debug("Getting article extraction data from url: $url")
           }
           val articleExtractionJsonObject =
-            khttp.get(url,
-              headers = mapOf(
-                "Content-Type" to "application/json",
-                "subscription-key" to documentParserApiKey
-              )).jsonObject
+              khttp.get(
+                      url,
+                      headers =
+                          mapOf(
+                              "Content-Type" to "application/json",
+                              "subscription-key" to documentParserApiKey))
+                  .jsonObject
 
           val parsedImage = articleExtractionJsonObject.optString("image")
 
-          article.parsed = ArticleParsed(
-            url = article.url,
-            title = articleExtractionJsonObject.optString("title"),
-            published = articleExtractionJsonObject.optString("published"),
-            author = articleExtractionJsonObject.optString("author"),
-            image = if (parsedImage.isNullOrBlank()) null else parsedImage,
-            description = articleExtractionJsonObject.optString("description"),
-            body = articleExtractionJsonObject.optString("body"),
-            videos = articleExtractionJsonObject.optJSONArray("videos")?.map { it.toString() }?.toSet(),
-            keywords = articleExtractionJsonObject.optJSONArray("keywords")?.map { it.toString() }?.toSet()
-          )
+          article.parsed =
+              ArticleParsed(
+                  url = article.url,
+                  title = articleExtractionJsonObject.optString("title"),
+                  published = articleExtractionJsonObject.optString("published"),
+                  author = articleExtractionJsonObject.optString("author"),
+                  image = if (parsedImage.isNullOrBlank()) null else parsedImage,
+                  description = articleExtractionJsonObject.optString("description"),
+                  body = articleExtractionJsonObject.optString("body"),
+                  videos =
+                      articleExtractionJsonObject
+                          .optJSONArray("videos")
+                          ?.map { it.toString() }
+                          ?.toSet(),
+                  keywords =
+                      articleExtractionJsonObject
+                          .optJSONArray("keywords")
+                          ?.map { it.toString() }
+                          ?.toSet())
         }
       } catch (e: Exception) {
         if (logger.isDebugEnabled) {

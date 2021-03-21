@@ -23,24 +23,22 @@
  */
 package org.rm3l.devfeed.config
 
+import java.util.concurrent.ExecutorService
+import java.util.concurrent.Executors
 import org.apache.commons.lang3.concurrent.BasicThreadFactory
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
-import java.util.concurrent.ExecutorService
-import java.util.concurrent.Executors
 
-/**
- * Configuration in charge of injecting all Async Executors in use throughout the application
- */
+/** Configuration in charge of injecting all Async Executors in use throughout the application */
 @Configuration
 class DevFeedAsyncConfiguration {
 
-  @Value("\${executor.thread-pool.size}")
-  private lateinit var numberOfThreadsInPool: String
+  @Value("\${executor.thread-pool.size}") private lateinit var numberOfThreadsInPool: String
 
   @Bean(name = ["devFeedExecutorService"], destroyMethod = "shutdownNow")
   fun devFeedExecutorService(): ExecutorService =
-    Executors.newFixedThreadPool(numberOfThreadsInPool.toInt(),
-      BasicThreadFactory.Builder().namingPattern("dev-feed-%d").build())
+      Executors.newFixedThreadPool(
+          numberOfThreadsInPool.toInt(),
+          BasicThreadFactory.Builder().namingPattern("dev-feed-%d").build())
 }
