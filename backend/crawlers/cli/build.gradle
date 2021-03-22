@@ -32,5 +32,5 @@ dependencies {
     implementation project(':dev-feed-persistence')
     implementation project(':dev-feed-screenshot')
     implementation 'com.fasterxml.jackson.core:jackson-databind:2.12.2'
-    implementation("info.picocli:picocli:4.5.1")
+    implementation("info.picocli:picocli:4.6.1")
 }
