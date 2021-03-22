@@ -1,7 +1,7 @@
 /*
  * The MIT License (MIT)
  *
- * Copyright (c) 2020 Armel Soro
+ * Copyright (c) 2021 Armel Soro
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -21,28 +21,17 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package org.rm3l.devfeed.graphql
 
-import graphql.kickstart.tools.GraphQLQueryResolver
-import org.rm3l.devfeed.common.contract.ArticleFilter
-import org.rm3l.devfeed.persistence.DevFeedDao
-import org.springframework.stereotype.Component
+package org.rm3l.devfeed.graphql.scalars
 
-@Suppress("unused")
-@Component
-class Query(private val dao: DevFeedDao) : GraphQLQueryResolver {
+import com.netflix.graphql.dgs.DgsComponent
+import com.netflix.graphql.dgs.DgsRuntimeWiring
+import graphql.Scalars
+import graphql.schema.idl.RuntimeWiring
 
-  fun articleDates(limit: Int?, offset: Long?) = dao.getArticlesDates(limit, offset)
+@DgsComponent
+class LongScalarRegistration {
 
-  fun articles(limit: Int?, offset: Long?, filter: ArticleFilter?) =
-      dao.getArticles(limit, offset, filter)
-
-  fun recentArticles(limit: Int?, offset: Long?) = dao.getRecentArticles(limit, offset)
-
-  fun allButRecentArticles(limit: Int?, offset: Long?, filter: ArticleFilter?) =
-      dao.allButRecentArticles(limit, offset, filter)
-
-  fun tags(limit: Int?, offset: Long?, search: List<String>?) = dao.getTags(limit, offset, search)
-
-  fun articlesWithNoScreenshots() = dao.getArticlesWithNoScreenshots()
+  @DgsRuntimeWiring
+  fun addScalar(builder: RuntimeWiring.Builder) = builder.scalar(Scalars.GraphQLLong)
 }
