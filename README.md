@@ -32,19 +32,51 @@ The tech stack is rather simple:
 
 ### Building and running
 
-1. Clone the repo
+#### Using the Backend GraphQL API
 
-```sh
-git clone https://github.com/rm3l/dev-feed && cd dev-feed
+##### Docker
+
+A Docker repository with the GraphQL API Server can be found here: https://hub.docker.com/r/rm3l/dev-feed-api
+
+To fetch the docker image, run:
+
+```bash
+docker image pull rm3l/dev-feed-api
 ```
 
-2. Build the Backend
+To run the server with the default options and expose it on port 8080:
+
+```bash
+docker container run --rm -p 8080:8080 rm3l/dev-feed-api
+```
+
+You can then access the GraphiQL browser by heading to http://localhost:8080/graphiql
+
+##### Kubernetes
+
+The Backend API is also published to [my Helm Charts repository](https://helm-charts.rm3l.org/), so as to be deployable to a Kubernetes Cluster using [Helm](https://helm.sh/).
+
+It is listed on Artifact Hub : https://artifacthub.io/packages/helm/rm3l/dev-feed
+
+```bash
+$ helm repo add rm3l https://helm-charts.rm3l.org
+$ helm install my-dev-feed rm3l/dev-feed
+```
+
+See https://artifacthub.io/packages/helm/rm3l/dev-feed or https://github.com/rm3l/helm-charts/blob/main/charts/dev-feed/README.md for
+all customizable values.
+
+You can then access the GraphiQL browser by heading to http://localhost:8080/graphiql
+
+##### Manual mode
+
+1. Build the Backend
 
 ```sh
 ./backend/gradlew -p ./backend build --stacktrace
 ```
 
-3. Run the Backend GraphQL API
+2. Run the Backend GraphQL API
 
 ```sh
 java -jar backend/api/build/libs/dev-feed-api-1.8.0.jar
@@ -52,9 +84,11 @@ java -jar backend/api/build/libs/dev-feed-api-1.8.0.jar
 
 You can then access the GraphiQL browser by heading to http://localhost:8080/graphiql
 
-4. Install Flutter by following the instructions on the [official website](https://flutter.dev/docs/get-started/install)
+#### Using the Mobile application
 
-5. Prepare the configuration environment
+1. Install Flutter by following the instructions on the [official website](https://flutter.dev/docs/get-started/install)
+
+2. Prepare the configuration environment
 
 Skip this to use the default Heroku Backend. Otherwise, if you have a custom Backend (either local or remote), you need to create a specific environment file (say `my_personal_backend.dart`) in the `mobile/lib/environments` folder, e.g.:
 
@@ -68,7 +102,7 @@ class MyPersonalBackend extends Env {
 }
 ```
 
-6. Build the mobile apps
+3. Build the mobile apps
 
 First `cd` to the `mobile` directory:
 
@@ -79,18 +113,18 @@ cd mobile
 If you simply want to target the default Heroku backend, just run:
 
 ```sh
-flutter build apk
+flutter build apk --debug
 ```
 
 Otherwise, if you have a custom Backend (and its related Dart environment file) declared under `mobile/lib/environments/my_personal_backend.dart`, then run:
 
 ```sh
-flutter build apk -t lib/environments/my_personal_backend.dart
+flutter build apk --debug -t lib/environments/my_personal_backend.dart
 ```
 
-You will then find the mobile applications built under the respective platform folders. For example, the APK for Android can be found under `build/app/outputs/apk/`.
+You will then find the mobile applications built under the respective platform folders. For example, the APK for Android can be found under `build/app/outputs/apk/debug/`.
 
-7. Install and run the APK either in an emulator or in a real device
+4. Install and run the APK either in an emulator or in a real device
 
 ```sh
 flutter install
@@ -99,7 +133,7 @@ flutter install
 Or:
 
 ```sh
-adb install -r build/app/outputs/apk/app.apk
+adb install -r build/app/outputs/apk/debug/app-debug.apk
 ```
 
 ## Contribution Guidelines
@@ -112,6 +146,7 @@ However, please make sure your description is clear enough and has sufficient in
 
 ## Credits / Inspiration
 
+* [EngineeringBlogs.xyz](https://engineeringblogs.xyz/)
 * [DiscoverDev.io](https://www.discoverdev.io/)
 
 ## Developed by
