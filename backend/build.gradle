@@ -38,7 +38,7 @@ subprojects {
     apply plugin: "org.jetbrains.kotlin.jvm"
 
     group = 'org.rm3l'
-    version = '1.7.1'
+    version = '1.8.0'
 
     repositories {
         jcenter()
