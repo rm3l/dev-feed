@@ -103,6 +103,12 @@ def getVersionCodeAndName = {
         return [versionCode, versionName]
 }
 
+java {
+    toolchain{
+        languageVersion = JavaLanguageVersion.of(16)
+    }
+}
+
 android {
     compileSdkVersion android_sdk
     buildToolsVersion buildTools_version

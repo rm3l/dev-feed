@@ -39,13 +39,17 @@ subprojects {
 
     group = 'org.rm3l'
     version = '1.7.1'
-    sourceCompatibility = 15
-    targetCompatibility = 15
 
     repositories {
         jcenter()
         mavenCentral()
         maven { url "https://jitpack.io" }
+    }
+
+    java {
+        toolchain{
+            languageVersion = JavaLanguageVersion.of(16)
+        }
     }
 
     compileKotlin {
