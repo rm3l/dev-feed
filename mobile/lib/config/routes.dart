@@ -34,7 +34,7 @@ class Routes {
   static final _tagLookupHandler = Handler(
       handlerFunc: (context, parameters) => TagLookup(parameters["id"][0]));
 
-  static void configureRoutes(Router router) {
+  static void configureRoutes(FluroRouter router) {
     router.notFoundHandler = _notFoundHandler;
     router.define("/", handler: _rootHandler);
 

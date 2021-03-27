@@ -1,4 +1,4 @@
-import 'package:fluro/src/router.dart' as fluro_router;
+import 'package:fluro/fluro.dart';
 import 'package:dev_feed/config/application.dart';
 import 'package:dev_feed/config/routes.dart';
 import 'package:flutter/material.dart';
@@ -20,7 +20,7 @@ class Env {
 
     value = this;
 
-    final router = fluro_router.Router();
+    final router = FluroRouter();
     Routes.configureRoutes(router);
     Application.router = router;
 
