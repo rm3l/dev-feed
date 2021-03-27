@@ -23,6 +23,9 @@
 name: dev_feed
 description: A Flutter-based mobile app displaying a list of daily curated content from top engineering blogs and articles.
 
+environment:
+  sdk: '>=2.10.0 <3.0.0'
+
 dependencies:
   flutter:
     sdk: flutter
@@ -30,7 +33,7 @@ dependencies:
   # The following adds the Cupertino Icons font to your application.
   # Use with the CupertinoIcons class for iOS style icons.
   cupertino_icons: "^1.0.0"
-  transparent_image: "^1.0.0"
+  transparent_image: ^2.0.0
 
 #  flutter_redux: "^0.5.3"
 
@@ -39,12 +42,12 @@ dependencies:
 #  tuple: "^1.0.2""
 
   flutter_custom_tabs: "^0.6.0"
-  shared_preferences: "^0.5.12"
+  shared_preferences: ^2.0.5
 #  mocha: "^0.0.2"
 
   flutter_calendar: "^0.0.9"
 
-  fluro: "^1.6.3"
+  fluro: ^2.0.3
   pigment: "^1.0.3"
 
   app_review: "^2.0.1"
