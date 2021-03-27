@@ -23,6 +23,9 @@
 name: dev_feed
 description: A Flutter-based mobile app displaying a list of daily curated content from top engineering blogs and articles.
 
+environment:
+  sdk: '>=2.10.0 <3.0.0'
+
 dependencies:
   flutter:
     sdk: flutter
