@@ -26,13 +26,12 @@ jobs:
       with:
         java-version: 15
 
-    - uses: actions/cache@master
-      #Using master because of the multi-paths feature (reportedly only available on master at the moment)
+    - uses: actions/cache@v2
       with:
         path: |
-          ~/.gradle/wrapper
           ~/.gradle/caches
-        key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle*') }}
+          ~/.gradle/wrapper
+        key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle*', '**/gradle-wrapper.properties') }}
         restore-keys: |
           ${{ runner.os }}-gradle-
 
@@ -72,15 +71,14 @@ jobs:
         with:
           username: ${{ secrets.DOCKER_HUB_USERNAME }}
           password: ${{ secrets.DOCKER_HUB_PASSWORD }}
-
-      - uses: actions/cache@master
-        #Using master because of the multi-paths feature (reportedly only available on master at the moment)
+            
+      - uses: actions/cache@v2
         with:
           path: |
-            ~/.gradle/wrapper
             ~/.gradle/caches
+            ~/.gradle/wrapper
             application/build/jib-cache
-          key: ${{ runner.os }}-jib-${{ hashFiles('**/*.gradle*') }}
+          key: ${{ runner.os }}-jib-${{ hashFiles('**/*.gradle*', '**/gradle-wrapper.properties') }}
           restore-keys: |
             ${{ runner.os }}-gradle-
 
