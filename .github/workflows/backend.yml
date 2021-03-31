@@ -26,7 +26,7 @@ jobs:
       with:
         java-version: 15
 
-    - uses: actions/cache@v2
+    - uses: actions/cache@v2.1.4
       with:
         path: |
           ~/.gradle/caches
@@ -72,7 +72,7 @@ jobs:
           username: ${{ secrets.DOCKER_HUB_USERNAME }}
           password: ${{ secrets.DOCKER_HUB_PASSWORD }}
             
-      - uses: actions/cache@v2
+      - uses: actions/cache@v2.1.4
         with:
           path: |
             ~/.gradle/caches
