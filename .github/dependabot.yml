@@ -10,16 +10,16 @@ updates:
   - rm3l
   labels:
   - dependencies
-# - package-ecosystem: gradle
-#   directory: "/mobile/android/app"
-#   schedule:
-#     interval: weekly
-#     time: '04:00'
-#   open-pull-requests-limit: 10
-#   reviewers:
-#   - rm3l
-#   labels:
-#   - dependencies
+- package-ecosystem: gradle
+  directory: "/mobile/android/app"
+  schedule:
+    interval: weekly
+    time: '04:00'
+  open-pull-requests-limit: 10
+  reviewers:
+  - rm3l
+  labels:
+  - dependencies
 - package-ecosystem: gradle
   directory: "/mobile/android"
   schedule:
@@ -40,106 +40,106 @@ updates:
   - rm3l
   labels:
   - dependencies
-# - package-ecosystem: gradle
-#   directory: "/backend/api"
-#   schedule:
-#     interval: weekly
-#     time: '04:00'
-#   open-pull-requests-limit: 10
-#   reviewers:
-#   - rm3l
-#   labels:
-#   - dependencies
-# - package-ecosystem: gradle
-#   directory: "/backend/article-parser"
-#   schedule:
-#     interval: weekly
-#     time: '04:00'
-#   open-pull-requests-limit: 10
-#   reviewers:
-#   - rm3l
-#   labels:
-#   - dependencies
-# - package-ecosystem: gradle
-#   directory: "/backend/common"
-#   schedule:
-#     interval: weekly
-#     time: '04:00'
-#   open-pull-requests-limit: 10
-#   reviewers:
-#   - rm3l
-#   labels:
-#   - dependencies
-# - package-ecosystem: gradle
-#   directory: "/backend/crawlers/common"
-#   schedule:
-#     interval: weekly
-#     time: '04:00'
-#   open-pull-requests-limit: 10
-#   reviewers:
-#   - rm3l
-#   labels:
-#   - dependencies
-# - package-ecosystem: gradle
-#   directory: "/backend/crawlers/cli"
-#   schedule:
-#     interval: weekly
-#     time: '04:00'
-#   open-pull-requests-limit: 10
-#   reviewers:
-#   - rm3l
-#   labels:
-#   - dependencies
-# - package-ecosystem: gradle
-#   directory: "/backend/crawlers/discoverdev.io"
-#   schedule:
-#     interval: weekly
-#     time: '04:00'
-#   open-pull-requests-limit: 10
-#   reviewers:
-#   - rm3l
-#   labels:
-#   - dependencies
-# - package-ecosystem: gradle
-#   directory: "/backend/crawlers/engineeringblogs.xyz"
-#   schedule:
-#     interval: weekly
-#     time: '04:00'
-#   open-pull-requests-limit: 10
-#   reviewers:
-#   - rm3l
-#   labels:
-#   - dependencies
-# - package-ecosystem: gradle
-#   directory: "/backend/crawlers/rm3l.org"
-#   schedule:
-#     interval: weekly
-#     time: '04:00'
-#   open-pull-requests-limit: 10
-#   reviewers:
-#   - rm3l
-#   labels:
-#   - dependencies
-# - package-ecosystem: gradle
-#   directory: "/backend/persistence"
-#   schedule:
-#     interval: weekly
-#     time: '04:00'
-#   open-pull-requests-limit: 10
-#   reviewers:
-#   - rm3l
-#   labels:
-#   - dependencies
-# - package-ecosystem: gradle
-#   directory: "/backend/screenshot"
-#   schedule:
-#     interval: weekly
-#     time: '04:00'
-#   open-pull-requests-limit: 10
-#   reviewers:
-#   - rm3l
-#   labels:
-#   - dependencies
+- package-ecosystem: gradle
+  directory: "/backend/api"
+  schedule:
+    interval: weekly
+    time: '04:00'
+  open-pull-requests-limit: 10
+  reviewers:
+  - rm3l
+  labels:
+  - dependencies
+- package-ecosystem: gradle
+  directory: "/backend/article-parser"
+  schedule:
+    interval: weekly
+    time: '04:00'
+  open-pull-requests-limit: 10
+  reviewers:
+  - rm3l
+  labels:
+  - dependencies
+- package-ecosystem: gradle
+  directory: "/backend/common"
+  schedule:
+    interval: weekly
+    time: '04:00'
+  open-pull-requests-limit: 10
+  reviewers:
+  - rm3l
+  labels:
+  - dependencies
+- package-ecosystem: gradle
+  directory: "/backend/crawlers/common"
+  schedule:
+    interval: weekly
+    time: '04:00'
+  open-pull-requests-limit: 10
+  reviewers:
+  - rm3l
+  labels:
+  - dependencies
+- package-ecosystem: gradle
+  directory: "/backend/crawlers/cli"
+  schedule:
+    interval: weekly
+    time: '04:00'
+  open-pull-requests-limit: 10
+  reviewers:
+  - rm3l
+  labels:
+  - dependencies
+- package-ecosystem: gradle
+  directory: "/backend/crawlers/discoverdev.io"
+  schedule:
+    interval: weekly
+    time: '04:00'
+  open-pull-requests-limit: 10
+  reviewers:
+  - rm3l
+  labels:
+  - dependencies
+- package-ecosystem: gradle
+  directory: "/backend/crawlers/engineeringblogs.xyz"
+  schedule:
+    interval: weekly
+    time: '04:00'
+  open-pull-requests-limit: 10
+  reviewers:
+  - rm3l
+  labels:
+  - dependencies
+- package-ecosystem: gradle
+  directory: "/backend/crawlers/rm3l.org"
+  schedule:
+    interval: weekly
+    time: '04:00'
+  open-pull-requests-limit: 10
+  reviewers:
+  - rm3l
+  labels:
+  - dependencies
+- package-ecosystem: gradle
+  directory: "/backend/persistence"
+  schedule:
+    interval: weekly
+    time: '04:00'
+  open-pull-requests-limit: 10
+  reviewers:
+  - rm3l
+  labels:
+  - dependencies
+- package-ecosystem: gradle
+  directory: "/backend/screenshot"
+  schedule:
+    interval: weekly
+    time: '04:00'
+  open-pull-requests-limit: 10
+  reviewers:
+  - rm3l
+  labels:
+  - dependencies
 - package-ecosystem: docker
   directory: "/backend"
   schedule:
