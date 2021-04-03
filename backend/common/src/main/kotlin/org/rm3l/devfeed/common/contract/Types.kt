@@ -24,9 +24,10 @@
 package org.rm3l.devfeed.common.contract
 
 import java.net.URL
+import java.util.UUID
 
 data class Article(
-    val id: String? = null,
+    var id: String? = UUID.randomUUID().toString(),
     val timestamp: Long = System.currentTimeMillis(),
     val title: String,
     val description: String? = null,

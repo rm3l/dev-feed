@@ -25,9 +25,11 @@
 package org.rm3l.devfeed.config
 
 import org.rm3l.devfeed.persistence.DevFeedDao
+import org.rm3l.devfeed.persistence.impl.mongodb.DevFeedMongoDbDao
 import org.rm3l.devfeed.persistence.impl.rdbms.DevFeedRdbmsDao
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.beans.factory.annotation.Value
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 import org.springframework.http.converter.json.Jackson2ObjectMapperBuilder
@@ -36,7 +38,8 @@ import org.springframework.http.converter.json.Jackson2ObjectMapperBuilder
 class DevFeedDaoConfiguration {
 
   @Bean(destroyMethod = "close")
-  fun devFeedDao(
+  @ConditionalOnProperty(name = ["datasource.type"], havingValue = "rdbms", matchIfMissing = true)
+  fun rdbmsDevFeedDao(
       @Value("\${datasource.url}") datasourceUrl: String,
       @Value("\${datasource.driver}") datasourceDriver: String,
       @Value("\${datasource.user}") datasourceUser: String,
@@ -51,4 +54,11 @@ class DevFeedDaoConfiguration {
           datasourcePassword = datasourcePassword,
           datasourcePoolSize = datasourcePoolSize.toInt(),
           objectMapper = jackson2ObjectMapperBuilder.build())
+
+  @Bean(destroyMethod = "close")
+  @ConditionalOnProperty(
+      name = ["datasource.type"], havingValue = "mongodb", matchIfMissing = false)
+  fun mongodbDevFeedDao(
+      @Value("\${datasource.mongodb.connectionString}") datasourceMongoDbConnectionString: String
+  ): DevFeedDao = DevFeedMongoDbDao(datasourceMongoDbConnectionString)
 }
