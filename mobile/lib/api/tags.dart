@@ -33,7 +33,8 @@ class TagsClient {
 
   TagsClient._internal();
 
-  Future<List<String>> _getTags(String graphqlQuery, String queryKey, {bool withCache = true}) async {
+  Future<List<String>> _getTags(String graphqlQuery, String queryKey,
+      {bool withCache = true}) async {
     var map = await issueGraphQLQuery(graphqlQuery, withCache: withCache);
     final dataMap = map["data"];
     var tagsList = dataMap[queryKey];
@@ -42,14 +43,18 @@ class TagsClient {
     }
     List<String> result = [];
     for (var tag in tagsList) {
-      result.add(tag.toString());
+      if (tag.toString().length >= 2) {
+        //At least '#<something>'
+        result.add(tag.toString());
+      }
     }
     result
         .sort((tag1, tag2) => tag1.toLowerCase().compareTo(tag2.toLowerCase()));
     return result;
   }
 
-  Future<List<String>> getTags({int limit, int offset, String search, bool withCache = true}) async {
+  Future<List<String>> getTags(
+      {int limit, int offset, String search, bool withCache = true}) async {
     String query = "query { \n "
         " tags";
     if (limit != null ||
