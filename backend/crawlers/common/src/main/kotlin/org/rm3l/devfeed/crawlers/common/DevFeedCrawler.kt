@@ -36,7 +36,7 @@ abstract class DevFeedCrawler : Callable<Collection<Article>> {
     @JvmStatic
     fun buildCliArgs(crawlerType: KClass<out DevFeedCrawler>, args: Array<String>): List<String> {
       if (args.isEmpty()) {
-        throw IllegalArgumentException("Please specify a subcommand, e.g.: rdbms")
+        throw IllegalArgumentException("Please specify a subcommand, e.g.: rdbms or mongo")
       }
       val argsList = args.toMutableList()
       val crawlerOption = "--crawler=${crawlerType.qualifiedName}"

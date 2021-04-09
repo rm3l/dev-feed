@@ -25,6 +25,7 @@
 // @file:JvmName("DevFeedCrawlerCliRunner")
 package org.rm3l.devfeed.crawlers.cli
 
+import org.rm3l.devfeed.crawlers.cli.mongodb.DevFeedCrawlerCliMongo
 import org.rm3l.devfeed.crawlers.cli.rdbms.DevFeedCrawlerCliRdbms
 import picocli.CommandLine
 import picocli.CommandLine.Model.CommandSpec
@@ -34,7 +35,7 @@ import picocli.CommandLine.ParameterException
     description = ["Fetch articles"],
     mixinStandardHelpOptions = true,
     version = ["1.8.0"],
-    subcommands = [DevFeedCrawlerCliRdbms::class])
+    subcommands = [DevFeedCrawlerCliRdbms::class, DevFeedCrawlerCliMongo::class])
 class DevFeedCrawlerCliRunner : Runnable {
 
   @CommandLine.Spec lateinit var spec: CommandSpec
