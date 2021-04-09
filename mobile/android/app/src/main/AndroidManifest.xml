@@ -39,6 +39,7 @@ SOFTWARE.
     <application
         android:label="Dev Feed"
         android:icon="@mipmap/ic_launcher"
+        android:usesCleartextTraffic="true"
         allowBackup="true">
         <activity
             android:name="io.flutter.embedding.android.FlutterActivity"
