@@ -727,10 +727,14 @@ class DevFeedRdbmsDao(
     if (datasource.isClosed) {
       throw java.lang.IllegalStateException("Datasource is closed")
     }
+    val currentTimestamp = System.currentTimeMillis()
     val result = mutableListOf<Article>()
     transaction {
       Articles.slice(Articles.timestamp)
-          .selectAll()
+          .select {
+            // #198 : Filter out articles that have a timestamp in the future
+            Articles.timestamp lessEq currentTimestamp
+          }
           .orderBy(Articles.timestamp, order = SortOrder.DESC)
           .limit(1)
           .withDistinct()
