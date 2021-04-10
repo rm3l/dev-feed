@@ -290,7 +290,14 @@ class DevFeedMongoDbDao(private val connectionString: String) : DevFeedDao {
   }
 
   override fun getRecentArticles(limit: Int?, offset: Long?): Collection<Article> {
-    val articlesByTimestampDesc = getArticles(limit, offset).sortedByDescending { it.timestamp }
+    val currentTimestamp = System.currentTimeMillis()
+    val articlesByTimestampDesc =
+        getArticles(limit, offset)
+            .filter {
+              // #198 : Filter out articles that have a timestamp in the future
+              it.timestamp <= currentTimestamp
+            }
+            .sortedByDescending { it.timestamp }
     if (articlesByTimestampDesc.isEmpty()) {
       return listOf()
     }
