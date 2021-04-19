@@ -29,6 +29,6 @@ description = 'DevFeed Persistence APIs'
 
 dependencies {
     api project(':dev-feed-common')
-    implementation 'com.fasterxml.jackson.core:jackson-databind:2.12.2'
+    implementation 'com.fasterxml.jackson.core:jackson-databind:2.12.3'
     implementation 'org.litote.kmongo:kmongo:4.2.6'
 }
