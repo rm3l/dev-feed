@@ -18,8 +18,8 @@ jobs:
         java-version: '16'
     - uses: subosito/flutter-action@v1
       with:
-        # channel: 'stable'
-        flutter-version: '2.0.5'
+        channel: 'beta'
+        flutter-version: '2.2.0-10.1.pre'
     - name: Get Flutter packages
       run: |
         cd mobile
