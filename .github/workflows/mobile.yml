@@ -32,9 +32,9 @@ jobs:
       run: |
         cd mobile
         flutter build apk --debug
-    - name: Archive artifacts
-      uses: actions/upload-artifact@v2
-      with:
-        name: APKs
-        path: mobile/build/app/outputs/apk/debug/app-*.apk
+#   - name: Archive artifacts
+#     uses: actions/upload-artifact@v2
+#     with:
+#       name: APKs
+#       path: mobile/build/app/outputs/apk/debug/app-*.apk
 
