@@ -108,7 +108,7 @@ subprojects {
 
         implementation 'khttp:khttp:1.0.0'
 
-        implementation('com.github.chimbori:crux:2.2.0')
+        implementation('com.github.chimbori:crux:3.0.1')
 
         implementation "com.rometools:rome-opml:1.15.0"
 
