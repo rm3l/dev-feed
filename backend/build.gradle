@@ -104,7 +104,7 @@ subprojects {
         implementation 'org.xerial:sqlite-jdbc:3.34.0'
         implementation 'com.h2database:h2:1.4.200'
         implementation 'org.postgresql:postgresql:42.2.20'
-        implementation 'org.mariadb.jdbc:mariadb-java-client:2.7.2'
+        implementation 'org.mariadb.jdbc:mariadb-java-client:2.7.3'
 
         implementation 'khttp:khttp:1.0.0'
 
