@@ -24,6 +24,15 @@
 
 package org.rm3l.devfeed.articleparser.impl
 
+import io.ktor.client.HttpClient
+import io.ktor.client.engine.apache.Apache
+import io.ktor.client.features.json.JacksonSerializer
+import io.ktor.client.features.json.JsonFeature
+import io.ktor.client.request.accept
+import io.ktor.client.request.get
+import io.ktor.client.request.header
+import io.ktor.http.ContentType
+import kotlinx.coroutines.runBlocking
 import org.rm3l.devfeed.common.articleparser.ArticleExtractor
 import org.rm3l.devfeed.common.contract.Article
 import org.rm3l.devfeed.common.contract.ArticleParsed
@@ -51,34 +60,35 @@ class DocumentParserApiArticleExtractor(
           if (logger.isDebugEnabled) {
             logger.debug("Getting article extraction data from url: $url")
           }
-          val articleExtractionJsonObject =
-              khttp.get(
-                      url,
-                      headers =
-                          mapOf(
-                              "Content-Type" to "application/json",
-                              "subscription-key" to documentParserApiKey))
-                  .jsonObject
+          val client =
+              HttpClient(Apache) {
+                engine { followRedirects = true }
+                install(JsonFeature) { serializer = JacksonSerializer() }
+              }
+          val articleExtractionJsonObject = runBlocking {
+            client.get<Map<String, Any>>(url) {
+              accept(ContentType.Application.Json)
+              header("subscription-key", documentParserApiKey)
+            }
+          }
 
-          val parsedImage = articleExtractionJsonObject.optString("image")
+          val parsedImage = articleExtractionJsonObject["image"] as String?
 
           article.parsed =
               ArticleParsed(
                   url = article.url,
-                  title = articleExtractionJsonObject.optString("title"),
-                  published = articleExtractionJsonObject.optString("published"),
-                  author = articleExtractionJsonObject.optString("author"),
+                  title = articleExtractionJsonObject["title"] as String?,
+                  published = articleExtractionJsonObject["published"] as String?,
+                  author = articleExtractionJsonObject["author"] as String?,
                   image = if (parsedImage.isNullOrBlank()) null else parsedImage,
-                  description = articleExtractionJsonObject.optString("description"),
-                  body = articleExtractionJsonObject.optString("body"),
+                  description = articleExtractionJsonObject["description"] as String?,
+                  body = articleExtractionJsonObject["body"] as String,
                   videos =
-                      articleExtractionJsonObject
-                          .optJSONArray("videos")
+                      (articleExtractionJsonObject["videos"] as List<Any?>?)
                           ?.map { it.toString() }
                           ?.toSet(),
                   keywords =
-                      articleExtractionJsonObject
-                          .optJSONArray("keywords")
+                      (articleExtractionJsonObject["keywords"] as List<Any?>?)
                           ?.map { it.toString() }
                           ?.toSet())
         }
