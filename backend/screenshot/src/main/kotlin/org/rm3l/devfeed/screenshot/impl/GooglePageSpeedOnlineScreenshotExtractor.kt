@@ -69,42 +69,38 @@ class GooglePageSpeedOnlineScreenshotExtractor(
     try {
       // Check if (title, url) pair already exist in the DB
       if (dao.shouldRequestScreenshot(article.title, article.url)) {
-        val client = HttpClient(Apache) {
-          engine {
-            followRedirects = true
-            connectTimeout = pageSpeedOnlineTimeoutSeconds
-            socketTimeout = pageSpeedOnlineTimeoutSeconds
-          }
-          install(JsonFeature) {
-            serializer = JacksonSerializer()
-          }
-        }
-        val getRequest =
-          runBlocking {
-            client.get<Map<String, Any>>(url) {
-              accept(ContentType.Application.Json)
+        val client =
+            HttpClient(Apache) {
+              engine {
+                followRedirects = true
+                connectTimeout = pageSpeedOnlineTimeoutSeconds
+                socketTimeout = pageSpeedOnlineTimeoutSeconds
+              }
+              install(JsonFeature) { serializer = JacksonSerializer() }
             }
-          }
+        val getRequest = runBlocking {
+          client.get<Map<String, Any>>(url) { accept(ContentType.Application.Json) }
+        }
 
         @Suppress("UNCHECKED_CAST")
         val screenshotJsonObject: Map<String, Any?>? =
-          (((getRequest.get("lighthouseResult") as Map<String, Any?>?)
-            ?.get("audits") as Map<String, Any?>?)
-            ?.get("final-screenshot") as Map<String, Any?>?)
-            ?.get("details") as Map<String, Any?>?
-        //Weird, but for reasons best known to Google, / is replaced with _, and +
+            (((getRequest.get("lighthouseResult") as Map<String, Any?>?)?.get("audits") as
+                        Map<String, Any?>?)
+                    ?.get("final-screenshot") as
+                    Map<String, Any?>?)
+                ?.get("details") as
+                Map<String, Any?>?
+        // Weird, but for reasons best known to Google, / is replaced with _, and +
         // is replaced with -
-        val base64ImageData = (screenshotJsonObject?.get("data") as String?)
-          ?.replace("_", "/")
-          ?.replace("-", "+")
+        val base64ImageData =
+            (screenshotJsonObject?.get("data") as String?)?.replace("_", "/")?.replace("-", "+")
         val mimeType = screenshotJsonObject?.get("mime_type") as String?
         val height = screenshotJsonObject?.get("height") as Int?
         val width = screenshotJsonObject?.get("width") as Int?
         if (!base64ImageData.isNullOrBlank()) {
-          article.screenshot = Screenshot(data = base64ImageData,
-            mimeType = mimeType,
-            width = width,
-            height = height)
+          article.screenshot =
+              Screenshot(
+                  data = base64ImageData, mimeType = mimeType, width = width, height = height)
         }
       }
     } catch (e: Exception) {

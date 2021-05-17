@@ -60,35 +60,37 @@ class DocumentParserApiArticleExtractor(
           if (logger.isDebugEnabled) {
             logger.debug("Getting article extraction data from url: $url")
           }
-          val client = HttpClient(Apache) {
-            engine {
-              followRedirects = true
-            }
-            install(JsonFeature) {
-              serializer = JacksonSerializer()
+          val client =
+              HttpClient(Apache) {
+                engine { followRedirects = true }
+                install(JsonFeature) { serializer = JacksonSerializer() }
+              }
+          val articleExtractionJsonObject = runBlocking {
+            client.get<Map<String, Any>>(url) {
+              accept(ContentType.Application.Json)
+              header("subscription-key", documentParserApiKey)
             }
           }
-          val articleExtractionJsonObject =
-            runBlocking {
-              client.get<Map<String, Any>>(url) {
-                accept(ContentType.Application.Json)
-                header("subscription-key", documentParserApiKey)
-              }
-            }
 
           val parsedImage = articleExtractionJsonObject["image"] as String?
 
-          article.parsed = ArticleParsed(
-            url = article.url,
-            title = articleExtractionJsonObject["title"] as String?,
-            published = articleExtractionJsonObject["published"] as String?,
-            author = articleExtractionJsonObject["author"] as String?,
-            image = if (parsedImage.isNullOrBlank()) null else parsedImage,
-            description = articleExtractionJsonObject["description"] as String?,
-            body = articleExtractionJsonObject["body"] as String,
-            videos = (articleExtractionJsonObject["videos"] as List<Any?>?) ?.map { it.toString() }?.toSet(),
-            keywords = (articleExtractionJsonObject["keywords"] as List<Any?>?)?.map { it.toString() }?.toSet()
-          )
+          article.parsed =
+              ArticleParsed(
+                  url = article.url,
+                  title = articleExtractionJsonObject["title"] as String?,
+                  published = articleExtractionJsonObject["published"] as String?,
+                  author = articleExtractionJsonObject["author"] as String?,
+                  image = if (parsedImage.isNullOrBlank()) null else parsedImage,
+                  description = articleExtractionJsonObject["description"] as String?,
+                  body = articleExtractionJsonObject["body"] as String,
+                  videos =
+                      (articleExtractionJsonObject["videos"] as List<Any?>?)
+                          ?.map { it.toString() }
+                          ?.toSet(),
+                  keywords =
+                      (articleExtractionJsonObject["keywords"] as List<Any?>?)
+                          ?.map { it.toString() }
+                          ?.toSet())
         }
       } catch (e: Exception) {
         if (logger.isDebugEnabled) {
