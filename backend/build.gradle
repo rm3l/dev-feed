@@ -22,7 +22,7 @@
  * SOFTWARE.
  */
 plugins {
-    id "com.diffplug.spotless" version "5.13.0"
+    id "com.diffplug.spotless" version "5.14.0"
     id "org.jetbrains.kotlin.jvm" version "1.5.10"
     id "org.jetbrains.kotlin.plugin.allopen" version "1.5.10"
 }
