@@ -113,7 +113,7 @@ subprojects {
 
         implementation('com.github.chimbori:crux:3.0.1')
 
-        implementation "com.rometools:rome-opml:1.15.0"
+        implementation "com.rometools:rome-opml:1.16.0"
 
         testImplementation(platform('org.junit:junit-bom:5.7.2'))
         testImplementation('org.junit.jupiter:junit-jupiter')
