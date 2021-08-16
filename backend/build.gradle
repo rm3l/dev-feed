@@ -103,7 +103,7 @@ subprojects {
         implementation 'org.xerial:sqlite-jdbc:3.36.0.1'
         implementation 'com.h2database:h2:1.4.200'
         implementation 'org.postgresql:postgresql:42.2.23'
-        implementation 'org.mariadb.jdbc:mariadb-java-client:2.7.3'
+        implementation 'org.mariadb.jdbc:mariadb-java-client:2.7.4'
 
         implementation "io.ktor:ktor-client-core:1.6.1"
         //Using Apache Engine Ktor engine, because it is at this time the only one that supports following redirects
