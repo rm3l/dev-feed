@@ -27,7 +27,7 @@ jobs:
         distribution: 'zulu'
         java-version: 16
 
-    - uses: actions/cache@v2.1.6
+    - uses: actions/cache@v2.1.7
       with:
         path: |
           ~/.gradle/caches
@@ -74,7 +74,7 @@ jobs:
           username: ${{ secrets.DOCKER_HUB_USERNAME }}
           password: ${{ secrets.DOCKER_HUB_PASSWORD }}
             
-      - uses: actions/cache@v2.1.6
+      - uses: actions/cache@v2.1.7
         with:
           path: |
             ~/.gradle/caches
