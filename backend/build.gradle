@@ -47,22 +47,22 @@ subprojects {
 
     java {
         toolchain{
-            languageVersion = JavaLanguageVersion.of(16)
+            languageVersion = JavaLanguageVersion.of(17)
         }
     }
 
     compileKotlin {
         kotlinOptions {
-            languageVersion = "1.4"
+            languageVersion = "1.6"
             freeCompilerArgs = ["-Xjsr305=strict", "-Xopt-in=kotlin.RequiresOptIn"]
-            jvmTarget = JavaVersion.VERSION_15.majorVersion
+            jvmTarget = JavaVersion.VERSION_17.majorVersion
         }
     }
     compileTestKotlin {
         kotlinOptions {
-            languageVersion = "1.4"
+            languageVersion = "1.6"
             freeCompilerArgs = ["-Xjsr305=strict", "-Xopt-in=kotlin.RequiresOptIn"]
-            jvmTarget = JavaVersion.VERSION_15.majorVersion
+            jvmTarget = JavaVersion.VERSION_17.majorVersion
         }
     }
 
