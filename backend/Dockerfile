@@ -21,7 +21,7 @@
 #SOFTWARE.
 
 # Build
-FROM adoptopenjdk:16-jdk-openj9 AS builder
+FROM eclipse-temurin:17 AS builder
 
 WORKDIR /dev-feed-backend
 
