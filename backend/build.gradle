@@ -23,7 +23,7 @@
  */
 plugins {
     id "com.diffplug.spotless" version "6.0.2"
-    id "org.jetbrains.kotlin.jvm" version "1.5.31"
+    id "org.jetbrains.kotlin.jvm" version "1.6.0"
     id "org.jetbrains.kotlin.plugin.allopen" version "1.6.0"
 }
 
@@ -77,7 +77,7 @@ subprojects {
         // configure<com.diffplug.gradle.spotless.SpotlessExtension> {
         kotlin {
             // by default the target is every '.kt' and '.kts` file in the java sourcesets
-            ktfmt()    // has its own section below
+            ktfmt("0.30")    // has its own section below
 //            ktlint()   // has its own section below
 //            diktat()   // has its own section below
 //            prettier() // has its own section below
