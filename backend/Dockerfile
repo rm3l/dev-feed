@@ -27,8 +27,11 @@ WORKDIR /dev-feed-backend
 
 COPY gradle /dev-feed-backend/gradle
 COPY api /dev-feed-backend/api
+COPY article-parser /dev-feed-backend/article-parser
 COPY common /dev-feed-backend/common
 COPY crawlers /dev-feed-backend/crawlers
+COPY persistence /dev-feed-backend/persistence
+COPY screenshot /dev-feed-backend/screenshot
 COPY build.gradle /dev-feed-backend/build.gradle
 COPY gradlew /dev-feed-backend/gradlew
 COPY gradlew.bat /dev-feed-backend/gradlew.bat
