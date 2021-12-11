@@ -36,11 +36,11 @@ COPY settings.gradle /dev-feed-backend/settings.gradle
 
 ENV GRADLE_OPTS="-Dorg.gradle.daemon=false"
 
-RUN ./gradlew build --info
+RUN ./gradlew build
 
-FROM adoptopenjdk:16-jdk-openj9
+FROM eclipse-temurin:17
 
-COPY --from=builder /dev-feed-backend/api/build/libs/dev-feed-api-1.9.0.jar /app.jar
+COPY --from=builder /dev-feed-backend/api/build/libs/dev-feed-api-1.10.0.jar /app.jar
 
 # /graphql and /graphiql endpoints
 EXPOSE 8080
