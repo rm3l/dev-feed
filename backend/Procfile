@@ -1,1 +1,1 @@
-web: java -Dserver.port=$PORT -Dmanagement.port=$PORT -Dmanagement.security.enabled=true $JAVA_OPTS -Dcrawlers.task.fetch-articles.max-age-days=90 -jar api/build/libs/dev-feed-api-1.10.0.jar
+web: java -Dserver.port=$PORT -Dmanagement.port=$PORT -Dmanagement.security.enabled=true $JAVA_OPTS -Dcrawlers.task.fetch-articles.max-age-days=90 -jar api/build/libs/dev-feed-api-1.10.0-SNAPSHOT.jar

@@ -22,6 +22,7 @@
  * SOFTWARE.
  */
 plugins {
+    id "pl.allegro.tech.build.axion-release" version "1.13.6"
     id "com.diffplug.spotless" version "6.0.2"
     id "org.jetbrains.kotlin.jvm" version "1.6.0"
     id "org.jetbrains.kotlin.plugin.allopen" version "1.6.0"
@@ -32,13 +33,54 @@ repositories {
     maven { url "https://jitpack.io" }
 }
 
+scmVersion {
+    repository {
+        type = 'git'
+        directory = project.rootProject.file('../')
+    }
+    tag {
+        prefix = ''
+    }
+    hooks {
+        pre 'fileUpdate', [
+                files: [
+                        '../README.md'
+                ],
+                pattern: {v,p -> /dev-feed-api-<version>/},
+                replacement: {v, p -> "dev-feed-api-$v"}]
+        pre 'fileUpdate', [
+                files: [
+                        'Dockerfile',
+                        'Procfile'
+                ],
+                pattern: {v,p -> /dev-feed-api-$v-SNAPSHOT/},
+                replacement: {v, p -> "dev-feed-api-$v"}]
+        pre 'fileUpdate', [
+                files: [
+                        'build.sh',
+                        'run.sh'
+                ],
+                pattern: {v,p -> /dev-feed-api:latest/},
+                replacement: {v, p -> "dev-feed-api:$v"}]
+        pre 'fileUpdate', [
+                file: 'crawlers/cli/src/main/kotlin/org/rm3l/devfeed/crawlers/cli/DevFeedCrawlerCliRunner.kt',
+                pattern: {v,p -> /version = ["latest"]/},
+                replacement: {v, p -> "version = [\"$v\"]"}]
+        pre 'commit'
+    }
+}
+
+allprojects {
+    project.version = scmVersion.version
+}
+
 subprojects {
 
     apply plugin: "com.diffplug.spotless"
     apply plugin: "org.jetbrains.kotlin.jvm"
 
     group = 'org.rm3l'
-    version = '1.10.0'
+    version = rootProject.scmVersion.version
 
     repositories {
         mavenCentral()
