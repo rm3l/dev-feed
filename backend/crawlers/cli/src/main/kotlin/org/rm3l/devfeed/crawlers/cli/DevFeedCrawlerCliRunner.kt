@@ -45,7 +45,7 @@ class DevFeedCrawlerCliRunner : Runnable {
     private val cmd: CommandLine by lazy { CommandLine(DevFeedCrawlerCliRunner()) }
 
     @JvmStatic
-    fun main(args: Array<String>) {
+    fun main(vararg args: String) {
       if (args.isEmpty()) {
         showHelp()
       } else {

@@ -361,7 +361,7 @@ class DevFeedRdbmsDao(
       article
           .tags
           ?.filterNotNull()
-          ?.map { articleTag -> articleTag.toLowerCase().trim().replace("\\s".toRegex(), "-") }
+          ?.map { articleTag -> articleTag.lowercase().trim().replace("\\s".toRegex(), "-") }
           ?.map { articleTag -> if (articleTag.startsWith("#")) articleTag else "#$articleTag" }
           ?.map { articleTag ->
             if (!existTagByName(articleTag)) {

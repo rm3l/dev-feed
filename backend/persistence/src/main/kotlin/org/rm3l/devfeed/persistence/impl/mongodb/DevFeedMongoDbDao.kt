@@ -245,7 +245,7 @@ class DevFeedMongoDbDao(private val connectionString: String) : DevFeedDao {
         }
         findIterable = articleCollection.find()
       } else {
-        val filterToBson = Filters.and(filtersAsBsonList!!)
+        val filterToBson = Filters.and(filtersAsBsonList)
         findIterable =
             if (limit == null) {
               if (offset == null) {
