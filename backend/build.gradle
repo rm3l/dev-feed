@@ -57,7 +57,7 @@ scmVersion {
                         'build.sh',
                         'run.sh'
                 ],
-                pattern: {v,p -> /dev-feed-api:$v/},
+                pattern: {v,p -> /dev-feed-api\:$v/},
                 replacement: {v, p -> "dev-feed-api:$v"}]
         pre 'fileUpdate', [
                 file: 'crawlers/cli/src/main/kotlin/org/rm3l/devfeed/crawlers/cli/DevFeedCrawlerCliRunner.kt',
