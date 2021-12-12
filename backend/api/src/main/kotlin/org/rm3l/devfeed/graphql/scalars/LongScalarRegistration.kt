@@ -26,12 +26,11 @@ package org.rm3l.devfeed.graphql.scalars
 
 import com.netflix.graphql.dgs.DgsComponent
 import com.netflix.graphql.dgs.DgsRuntimeWiring
-import graphql.Scalars
+import graphql.scalars.ExtendedScalars.GraphQLLong
 import graphql.schema.idl.RuntimeWiring
 
 @DgsComponent
 class LongScalarRegistration {
 
-  @DgsRuntimeWiring
-  fun addScalar(builder: RuntimeWiring.Builder) = builder.scalar(Scalars.GraphQLLong)
+  @DgsRuntimeWiring fun addScalar(builder: RuntimeWiring.Builder) = builder.scalar(GraphQLLong)
 }
