@@ -64,7 +64,7 @@ jib {
         image = "${project.group}/${project.name}"
     }
     from {
-        image = 'openjdk:16-alpine'
+        image = 'openjdk:17-alpine'
     }
     container {
         labels = [
