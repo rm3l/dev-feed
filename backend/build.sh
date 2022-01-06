@@ -25,4 +25,4 @@
 
 set -eux
 
-docker image build -t org.rm3l/dev-feed-api:1.11.0 .
+docker image build -t org.rm3l/dev-feed-api:1.12.0 .
