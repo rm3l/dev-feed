@@ -43,7 +43,7 @@ RUN ./gradlew build
 
 FROM eclipse-temurin:17
 
-COPY --from=builder /dev-feed-backend/api/build/libs/dev-feed-api-1.12.0.jar /app.jar
+COPY --from=builder /dev-feed-backend/api/build/libs/dev-feed-api-1.12.1.jar /app.jar
 
 # /graphql and /graphiql endpoints
 EXPOSE 8080
