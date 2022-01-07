@@ -41,7 +41,7 @@ class Rm3lOrgCrawler : DevFeedCrawler() {
   companion object {
     @JvmStatic private val logger = LoggerFactory.getLogger(Rm3lOrgCrawler::class.java)
 
-    private const val RSS_FEED_URL = "https://rm3l.org/rss/"
+    private const val RSS_FEED_URL = "https://rm3l.org/rss"
   }
 
   @Throws(Exception::class)
