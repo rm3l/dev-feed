@@ -53,7 +53,7 @@ dependencies {
     implementation('org.springframework.boot:spring-boot-starter-web')
 
     // GraphQL and GraphiQL (via Netflix Data Graph Service (DGS))
-    implementation "com.netflix.graphql.dgs:graphql-dgs-spring-boot-starter:4.9.20"
+    implementation "com.netflix.graphql.dgs:graphql-dgs-spring-boot-starter:4.9.21"
     implementation "com.graphql-java:graphql-java-extended-scalars:17.0"
 
     testImplementation "org.springframework.boot:spring-boot-starter-test:2.6.4"
