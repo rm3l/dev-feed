@@ -1,4 +1,5 @@
 version: 2
+enable-beta-ecosystems: true
 updates:
 - package-ecosystem: "github-actions"
   directory: "/"
@@ -11,6 +12,12 @@ updates:
   - rm3l
   labels:
   - dependencies
+- package-ecosystem: "pub"
+  directory: "/mobile/"
+  schedule:
+    interval: weekly
+    day: "saturday"
+    time: '04:00'
 - package-ecosystem: gradle
   directory: "/mobile/android/app"
   schedule:
