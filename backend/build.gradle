@@ -144,7 +144,7 @@ subprojects {
         implementation 'org.postgresql:postgresql:42.3.4'
         implementation 'org.mariadb.jdbc:mariadb-java-client:3.0.4'
 
-        implementation "io.ktor:ktor-client-core:1.6.8"
+        implementation "io.ktor:ktor-client-core:2.0.0"
         //Using Apache Engine Ktor engine, because it is at this time the only one that supports following redirects
         // https://ktor.io/docs/http-client-engines.html#jvm
         implementation "io.ktor:ktor-client-apache:1.6.8"
