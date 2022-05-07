@@ -59,14 +59,14 @@ jobs:
           cache: 'gradle'
 
       # - name: Login to GitHub Packages Docker Registry
-      #   uses: docker/login-action@v1
+      #   uses: docker/login-action@v2
       #   with:
       #     registry: docker.pkg.github.com
       #     username: ${{ github.repository_owner }}
       #     password: ${{ secrets.GH_PACKAGES_TOKEN }}
 
       - name: Login to DockerHub
-        uses: docker/login-action@v1
+        uses: docker/login-action@v2
         with:
           username: ${{ secrets.DOCKER_HUB_USERNAME }}
           password: ${{ secrets.DOCKER_HUB_PASSWORD }}
