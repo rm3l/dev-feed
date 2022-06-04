@@ -28,6 +28,10 @@ plugins {
     id "org.jetbrains.kotlin.plugin.allopen" version "1.6.21"
 }
 
+ext {
+    ktor_version = "2.0.2"
+}
+
 repositories {
     mavenCentral()
     maven { url "https://jitpack.io" }
@@ -144,11 +148,13 @@ subprojects {
         implementation 'org.postgresql:postgresql:42.3.6'
         implementation 'org.mariadb.jdbc:mariadb-java-client:3.0.5'
 
-        implementation "io.ktor:ktor-client-core:1.6.8"
+        implementation "io.ktor:ktor-client-core:$ktor_version"
         //Using Apache Engine Ktor engine, because it is at this time the only one that supports following redirects
         // https://ktor.io/docs/http-client-engines.html#jvm
-        implementation "io.ktor:ktor-client-apache:1.6.8"
-        implementation "io.ktor:ktor-client-jackson:1.6.8"
+        implementation "io.ktor:ktor-client-apache:$ktor_version"
+//        implementation "io.ktor:ktor-client-jackson:2.0.2"
+        implementation "io.ktor:ktor-serialization-jackson:$ktor_version"
+        implementation "io.ktor:ktor-client-content-negotiation:$ktor_version"
 
         implementation('com.github.chimbori:crux:3.0.1')
 

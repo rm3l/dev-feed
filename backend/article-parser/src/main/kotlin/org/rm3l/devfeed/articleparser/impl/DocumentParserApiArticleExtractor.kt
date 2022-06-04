@@ -25,13 +25,14 @@
 package org.rm3l.devfeed.articleparser.impl
 
 import io.ktor.client.HttpClient
+import io.ktor.client.call.body
 import io.ktor.client.engine.apache.Apache
-import io.ktor.client.features.json.JacksonSerializer
-import io.ktor.client.features.json.JsonFeature
+import io.ktor.client.plugins.contentnegotiation.*
 import io.ktor.client.request.accept
 import io.ktor.client.request.get
 import io.ktor.client.request.header
 import io.ktor.http.ContentType
+import io.ktor.serialization.jackson.jackson
 import kotlinx.coroutines.runBlocking
 import org.rm3l.devfeed.common.articleparser.ArticleExtractor
 import org.rm3l.devfeed.common.contract.Article
@@ -63,13 +64,15 @@ class DocumentParserApiArticleExtractor(
           val client =
               HttpClient(Apache) {
                 engine { followRedirects = true }
-                install(JsonFeature) { serializer = JacksonSerializer() }
+                install(ContentNegotiation) { jackson() }
               }
           val articleExtractionJsonObject = runBlocking {
-            client.get<Map<String, Any>>(url) {
-              accept(ContentType.Application.Json)
-              header("subscription-key", documentParserApiKey)
-            }
+            client
+                .get(url) {
+                  accept(ContentType.Application.Json)
+                  header("subscription-key", documentParserApiKey)
+                }
+                .body<Map<String, Any>>()
           }
 
           val parsedImage = articleExtractionJsonObject["image"] as String?

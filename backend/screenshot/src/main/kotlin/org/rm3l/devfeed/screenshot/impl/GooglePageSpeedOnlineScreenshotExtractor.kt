@@ -25,12 +25,13 @@
 package org.rm3l.devfeed.screenshot.impl
 
 import io.ktor.client.HttpClient
+import io.ktor.client.call.body
 import io.ktor.client.engine.apache.Apache
-import io.ktor.client.features.json.JacksonSerializer
-import io.ktor.client.features.json.JsonFeature
+import io.ktor.client.plugins.contentnegotiation.*
 import io.ktor.client.request.accept
 import io.ktor.client.request.get
 import io.ktor.http.ContentType
+import io.ktor.serialization.jackson.jackson
 import kotlinx.coroutines.runBlocking
 import org.rm3l.devfeed.common.contract.Article
 import org.rm3l.devfeed.common.contract.Screenshot
@@ -76,11 +77,12 @@ class GooglePageSpeedOnlineScreenshotExtractor(
                 connectTimeout = pageSpeedOnlineTimeoutSeconds
                 socketTimeout = pageSpeedOnlineTimeoutSeconds
               }
-              install(JsonFeature) { serializer = JacksonSerializer() }
+              install(ContentNegotiation) { jackson() }
             }
-        val getRequest = runBlocking {
-          client.get<Map<String, Any>>(url) { accept(ContentType.Application.Json) }
-        }
+        val getRequest =
+            runBlocking<Map<String, Any>> {
+              client.get(url) { accept(ContentType.Application.Json) }.body()
+            }
 
         @Suppress("UNCHECKED_CAST")
         val screenshotJsonObject: Map<String, Any?>? =
