@@ -22,7 +22,7 @@
  * SOFTWARE.
  */
 plugins {
-    id "pl.allegro.tech.build.axion-release" version "1.14.0"
+    id "pl.allegro.tech.build.axion-release" version "1.14.1"
     id "com.diffplug.spotless" version "6.10.0"
     id "org.jetbrains.kotlin.jvm" version "1.6.21"
     id "org.jetbrains.kotlin.plugin.allopen" version "1.6.21"
