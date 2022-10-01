@@ -21,7 +21,7 @@
 #SOFTWARE.
 
 # Build
-FROM eclipse-temurin:18 AS builder
+FROM eclipse-temurin:19 AS builder
 
 WORKDIR /dev-feed-backend
 
@@ -41,7 +41,7 @@ ENV GRADLE_OPTS="-Dorg.gradle.daemon=false"
 
 RUN ./gradlew build
 
-FROM eclipse-temurin:18
+FROM eclipse-temurin:19
 
 COPY --from=builder /dev-feed-backend/api/build/libs/dev-feed-api-1.12.1.jar /app.jar
 
