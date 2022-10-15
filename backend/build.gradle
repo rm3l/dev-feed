@@ -25,7 +25,7 @@ plugins {
     id "pl.allegro.tech.build.axion-release" version "1.14.2"
     id "com.diffplug.spotless" version "6.11.0"
     id "org.jetbrains.kotlin.jvm" version "1.6.21"
-    id "org.jetbrains.kotlin.plugin.allopen" version "1.6.21"
+    id "org.jetbrains.kotlin.plugin.allopen" version "1.7.20"
 }
 
 ext {
