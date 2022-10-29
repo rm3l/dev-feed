@@ -29,7 +29,7 @@ plugins {
 }
 
 ext {
-    ktor_version = "2.1.2"
+    ktor_version = "2.1.3"
 }
 
 repositories {
