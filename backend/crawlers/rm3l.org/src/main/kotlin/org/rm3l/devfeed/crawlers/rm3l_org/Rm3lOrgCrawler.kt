@@ -41,7 +41,7 @@ class Rm3lOrgCrawler : DevFeedCrawler() {
   companion object {
     @JvmStatic private val logger = LoggerFactory.getLogger(Rm3lOrgCrawler::class.java)
 
-    private const val RSS_FEED_URL = "https://rm3l.org/rss"
+    private const val RSS_FEED_URL = "https://rm3l.org/index.xml"
   }
 
   @Throws(Exception::class)
@@ -53,14 +53,7 @@ class Rm3lOrgCrawler : DevFeedCrawler() {
 
       val articles =
           SyndFeedInput()
-              .build(
-                  XmlReader(
-                      ByteArrayInputStream(
-                          URL(RSS_FEED_URL)
-                              .readText()
-                              .replace(
-                                  "https://cms.rm3l.org", "https://rm3l.org", ignoreCase = true)
-                              .toByteArray())))
+              .build(XmlReader(ByteArrayInputStream(URL(RSS_FEED_URL).readText().toByteArray())))
               .entries
               .filterNot { it.publishedDate == null && it.updatedDate == null }
               .map { feedEntry ->
