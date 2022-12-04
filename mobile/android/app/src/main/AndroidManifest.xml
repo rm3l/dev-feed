@@ -40,7 +40,8 @@ SOFTWARE.
         android:label="Dev Feed"
         android:icon="@mipmap/ic_launcher"
         android:usesCleartextTraffic="true"
-        allowBackup="true">
+        android:allowBackup="false"
+        allowBackup="false">
         <activity
             android:name="io.flutter.embedding.android.FlutterActivity"
             android:launchMode="singleTop"
