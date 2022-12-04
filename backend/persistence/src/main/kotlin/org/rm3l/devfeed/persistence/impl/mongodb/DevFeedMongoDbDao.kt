@@ -164,8 +164,7 @@ class DevFeedMongoDbDao(private val connectionString: String) : DevFeedDao {
       throw IllegalStateException("insertedId is NULL or blank for article $article")
     }
     val tagDocuments =
-        article
-            .tags
+        article.tags
             ?.filterNot { it.isNullOrBlank() }
             ?.map { it!! }
             ?.map { if (it.startsWith("#")) it else "#$it" }
@@ -179,7 +178,8 @@ class DevFeedMongoDbDao(private val connectionString: String) : DevFeedDao {
   }
 
   override fun shouldRequestScreenshot(title: String, url: String): Boolean {
-    return articleCollection.findOne(ArticleDocument::title eq title, ArticleDocument::url eq url)
+    return articleCollection
+        .findOne(ArticleDocument::title eq title, ArticleDocument::url eq url)
         ?.screenshotData == null
   }
 

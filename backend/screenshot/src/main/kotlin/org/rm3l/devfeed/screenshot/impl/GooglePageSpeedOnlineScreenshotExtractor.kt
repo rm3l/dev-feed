@@ -86,12 +86,10 @@ class GooglePageSpeedOnlineScreenshotExtractor(
 
         @Suppress("UNCHECKED_CAST")
         val screenshotJsonObject: Map<String, Any?>? =
-            (((getRequest.get("lighthouseResult") as Map<String, Any?>?)?.get("audits") as
-                        Map<String, Any?>?)
-                    ?.get("final-screenshot") as
-                    Map<String, Any?>?)
-                ?.get("details") as
-                Map<String, Any?>?
+            (((getRequest.get("lighthouseResult") as Map<String, Any?>?)?.get("audits")
+                        as Map<String, Any?>?)
+                    ?.get("final-screenshot") as Map<String, Any?>?)
+                ?.get("details") as Map<String, Any?>?
         // Weird, but for reasons best known to Google, / is replaced with _, and +
         // is replaced with -
         val base64ImageData =

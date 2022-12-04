@@ -65,8 +65,8 @@ class EngineeringBlogsCrawler(
       val opmlFileContent = URL(OPML_URL).readText()
 
       val opml =
-          WireFeedInput().build(XmlReader(ByteArrayInputStream(opmlFileContent.toByteArray()))) as
-              Opml
+          WireFeedInput().build(XmlReader(ByteArrayInputStream(opmlFileContent.toByteArray())))
+              as Opml
 
       val articles =
           opml.outlines
