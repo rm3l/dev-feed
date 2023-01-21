@@ -42,7 +42,7 @@ dependencies:
 #  tuple: "^1.0.2""
 
   flutter_custom_tabs: "^0.6.0"
-  shared_preferences: ^2.0.5
+  shared_preferences: ^2.0.17
 #  mocha: "^0.0.2"
 
   flutter_calendar: "^0.0.9"
