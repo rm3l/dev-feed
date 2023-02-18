@@ -47,7 +47,7 @@ dependencies:
 
   flutter_calendar: "^0.0.9"
 
-  fluro: ^2.0.4
+  fluro: ^2.0.5
   pigment: ^1.0.4
 
   app_review: "^2.0.1"
