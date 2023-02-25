@@ -143,7 +143,7 @@ subprojects {
         implementation 'com.zaxxer:HikariCP:5.0.1'
 
         //JDBC Drivers
-        implementation 'org.xerial:sqlite-jdbc:3.40.1.0'
+        implementation 'org.xerial:sqlite-jdbc:3.41.0.0'
         implementation 'com.h2database:h2:2.1.214'
         implementation 'org.postgresql:postgresql:42.5.4'
         implementation 'org.mariadb.jdbc:mariadb-java-client:3.1.2'
