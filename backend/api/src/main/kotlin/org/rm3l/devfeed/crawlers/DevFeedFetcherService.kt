@@ -33,6 +33,7 @@ import javax.annotation.PostConstruct
 import javax.annotation.PreDestroy
 import org.apache.commons.lang3.concurrent.BasicThreadFactory
 import org.rm3l.devfeed.common.articleparser.ArticleExtractor
+import org.rm3l.devfeed.common.contract.Article
 import org.rm3l.devfeed.common.screenshot.ArticleScreenshotExtractor
 import org.rm3l.devfeed.crawlers.common.DevFeedCrawler
 import org.rm3l.devfeed.persistence.ArticleUpdater
@@ -179,5 +180,41 @@ class DevFeedFetcherService(
       screenshotUpdatesErrored.set(true)
       screenshotUpdatesSucceeded.set(false)
     }
+  }
+}
+
+class DummyCrawler : DevFeedCrawler() {
+
+  private companion object {
+    private const val SOURCE = "https://dev-feed.example.com"
+  }
+
+  override fun call(): Collection<Article> {
+    val now = System.currentTimeMillis()
+    return listOf(
+        Article(
+            timestamp = now,
+            title = "Article Title 1",
+            description = "Lorem Ipsum Dolor Sit Amet",
+            source = SOURCE,
+            url = "$SOURCE/article1",
+            tags = listOf("tag1", "tag2"),
+        ),
+        Article(
+            timestamp = now,
+            title = "Article Title 2",
+            description = "consectetur adipiscing elit",
+            source = SOURCE,
+            url = "$SOURCE/article2",
+            tags = listOf("tag1", "tag3", "tag4"),
+        ),
+        Article(
+            timestamp = now,
+            title = "Article Title 3",
+            description = "sed do eiusmod tempor incididunt ut labore et dolore magna aliqua",
+            source = SOURCE,
+            url = "$SOURCE/article3",
+            tags = listOf("tag10", "tag3", "tag1"),
+        ))
   }
 }

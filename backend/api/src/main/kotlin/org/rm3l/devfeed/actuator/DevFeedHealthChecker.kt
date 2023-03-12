@@ -33,7 +33,7 @@ import org.springframework.stereotype.Service
 class DevFeedHealthChecker(private val dao: DevFeedDao) : HealthIndicator {
 
   override fun health(): Health =
-      if (dao.getRecentArticles(limit = 1).isNotEmpty()) {
+      if (dao.getArticles(limit = 1).isNotEmpty()) {
         Health.up().build()
       } else {
         Health.down().build()
