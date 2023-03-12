@@ -25,6 +25,7 @@
 package org.rm3l.devfeed.config
 
 import java.util.concurrent.ExecutorService
+import org.rm3l.devfeed.crawlers.DummyCrawler
 import org.rm3l.devfeed.crawlers.discoverdev_io.DiscoverDevIoCrawler
 import org.rm3l.devfeed.crawlers.engineeringblogs_xyz.EngineeringBlogsCrawler
 import org.rm3l.devfeed.crawlers.rm3l_org.Rm3lOrgCrawler
@@ -40,6 +41,11 @@ class DevFeedCrawlersConfiguration {
   @Autowired
   @Qualifier("devFeedExecutorService")
   private lateinit var devFeedExecutorService: ExecutorService
+
+  @Bean
+  @ConditionalOnProperty(
+      name = ["crawlers.dummy.enabled"], havingValue = "true", matchIfMissing = false)
+  fun dummyCrawler() = DummyCrawler()
 
   @Bean
   @ConditionalOnProperty(
