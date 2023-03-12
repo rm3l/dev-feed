@@ -329,7 +329,7 @@ class DevFeedRdbmsDao(
             it[timestamp] = article.timestamp
             it[title] = article.title
             it[description] =
-                if (article.description?.length ?: 0 > 10_000)
+                if ((article.description?.length ?: 0) > 10_000)
                     article.description?.substring(0 until 10_000)?.plus("...")
                 else article.description
             it[link] = article.url
