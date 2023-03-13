@@ -62,8 +62,6 @@ class DevFeedFetcherService(
   @Qualifier("devFeedExecutorService")
   private lateinit var devFeedExecutorService: ExecutorService
 
-  @Value("\${crawlers.task.fetch-articles}") private lateinit var fetchArtcicles: String
-
   @Value("\${crawlers.task.fetch-articles.max-age-days}")
   private lateinit var articlesMaxAgeDays: String
 
@@ -105,7 +103,7 @@ class DevFeedFetcherService(
   @Synchronized
   fun triggerRemoteWebsiteCrawlingAndScreenshotUpdater() {
     try {
-      if (fetchArtcicles.toBoolean() && !crawlers.isNullOrEmpty()) {
+      if (!crawlers.isNullOrEmpty()) {
         crawlers
             .map { crawler ->
               CompletableFuture.runAsync(
