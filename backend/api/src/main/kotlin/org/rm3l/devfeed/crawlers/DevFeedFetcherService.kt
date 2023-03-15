@@ -84,12 +84,9 @@ class DevFeedFetcherService(
           Executors.newFixedThreadPool(crawlers.size + 1, threadFactory)
         }
 
+    // Fire and forget to not block the application startup
     CompletableFuture.runAsync(
-            { triggerRemoteWebsiteCrawlingAndScreenshotUpdater() }, this.crawlersExecutor)
-        .exceptionally {
-          logger.info(it.message, it)
-          null
-        }
+        { triggerRemoteWebsiteCrawlingAndScreenshotUpdater() }, this.crawlersExecutor)
 
     return
   }
@@ -108,7 +105,7 @@ class DevFeedFetcherService(
             .map { crawler ->
               CompletableFuture.runAsync(
                   {
-                    logger.debug("Crawling from $crawler...")
+                    logger.info("Crawling from $crawler...")
                     val articles = crawler.call()
                     articles.handleAndPersistIfNeeded(
                         dao,
@@ -117,7 +114,7 @@ class DevFeedFetcherService(
                         articleExtractor,
                         maxAgeDays =
                             if (articlesMaxAgeDays.isBlank()) null else articlesMaxAgeDays.toLong())
-                    logger.debug("... Done crawling from $crawler : ${articles.size} articles!")
+                    logger.info("... Done crawling from $crawler : ${articles.size} articles!")
                   },
                   crawlersExecutor!!)
             }
