@@ -54,7 +54,7 @@ class DevFeedCrawlersConfiguration {
 
   @Bean
   @ConditionalOnProperty(
-      name = ["crawlers.engineeringblogx_xyz.enabled"], havingValue = "true", matchIfMissing = true)
+      name = ["crawlers.engineeringblogs_xyz.enabled"], havingValue = "true", matchIfMissing = true)
   fun engineeringBlogsXyzCrawler() = EngineeringBlogsCrawler(devFeedExecutorService)
 
   @Bean
