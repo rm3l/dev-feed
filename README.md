@@ -79,7 +79,7 @@ You can then access the GraphiQL browser by heading to http://localhost:8080/gra
 2. Run the Backend GraphQL API
 
 ```sh
-java -jar backend/api/build/libs/dev-feed-api-2.0.0.jar
+java -jar backend/api/build/libs/dev-feed-api-2.0.1.jar
 ```
 
 You can then access the GraphiQL browser by heading to http://localhost:8080/graphiql

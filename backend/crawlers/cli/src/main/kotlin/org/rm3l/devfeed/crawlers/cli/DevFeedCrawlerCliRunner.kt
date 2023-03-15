@@ -34,7 +34,7 @@ import picocli.CommandLine.ParameterException
 @CommandLine.Command(
     description = ["Fetch articles"],
     mixinStandardHelpOptions = true,
-    version = ["2.0.0"],
+    version = ["2.0.1"],
     subcommands = [DevFeedCrawlerCliRdbms::class, DevFeedCrawlerCliMongo::class])
 class DevFeedCrawlerCliRunner : Runnable {
 
