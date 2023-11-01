@@ -82,7 +82,7 @@ jib {
         ]
         jvmFlags = ['-Djava.security.egd=file:/dev/./urandom']
         ports = ['8080', '8081']
-        format = 'OCI'
+        format = 'Docker'
     }
 }
 

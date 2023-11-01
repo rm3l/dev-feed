@@ -71,6 +71,6 @@ jib {
                 "maintainer": "Armel Soro <armel@rm3l.org>"
         ]
         jvmFlags = ['-Djava.security.egd=file:/dev/./urandom']
-        format = 'OCI'
+        format = 'Docker'
     }
 }
