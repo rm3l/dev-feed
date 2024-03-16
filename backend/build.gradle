@@ -145,7 +145,7 @@ subprojects {
         //JDBC Drivers
         implementation 'org.xerial:sqlite-jdbc:3.45.1.0'
         implementation 'com.h2database:h2:2.2.224'
-        implementation 'org.postgresql:postgresql:42.7.2'
+        implementation 'org.postgresql:postgresql:42.7.3'
         implementation 'org.mariadb.jdbc:mariadb-java-client:3.3.3'
 
         implementation "io.ktor:ktor-client-core:$ktor_version"
