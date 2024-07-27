@@ -133,7 +133,7 @@ subprojects {
         implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk8"
         implementation "org.jetbrains.kotlin:kotlin-reflect"
 
-        implementation 'org.apache.commons:commons-lang3:3.14.0'
+        implementation 'org.apache.commons:commons-lang3:3.15.0'
 
         implementation("org.jsoup:jsoup:1.18.1")
 
