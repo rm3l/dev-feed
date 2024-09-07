@@ -15,7 +15,7 @@ companies all over the world.
 It stemmed from my own needs to not only follow a curated list of tech-related blogs, but also
 play a little bit with the excellent [Flutter](https://flutter.dev/) SDK.
 
-<a href="https://play.google.com/store/apps/details?id=org.rm3l.awesome_dev"><img src="https://github.com/rm3l/dev-feed/raw/master/mobile/deployment/screenshots/android/google-play-badge.png" width="50%"/></a>
+<a href="https://play.google.com/store/apps/details?id=lemrapps.dev_feed"><img src="https://github.com/rm3l/dev-feed/raw/master/mobile/deployment/screenshots/android/google-play-badge.png" width="50%"/></a>
 
 ![demo](https://raw.githubusercontent.com/rm3l/dev-feed/master/mobile/deployment/screenshots/android/latest_news_w400.png)
 

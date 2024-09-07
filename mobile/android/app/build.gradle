@@ -127,7 +127,7 @@ android {
     }
 
     defaultConfig {
-        applicationId "org.rm3l.awesome_dev"
+        applicationId "lemrapps.dev_feed"
         minSdkVersion 16
         targetSdkVersion android_sdk
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
