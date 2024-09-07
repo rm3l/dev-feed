@@ -21,8 +21,8 @@ jobs:
         cache: 'gradle'
     - uses: subosito/flutter-action@v2.16.0
       with:
-        channel: 'beta'
-        flutter-version: '2.2.0-10.1.pre'
+        channel: 'stable'
+        flutter-version: '2.2.2'
     - name: Get Flutter packages
       run: |
         cd mobile
@@ -35,9 +35,9 @@ jobs:
       run: |
         cd mobile
         flutter build apk --debug
-#   - name: Archive artifacts
-#     uses: actions/upload-artifact@v2
-#     with:
-#       name: APKs
-#       path: mobile/build/app/outputs/apk/debug/app-*.apk
-
+    - name: Archive artifacts
+      uses: actions/upload-artifact@v4
+      with:
+        name: APKs
+        path: mobile/build/app/outputs/apk/debug/app-*.apk
+        retention-days: 1
