@@ -3,7 +3,7 @@
 [![Backend Build Workflow](https://github.com/rm3l/dev-feed/workflows/Backend%20Build%20and%20Publish%20Docker%20Image/badge.svg)](https://github.com/rm3l/dev-feed/actions?query=workflow%3A%22Backend+Build+and+Publish+Docker+Image%22)
 [![Mobile Build Workflow](https://github.com/rm3l/dev-feed/workflows/Mobile%20Build/badge.svg)](https://github.com/rm3l/dev-feed/actions?query=workflow%3A%22Mobile+Build%22)
 
-[![Heroku](https://img.shields.io/badge/heroku-deployed%20on%20free%20dyno-blue.svg)](https://dev-feed-api.herokuapp.com/graphiql)
+[![Render](https://img.shields.io/badge/deployed%20on%20render-blue.svg)](https://dev-feed-api.onrender.com/graphiql)
 
 [![Docker Stars](https://img.shields.io/docker/stars/rm3l/dev-feed-api.svg)](https://hub.docker.com/r/rm3l/dev-feed-api)
 [![Docker Pulls](https://img.shields.io/docker/pulls/rm3l/dev-feed-api.svg)](https://hub.docker.com/r/rm3l/dev-feed-api)
