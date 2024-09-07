@@ -24,7 +24,7 @@ import 'dart:io';
 import 'package:dev_feed/config/application.dart';
 import 'package:dev_feed/config/routes.dart';
 import 'package:dev_feed/env.dart';
-import 'package:dev_feed/environments/heroku.dart';
+import 'package:dev_feed/environments/render.dart';
 import 'package:dev_feed/ui/about.dart';
 import 'package:dev_feed/ui/archives.dart';
 import 'package:dev_feed/ui/favorites.dart';
@@ -44,7 +44,7 @@ enum AppBarMenuItem { ABOUT, SEND_FEEDBACK, RATING }
 
 // final alice = Alice(showNotification: true, darkTheme: true);
 
-void main() => Heroku();
+void main() => Render();
 
 class DevFeedApp extends StatelessWidget {
   final Env env;
