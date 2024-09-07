@@ -39,5 +39,5 @@ jobs:
       uses: actions/upload-artifact@v4
       with:
         name: APKs
-        path: mobile/build/app/outputs/apk/debug/app-*.apk
+        path: mobile/build/app/outputs/flutter-apk/app-*.apk
         retention-days: 1
