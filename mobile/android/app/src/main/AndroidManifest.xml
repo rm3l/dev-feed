@@ -48,20 +48,21 @@ SOFTWARE.
             android:theme="@style/LaunchTheme"
             android:configChanges="orientation|keyboardHidden|keyboard|screenSize|locale|layoutDirection|fontScale"
             android:hardwareAccelerated="true"
-	    android:windowSoftInputMode="adjustResize">
+	        android:windowSoftInputMode="adjustResize"
+            android:exported="true">
             <!-- Specify that the launch screen should continue being displayed -->
-	    <!-- until Flutter renders its first frame. -->
+	        <!-- until Flutter renders its first frame. -->
             <meta-data
-		android:name="io.flutter.embedding.android.SplashScreenDrawable"
-		android:resource="@drawable/launch_background" />
+                android:name="io.flutter.embedding.android.SplashScreenDrawable"
+                android:resource="@drawable/launch_background" />
             <intent-filter>
                 <action android:name="android.intent.action.MAIN"/>
                 <category android:name="android.intent.category.LAUNCHER"/>
             </intent-filter>
         </activity>
         <meta-data
-		android:name="flutterEmbedding"
-		android:value="2" />
+            android:name="flutterEmbedding"
+            android:value="2" />
 
     </application>
 </manifest>
