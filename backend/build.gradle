@@ -41,7 +41,7 @@ scmVersion {
     localOnly = true
     repository {
         type = 'git'
-        directory = project.rootProject.file('../')
+        directory = project.rootProject.file('../').getAbsolutePath()
     }
     tag {
         prefix = ''
