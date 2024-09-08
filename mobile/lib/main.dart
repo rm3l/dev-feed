@@ -36,11 +36,12 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:url_launcher/url_launcher.dart';
 
-import 'package:app_review/app_review.dart';
+//import 'package:app_review/app_review.dart';
 
 const contactEmailAddress = "apps+dev_feed@rm3l.org";
 
-enum AppBarMenuItem { ABOUT, SEND_FEEDBACK, RATING }
+//enum AppBarMenuItem { ABOUT, SEND_FEEDBACK, RATING }
+enum AppBarMenuItem { ABOUT, SEND_FEEDBACK }
 
 // final alice = Alice(showNotification: true, darkTheme: true);
 
@@ -88,12 +89,12 @@ class _DevFeedState extends State<DevFeed> with TickerProviderStateMixin {
   void initState() {
     super.initState();
 
-    AppReview.getAppID.then((onValue) {
-      setState(() {
-        appID = onValue;
-      });
-      print("App ID: $appID");
-    });
+    //AppReview.getAppID.then((onValue) {
+    //  setState(() {
+    //    appID = onValue;
+    //  });
+    //  print("App ID: $appID");
+    //});
 
     _navigationViews = <NavigationIconView>[
       NavigationIconView(
@@ -204,9 +205,9 @@ class _DevFeedState extends State<DevFeed> with TickerProviderStateMixin {
           value: AppBarMenuItem.ABOUT, child: const Text('About')),
       const PopupMenuItem<AppBarMenuItem>(
           value: AppBarMenuItem.SEND_FEEDBACK,
-          child: const Text('Send Feedback')),
-      const PopupMenuItem<AppBarMenuItem>(
-          value: AppBarMenuItem.RATING, child: const Text('Rate this app!'))
+          child: const Text('Send Feedback'))
+      //const PopupMenuItem<AppBarMenuItem>(
+      //    value: AppBarMenuItem.RATING, child: const Text('Rate this app!'))
     ]);
 
     return Scaffold(
@@ -220,15 +221,15 @@ class _DevFeedState extends State<DevFeed> with TickerProviderStateMixin {
                 case AppBarMenuItem.ABOUT:
                   showGalleryAboutDialog(_scaffoldKey.currentContext);
                   break;
-                case AppBarMenuItem.RATING:
-                  {
-                    AppReview.requestReview.catchError((onError) {
-                      Scaffold.of(context).showSnackBar(SnackBar(
-                        content: Text("Error: ${onError.toString()}"),
-                      ));
-                    });
-                  }
-                  break;
+                //case AppBarMenuItem.RATING:
+                //  {
+                //    AppReview.requestReview.catchError((onError) {
+                //      Scaffold.of(context).showSnackBar(SnackBar(
+                //        content: Text("Error: ${onError.toString()}"),
+                //      ));
+                //    });
+                //  }
+                //  break;
                 case AppBarMenuItem.SEND_FEEDBACK:
                   {
                     //TODO For now, open up the default email address,
