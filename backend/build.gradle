@@ -137,7 +137,7 @@ subprojects {
 
         implementation("org.jsoup:jsoup:1.18.1")
 
-        implementation("org.jetbrains.exposed:exposed-dao:0.39.2")
+        implementation("org.jetbrains.exposed:exposed-dao:0.55.0")
         implementation("org.jetbrains.exposed:exposed-jdbc:0.39.2")
 
         implementation 'com.zaxxer:HikariCP:6.0.0'
