@@ -25,7 +25,7 @@ plugins {
     id 'application'
     id "org.jetbrains.kotlin.jvm"
     id "com.github.johnrengelman.shadow" version "7.1.2"
-    id "com.google.cloud.tools.jib" version "3.4.3"
+    id "com.google.cloud.tools.jib" version "3.4.4"
 }
 
 description = 'Crawler for rm3l.org'
