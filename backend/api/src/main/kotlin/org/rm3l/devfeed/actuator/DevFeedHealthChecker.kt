@@ -25,6 +25,7 @@
 package org.rm3l.devfeed.actuator
 
 import org.rm3l.devfeed.persistence.DevFeedDao
+import org.slf4j.LoggerFactory
 import org.springframework.boot.actuate.health.Health
 import org.springframework.boot.actuate.health.HealthIndicator
 import org.springframework.stereotype.Service
@@ -32,10 +33,19 @@ import org.springframework.stereotype.Service
 @Service
 class DevFeedHealthChecker(private val dao: DevFeedDao) : HealthIndicator {
 
+  companion object {
+    @JvmStatic private val logger = LoggerFactory.getLogger(DevFeedHealthChecker::class.java)
+  }
+
   override fun health(): Health =
-      if (dao.getArticles(limit = 1).isNotEmpty()) {
+      try {
+        dao.checkHealth()
         Health.up().build()
-      } else {
+      } catch (e: Exception) {
+        logger.warn("Application down due to the following health check error: ${e.message}")
+        if (logger.isDebugEnabled) {
+          logger.debug(e.message, e)
+        }
         Health.down().build()
       }
 }
