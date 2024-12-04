@@ -1,0 +1,10 @@
+apiVersion: backstage.io/v1alpha1
+kind: Component
+metadata:
+  name: dev-feed
+  annotations:
+    github.com/project-slug: rm3l/dev-feed
+spec:
+  type: other
+  lifecycle: unknown
+  owner: user:default/rm3l
