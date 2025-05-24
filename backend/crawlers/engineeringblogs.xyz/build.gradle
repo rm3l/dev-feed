@@ -24,7 +24,7 @@
 plugins {
     id 'application'
     id "org.jetbrains.kotlin.jvm"
-    id "com.github.johnrengelman.shadow" version "7.1.2"
+    id "com.gradleup.shadow" version "8.3.6"
     id "com.google.cloud.tools.jib" version "3.4.5"
 }
 
@@ -39,8 +39,8 @@ dependencies {
     implementation project(':crawlers:dev-feed-crawlers-cli')
 }
 
-shadowJar {
-    classifier = 'executable-jar'
+tasks.named('shadowJar', com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar) {
+    archiveClassifier = 'executable-jar'
 }
 
 tasks.withType(AbstractArchiveTask) {
