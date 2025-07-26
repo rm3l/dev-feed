@@ -8,8 +8,6 @@ updates:
     day: "saturday"
     time: '04:00'
   open-pull-requests-limit: 10
-  reviewers:
-  - rm3l
   labels:
   - dependencies
 - package-ecosystem: "pub"
@@ -25,8 +23,6 @@ updates:
     day: "saturday"
     time: '04:00'
   open-pull-requests-limit: 10
-  reviewers:
-  - rm3l
   labels:
   - dependencies
 - package-ecosystem: gradle
@@ -36,8 +32,6 @@ updates:
     day: "saturday"
     time: '04:00'
   open-pull-requests-limit: 10
-  reviewers:
-  - rm3l
   labels:
   - dependencies
 - package-ecosystem: gradle
@@ -47,8 +41,6 @@ updates:
     day: "saturday"
     time: '04:00'
   open-pull-requests-limit: 10
-  reviewers:
-  - rm3l
   labels:
   - dependencies
 - package-ecosystem: gradle
@@ -58,8 +50,6 @@ updates:
     day: "saturday"
     time: '04:00'
   open-pull-requests-limit: 10
-  reviewers:
-  - rm3l
   labels:
   - dependencies
 - package-ecosystem: gradle
@@ -69,8 +59,6 @@ updates:
     day: "saturday"
     time: '04:00'
   open-pull-requests-limit: 10
-  reviewers:
-  - rm3l
   labels:
   - dependencies
 - package-ecosystem: gradle
@@ -80,8 +68,6 @@ updates:
     day: "saturday"
     time: '04:00'
   open-pull-requests-limit: 10
-  reviewers:
-  - rm3l
   labels:
   - dependencies
 - package-ecosystem: gradle
@@ -91,8 +77,6 @@ updates:
     day: "saturday"
     time: '04:00'
   open-pull-requests-limit: 10
-  reviewers:
-  - rm3l
   labels:
   - dependencies
 - package-ecosystem: gradle
@@ -102,8 +86,6 @@ updates:
     day: "saturday"
     time: '04:00'
   open-pull-requests-limit: 10
-  reviewers:
-  - rm3l
   labels:
   - dependencies
 - package-ecosystem: gradle
@@ -113,8 +95,6 @@ updates:
     day: "saturday"
     time: '04:00'
   open-pull-requests-limit: 10
-  reviewers:
-  - rm3l
   labels:
   - dependencies
 - package-ecosystem: gradle
@@ -124,8 +104,6 @@ updates:
     day: "saturday"
     time: '04:00'
   open-pull-requests-limit: 10
-  reviewers:
-  - rm3l
   labels:
   - dependencies
 - package-ecosystem: gradle
@@ -135,8 +113,6 @@ updates:
     day: "saturday"
     time: '04:00'
   open-pull-requests-limit: 10
-  reviewers:
-  - rm3l
   labels:
   - dependencies
 - package-ecosystem: gradle
@@ -146,8 +122,6 @@ updates:
     day: "saturday"
     time: '04:00'
   open-pull-requests-limit: 10
-  reviewers:
-  - rm3l
   labels:
   - dependencies
 - package-ecosystem: gradle
@@ -157,8 +131,6 @@ updates:
     day: "saturday"
     time: '04:00'
   open-pull-requests-limit: 10
-  reviewers:
-  - rm3l
   labels:
   - dependencies
 - package-ecosystem: docker
@@ -168,7 +140,5 @@ updates:
     day: "saturday"
     time: '04:00'
   open-pull-requests-limit: 10
-  reviewers:
-  - rm3l
   labels:
   - dependencies
