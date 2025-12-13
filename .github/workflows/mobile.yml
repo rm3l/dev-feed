@@ -36,7 +36,7 @@ jobs:
         cd mobile
         flutter build apk --debug
     - name: Archive artifacts
-      uses: actions/upload-artifact@v5
+      uses: actions/upload-artifact@v6
       with:
         name: APKs
         path: mobile/build/app/outputs/flutter-apk/app-*.apk
