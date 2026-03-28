@@ -127,7 +127,7 @@ android {
     }
 
     defaultConfig {
-        applicationId "lemrapps.dev_feed"
+        applicationId "lemrapp.dev_feed"
         minSdkVersion 16
         targetSdkVersion android_sdk
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
