@@ -35,8 +35,9 @@ if (flutterRoot == null) {
 apply plugin: 'com.android.application'
 apply from: "$flutterRoot/packages/flutter_tools/gradle/flutter.gradle"
 
-def android_sdk = 34
-def buildTools_version = '28.0.3'
+def android_compile_sdk = 34
+def android_target_sdk = 35
+def buildTools_version = '34.0.0'
 
 def homePath = System.properties['user.home'].toString()
 
@@ -110,7 +111,7 @@ java {
 }
 
 android {
-    compileSdkVersion android_sdk
+    compileSdkVersion android_compile_sdk
     buildToolsVersion buildTools_version
 
     lintOptions {
@@ -129,7 +130,7 @@ android {
     defaultConfig {
         applicationId "lemrapp.dev_feed"
         minSdkVersion 16
-        targetSdkVersion android_sdk
+        targetSdkVersion android_target_sdk
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
 
         // Fetch the version according to git latest tag and "how far are we from last tag"
