@@ -40,7 +40,12 @@ fun Article.toArticleDocument(): ArticleDocument {
       description = this.description,
       url = this.url,
       domain = this.domain,
-      tags = this.tags?.map { if (it?.startsWith("#") == true) it else "#$it" }?.toSet(),
+      tags =
+          this.tags
+              ?.filterNotNull()
+              ?.map { it.lowercase().trim().replace("\\s".toRegex(), "-") }
+              ?.map { if (it.startsWith("#")) it else "#$it" }
+              ?.toSet(),
       screenshotData = this.screenshot?.data,
       screenshotMimeType = this.screenshot?.mimeType,
       screenshotWidth = this.screenshot?.width,
@@ -80,7 +85,8 @@ fun ArticleFilter?.toBsonFilters(): List<Bson>? {
     mutableFilterList.add(
         Filters.or(
             this.tags!!
-                .map { if (it.startsWith("#") == true) it else "#$it" }
+                .map { it.lowercase().trim().replace("\\s".toRegex(), "-") }
+                .map { if (it.startsWith("#")) it else "#$it" }
                 .map { ArticleDocument::tags contains it }
                 .toList()))
   }

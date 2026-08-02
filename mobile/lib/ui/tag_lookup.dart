@@ -30,7 +30,7 @@ enum IndicatorType { overscroll, refresh }
 
 class TagLookup extends StatelessWidget {
   final String _tag;
-  TagLookup(this._tag);
+  TagLookup(String tag) : _tag = tag?.toLowerCase();
 
   @override
   Widget build(BuildContext context) {
@@ -45,7 +45,7 @@ class TagLookup extends StatelessWidget {
 
 class _TagLookupHome extends StatefulWidget {
   final String _tag;
-  _TagLookupHome(this._tag);
+  _TagLookupHome(String tag) : _tag = tag?.toLowerCase();
 
   @override
   State<StatefulWidget> createState() => _TagLookupHomeState();

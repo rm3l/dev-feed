@@ -45,7 +45,7 @@ class TagsClient {
     for (var tag in tagsList) {
       if (tag.toString().length >= 2) {
         //At least '#<something>'
-        result.add(tag.toString());
+        result.add(tag.toString().toLowerCase());
       }
     }
     result

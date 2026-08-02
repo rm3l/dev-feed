@@ -147,7 +147,7 @@ class DevFeedMongoDbDao(private val connectionString: String) : DevFeedDao {
   }
 
   override fun existTagByName(name: String): Boolean {
-    return tagCollection.findOne(TagDocument::tag eq name) != null
+    return tagCollection.findOne(TagDocument::tag eq name.lowercase()) != null
   }
 
   override fun findArticleById(articleId: String): Article? {
@@ -166,7 +166,7 @@ class DevFeedMongoDbDao(private val connectionString: String) : DevFeedDao {
     val tagDocuments =
         article.tags
             ?.filterNot { it.isNullOrBlank() }
-            ?.map { it!! }
+            ?.map { it!!.lowercase().trim().replace("\\s".toRegex(), "-") }
             ?.map { if (it.startsWith("#")) it else "#$it" }
             ?.filterNot { existTagByName(it) }
             ?.map { TagDocument(tag = it) }
@@ -328,7 +328,7 @@ class DevFeedMongoDbDao(private val connectionString: String) : DevFeedDao {
             }
           }
     } else {
-      val filterToBson = Filters.or(search.map { TagDocument::tag eq it }.toList())
+      val filterToBson = Filters.or(search.map { TagDocument::tag eq it.lowercase() }.toList())
       findIterable =
           if (limit == null) {
             if (offset == null) {
@@ -350,7 +350,7 @@ class DevFeedMongoDbDao(private val connectionString: String) : DevFeedDao {
           // At least '#<something>'
           it.length >= 2
         }
-        .filter { search?.contains(it) ?: true }
+        .filter { tag -> search?.any { it.lowercase() == tag } ?: true }
         .toSet()
         .sorted()
   }

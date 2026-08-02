@@ -83,7 +83,7 @@ class Article {
   static List<String> convertTags(List<dynamic> tags) {
     final result = <String>[];
     for (var tag in tags) {
-      result.add(tag.toString());
+      result.add(tag.toString().toLowerCase());
     }
     return result;
   }
