@@ -38,6 +38,7 @@ import org.rm3l.devfeed.common.contract.ArticleFilter
 import org.rm3l.devfeed.common.contract.ArticleParsed
 import org.rm3l.devfeed.common.contract.Screenshot
 import org.rm3l.devfeed.common.utils.asSupportedTimestamp
+import org.rm3l.devfeed.common.utils.normalizeTag
 import org.rm3l.devfeed.persistence.DevFeedDao
 
 data class ArticleDocument(
@@ -112,6 +113,13 @@ data class ArticleDocument(
 
 data class TagDocument(val tag: String)
 
+/**
+ * Builds a regex matching this string exactly, case-insensitively - so tag lookups remain correct
+ * regardless of the casing under which a tag was originally persisted.
+ */
+private fun String.toCaseInsensitiveExactRegex(): Regex =
+    Regex("^${Regex.escape(this)}$", RegexOption.IGNORE_CASE)
+
 class DevFeedMongoDbDao(private val connectionString: String) : DevFeedDao {
 
   private val mongoClient: MongoClient by lazy { KMongo.createClient(connectionString) }
@@ -147,7 +155,7 @@ class DevFeedMongoDbDao(private val connectionString: String) : DevFeedDao {
   }
 
   override fun existTagByName(name: String): Boolean {
-    return tagCollection.findOne(TagDocument::tag eq name.lowercase()) != null
+    return tagCollection.findOne(TagDocument::tag regex name.toCaseInsensitiveExactRegex()) != null
   }
 
   override fun findArticleById(articleId: String): Article? {
@@ -166,8 +174,7 @@ class DevFeedMongoDbDao(private val connectionString: String) : DevFeedDao {
     val tagDocuments =
         article.tags
             ?.filterNot { it.isNullOrBlank() }
-            ?.map { it!!.lowercase().trim().replace("\\s".toRegex(), "-") }
-            ?.map { if (it.startsWith("#")) it else "#$it" }
+            ?.map { it!!.normalizeTag() }
             ?.filterNot { existTagByName(it) }
             ?.map { TagDocument(tag = it) }
             ?.toList()
@@ -328,7 +335,9 @@ class DevFeedMongoDbDao(private val connectionString: String) : DevFeedDao {
             }
           }
     } else {
-      val filterToBson = Filters.or(search.map { TagDocument::tag eq it.lowercase() }.toList())
+      val filterToBson =
+          Filters.or(
+              search.map { TagDocument::tag regex it.toCaseInsensitiveExactRegex() }.toList())
       findIterable =
           if (limit == null) {
             if (offset == null) {
@@ -350,7 +359,7 @@ class DevFeedMongoDbDao(private val connectionString: String) : DevFeedDao {
           // At least '#<something>'
           it.length >= 2
         }
-        .filter { tag -> search?.any { it.lowercase() == tag } ?: true }
+        .filter { tag -> search?.any { it.equals(tag, ignoreCase = true) } ?: true }
         .toSet()
         .sorted()
   }

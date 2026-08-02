@@ -54,6 +54,7 @@ import org.rm3l.devfeed.common.contract.ArticleFilter
 import org.rm3l.devfeed.common.contract.ArticleParsed
 import org.rm3l.devfeed.common.contract.Screenshot
 import org.rm3l.devfeed.common.utils.asSupportedTimestamp
+import org.rm3l.devfeed.common.utils.normalizeTag
 import org.rm3l.devfeed.persistence.DevFeedDao
 import org.slf4j.LoggerFactory
 
@@ -361,8 +362,7 @@ class DevFeedRdbmsDao(
 
       article.tags
           ?.filterNotNull()
-          ?.map { articleTag -> articleTag.lowercase().trim().replace("\\s".toRegex(), "-") }
-          ?.map { articleTag -> if (articleTag.startsWith("#")) articleTag else "#$articleTag" }
+          ?.map { it.normalizeTag() }
           ?.map { articleTag ->
             if (!existTagByName(articleTag)) {
               Tags.insert { it[name] = articleTag }
