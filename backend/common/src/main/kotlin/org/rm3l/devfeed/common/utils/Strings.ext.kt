@@ -33,3 +33,15 @@ fun String?.asSupportedTimestamp() =
           LocalDateTime.parse("${it}T12:00:00", DateTimeFormatter.ISO_DATE_TIME)
               .toEpochSecond(ZoneOffset.UTC)
     }
+
+/**
+ * Normalizes a tag by lowercasing it, trimming whitespace, replacing internal whitespace with
+ * dashes, and ensuring it is prefixed with `#`.
+ */
+fun String.normalizeTag(): String =
+    this.lowercase().trim().replace("\\s".toRegex(), "-").let {
+      if (it.startsWith("#")) it else "#$it"
+    }
+
+fun Collection<String?>?.normalizeTags(): Set<String> =
+    this?.filterNotNull()?.map { it.normalizeTag() }?.toSet() ?: emptySet()

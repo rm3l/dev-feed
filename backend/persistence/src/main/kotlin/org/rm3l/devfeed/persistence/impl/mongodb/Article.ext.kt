@@ -31,6 +31,7 @@ import org.litote.kmongo.eq
 import org.litote.kmongo.regex
 import org.rm3l.devfeed.common.contract.Article
 import org.rm3l.devfeed.common.contract.ArticleFilter
+import org.rm3l.devfeed.common.utils.normalizeTags
 
 fun Article.toArticleDocument(): ArticleDocument {
   return ArticleDocument(
@@ -40,7 +41,7 @@ fun Article.toArticleDocument(): ArticleDocument {
       description = this.description,
       url = this.url,
       domain = this.domain,
-      tags = this.tags?.map { if (it?.startsWith("#") == true) it else "#$it" }?.toSet(),
+      tags = this.tags.normalizeTags(),
       screenshotData = this.screenshot?.data,
       screenshotMimeType = this.screenshot?.mimeType,
       screenshotWidth = this.screenshot?.width,
@@ -78,11 +79,7 @@ fun ArticleFilter?.toBsonFilters(): List<Bson>? {
   }
   if (!this.tags.isNullOrEmpty()) {
     mutableFilterList.add(
-        Filters.or(
-            this.tags!!
-                .map { if (it.startsWith("#") == true) it else "#$it" }
-                .map { ArticleDocument::tags contains it }
-                .toList()))
+        Filters.or(this.tags.normalizeTags().map { ArticleDocument::tags contains it }.toList()))
   }
   if (this.search != null) {
     mutableFilterList.add(

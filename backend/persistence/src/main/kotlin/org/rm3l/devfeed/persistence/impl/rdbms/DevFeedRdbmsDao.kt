@@ -41,6 +41,7 @@ import org.jetbrains.exposed.sql.Table
 import org.jetbrains.exposed.sql.and
 import org.jetbrains.exposed.sql.deleteWhere
 import org.jetbrains.exposed.sql.insert
+import org.jetbrains.exposed.sql.lowerCase
 import org.jetbrains.exposed.sql.not
 import org.jetbrains.exposed.sql.or
 import org.jetbrains.exposed.sql.select
@@ -53,6 +54,7 @@ import org.rm3l.devfeed.common.contract.ArticleFilter
 import org.rm3l.devfeed.common.contract.ArticleParsed
 import org.rm3l.devfeed.common.contract.Screenshot
 import org.rm3l.devfeed.common.utils.asSupportedTimestamp
+import org.rm3l.devfeed.common.utils.normalizeTag
 import org.rm3l.devfeed.persistence.DevFeedDao
 import org.slf4j.LoggerFactory
 
@@ -188,7 +190,7 @@ class DevFeedRdbmsDao(
       throw java.lang.IllegalStateException("Datasource is closed")
     }
     var result = false
-    transaction { result = !Tags.select { Tags.name.eq(name) }.empty() }
+    transaction { result = !Tags.select { Tags.name.lowerCase() eq name.lowercase() }.empty() }
     return result
   }
 
@@ -360,8 +362,7 @@ class DevFeedRdbmsDao(
 
       article.tags
           ?.filterNotNull()
-          ?.map { articleTag -> articleTag.lowercase().trim().replace("\\s".toRegex(), "-") }
-          ?.map { articleTag -> if (articleTag.startsWith("#")) articleTag else "#$articleTag" }
+          ?.map { it.normalizeTag() }
           ?.map { articleTag ->
             if (!existTagByName(articleTag)) {
               Tags.insert { it[name] = articleTag }
@@ -818,7 +819,7 @@ class DevFeedRdbmsDao(
           if (search != null && search.isNotEmpty()) {
             var searchOp: Op<Boolean> = Op.TRUE
             for (tag in search) {
-              searchOp = searchOp.or(Tags.name.like("%$tag%"))
+              searchOp = searchOp.or(Tags.name.lowerCase() like "%${tag.lowercase()}%")
             }
             tagNameSlice.select { searchOp }
           } else {
