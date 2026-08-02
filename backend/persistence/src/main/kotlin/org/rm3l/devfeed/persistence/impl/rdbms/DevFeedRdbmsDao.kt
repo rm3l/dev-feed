@@ -189,9 +189,7 @@ class DevFeedRdbmsDao(
       throw java.lang.IllegalStateException("Datasource is closed")
     }
     var result = false
-    transaction {
-      result = !Tags.select { Tags.name.lowerCase() eq name.lowercase() }.empty()
-    }
+    transaction { result = !Tags.select { Tags.name.lowerCase() eq name.lowercase() }.empty() }
     return result
   }
 
