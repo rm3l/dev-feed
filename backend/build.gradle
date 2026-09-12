@@ -144,7 +144,7 @@ subprojects {
 
         //JDBC Drivers
         implementation 'org.xerial:sqlite-jdbc:3.53.4.0'
-        implementation 'com.h2database:h2:2.4.240'
+        implementation 'com.h2database:h2:2.5.250'
         implementation 'org.postgresql:postgresql:42.7.13'
         implementation 'org.mariadb.jdbc:mariadb-java-client:3.5.10'
 
