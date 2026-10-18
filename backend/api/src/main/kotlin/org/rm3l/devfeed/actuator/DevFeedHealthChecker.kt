@@ -26,8 +26,8 @@ package org.rm3l.devfeed.actuator
 
 import org.rm3l.devfeed.persistence.DevFeedDao
 import org.slf4j.LoggerFactory
-import org.springframework.boot.actuate.health.Health
-import org.springframework.boot.actuate.health.HealthIndicator
+import org.springframework.boot.health.Health
+import org.springframework.boot.health.HealthIndicator
 import org.springframework.stereotype.Service
 
 @Service
