@@ -17,7 +17,9 @@ updates:
     day: "saturday"
     time: '04:00'
 - package-ecosystem: gradle
-  directory: "/mobile/android/app"
+  directories:
+  - "/mobile/android"
+  - "/mobile/android/app"
   schedule:
     interval: weekly
     day: "saturday"
@@ -25,8 +27,23 @@ updates:
   open-pull-requests-limit: 10
   labels:
   - dependencies
+  groups:
+    mobile-gradle:
+      patterns:
+      - "*"
 - package-ecosystem: gradle
-  directory: "/mobile/android"
+  directories:
+  - "/backend"
+  - "/backend/api"
+  - "/backend/article-parser"
+  - "/backend/common"
+  - "/backend/crawlers/common"
+  - "/backend/crawlers/cli"
+  - "/backend/crawlers/discoverdev.io"
+  - "/backend/crawlers/engineeringblogs.xyz"
+  - "/backend/crawlers/rm3l.org"
+  - "/backend/persistence"
+  - "/backend/screenshot"
   schedule:
     interval: weekly
     day: "saturday"
@@ -34,105 +51,17 @@ updates:
   open-pull-requests-limit: 10
   labels:
   - dependencies
-- package-ecosystem: gradle
-  directory: "/backend"
-  schedule:
-    interval: weekly
-    day: "saturday"
-    time: '04:00'
-  open-pull-requests-limit: 10
-  labels:
-  - dependencies
-- package-ecosystem: gradle
-  directory: "/backend/api"
-  schedule:
-    interval: weekly
-    day: "saturday"
-    time: '04:00'
-  open-pull-requests-limit: 10
-  labels:
-  - dependencies
-- package-ecosystem: gradle
-  directory: "/backend/article-parser"
-  schedule:
-    interval: weekly
-    day: "saturday"
-    time: '04:00'
-  open-pull-requests-limit: 10
-  labels:
-  - dependencies
-- package-ecosystem: gradle
-  directory: "/backend/common"
-  schedule:
-    interval: weekly
-    day: "saturday"
-    time: '04:00'
-  open-pull-requests-limit: 10
-  labels:
-  - dependencies
-- package-ecosystem: gradle
-  directory: "/backend/crawlers/common"
-  schedule:
-    interval: weekly
-    day: "saturday"
-    time: '04:00'
-  open-pull-requests-limit: 10
-  labels:
-  - dependencies
-- package-ecosystem: gradle
-  directory: "/backend/crawlers/cli"
-  schedule:
-    interval: weekly
-    day: "saturday"
-    time: '04:00'
-  open-pull-requests-limit: 10
-  labels:
-  - dependencies
-- package-ecosystem: gradle
-  directory: "/backend/crawlers/discoverdev.io"
-  schedule:
-    interval: weekly
-    day: "saturday"
-    time: '04:00'
-  open-pull-requests-limit: 10
-  labels:
-  - dependencies
-- package-ecosystem: gradle
-  directory: "/backend/crawlers/engineeringblogs.xyz"
-  schedule:
-    interval: weekly
-    day: "saturday"
-    time: '04:00'
-  open-pull-requests-limit: 10
-  labels:
-  - dependencies
-- package-ecosystem: gradle
-  directory: "/backend/crawlers/rm3l.org"
-  schedule:
-    interval: weekly
-    day: "saturday"
-    time: '04:00'
-  open-pull-requests-limit: 10
-  labels:
-  - dependencies
-- package-ecosystem: gradle
-  directory: "/backend/persistence"
-  schedule:
-    interval: weekly
-    day: "saturday"
-    time: '04:00'
-  open-pull-requests-limit: 10
-  labels:
-  - dependencies
-- package-ecosystem: gradle
-  directory: "/backend/screenshot"
-  schedule:
-    interval: weekly
-    day: "saturday"
-    time: '04:00'
-  open-pull-requests-limit: 10
-  labels:
-  - dependencies
+  groups:
+    backend-kotlin:
+      patterns:
+      - "org.jetbrains.kotlin*"
+      - "org.jetbrains.kotlinx*"
+    backend-spring:
+      patterns:
+      - "org.springframework*"
+    backend-other:
+      patterns:
+      - "*"
 - package-ecosystem: docker
   directory: "/backend"
   schedule:
