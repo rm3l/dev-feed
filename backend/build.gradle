@@ -96,15 +96,15 @@ subprojects {
 
     compileKotlin {
         kotlinOptions {
-            languageVersion = "1.6"
-            freeCompilerArgs = ["-Xjsr305=strict", "-Xopt-in=kotlin.RequiresOptIn"]
+            languageVersion = "2.0"
+            freeCompilerArgs = ["-Xjsr305=strict", "-opt-in=kotlin.RequiresOptIn"]
             jvmTarget = JavaVersion.VERSION_17.majorVersion
         }
     }
     compileTestKotlin {
         kotlinOptions {
-            languageVersion = "1.6"
-            freeCompilerArgs = ["-Xjsr305=strict", "-Xopt-in=kotlin.RequiresOptIn"]
+            languageVersion = "2.0"
+            freeCompilerArgs = ["-Xjsr305=strict", "-opt-in=kotlin.RequiresOptIn"]
             jvmTarget = JavaVersion.VERSION_17.majorVersion
         }
     }
