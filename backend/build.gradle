@@ -137,8 +137,8 @@ subprojects {
 
         implementation("org.jsoup:jsoup:1.23.2")
 
-        implementation("org.jetbrains.exposed:exposed-dao:0.39.2")
-        implementation("org.jetbrains.exposed:exposed-jdbc:0.39.2")
+        implementation("org.jetbrains.exposed:exposed-dao:1.6.0")
+        implementation("org.jetbrains.exposed:exposed-jdbc:1.6.0")
 
         implementation 'com.zaxxer:HikariCP:7.1.0'
 
@@ -146,7 +146,7 @@ subprojects {
         implementation 'org.xerial:sqlite-jdbc:3.53.4.0'
         implementation 'com.h2database:h2:2.5.252'
         implementation 'org.postgresql:postgresql:42.7.14'
-        implementation 'org.mariadb.jdbc:mariadb-java-client:3.5.10'
+        implementation 'org.mariadb.jdbc:mariadb-java-client:4.0.0'
 
         implementation "io.ktor:ktor-client-core:$ktor_version"
         //Using Apache Engine Ktor engine, because it is at this time the only one that supports following redirects
